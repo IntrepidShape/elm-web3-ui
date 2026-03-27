@@ -1,0 +1,423 @@
+/* =============================================================
+   elm-web3-ui — Brutalist Skin
+   Neobrutalism: thick borders, flat shadows, stark contrast,
+   raw typography. Growing aesthetic in indie and web3 apps.
+   Zero external dependencies.
+
+   Override --brut-accent and --brut-shadow for your palette:
+     :root {
+       --brut-accent:  #ff6b35;   /* orange */
+       --brut-shadow:  #000000;
+     }
+   ============================================================= */
+
+:root {
+  --brut-bg:        #ffffff;
+  --brut-fg:        #000000;
+  --brut-accent:    #ffd60a;   /* yellow — change freely */
+  --brut-accent-2:  #ff006e;
+  --brut-success:   #06d6a0;
+  --brut-warning:   #ffb703;
+  --brut-danger:    #ef233c;
+  --brut-border:    3px solid #000000;
+  --brut-shadow:    4px 4px 0 #000000;
+  --brut-radius:    0px;
+  --brut-mono:      ui-monospace, SFMono-Regular, Menlo, "Courier New", monospace;
+}
+
+/* ----- Reset helpers --------------------------------------- */
+
+.web3-connect-btn,
+.web3-disconnect-btn,
+.web3-action-btn,
+.web3-sign-btn,
+.web3-wallet-option {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1.25rem;
+  font-family: inherit;
+  font-size: 0.875rem;
+  font-weight: 700;
+  line-height: 1.5;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  border-radius: var(--brut-radius);
+  border: var(--brut-border);
+  cursor: pointer;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: box-shadow 0.1s ease, transform 0.1s ease;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.web3-connect-btn:hover:not(:disabled),
+.web3-disconnect-btn:hover,
+.web3-action-btn:hover:not(:disabled),
+.web3-sign-btn:hover:not(:disabled),
+.web3-wallet-option:hover {
+  box-shadow: none;
+  transform: translate(4px, 4px);
+}
+
+.web3-connect-btn:focus-visible,
+.web3-disconnect-btn:focus-visible,
+.web3-action-btn:focus-visible,
+.web3-sign-btn:focus-visible,
+.web3-wallet-option:focus-visible {
+  outline: 3px solid var(--brut-accent-2);
+  outline-offset: 2px;
+}
+
+/* ----- Connect Button -------------------------------------- */
+
+.web3-connect-btn {
+  background-color: var(--brut-accent);
+  color: var(--brut-fg);
+  box-shadow: var(--brut-shadow);
+}
+
+.web3-connect-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
+/* ----- Disconnect Button ----------------------------------- */
+
+.web3-disconnect-btn {
+  background-color: var(--brut-bg);
+  color: var(--brut-fg);
+  box-shadow: var(--brut-shadow);
+}
+
+/* ----- Wallet State Container ------------------------------ */
+
+.web3-wallet-state {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+/* ----- Wallet Picker --------------------------------------- */
+
+.web3-wallet-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  min-width: 240px;
+  background-color: var(--brut-bg);
+  border: var(--brut-border);
+  box-shadow: 6px 6px 0 var(--brut-fg);
+}
+
+.web3-wallet-option {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  background-color: var(--brut-bg);
+  color: var(--brut-fg);
+  border: none;
+  border-bottom: var(--brut-border);
+  border-radius: 0;
+  text-align: left;
+  cursor: pointer;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  box-shadow: none;
+  transform: none;
+  transition: background-color 0.1s ease;
+  text-transform: none;
+}
+
+.web3-wallet-option:last-child {
+  border-bottom: none;
+}
+
+.web3-wallet-option:hover {
+  background-color: var(--brut-accent);
+  box-shadow: none;
+  transform: none;
+}
+
+.web3-wallet-option img {
+  width: 1.5rem;
+  height: 1.5rem;
+  border: 2px solid var(--brut-fg);
+  flex-shrink: 0;
+}
+
+/* ----- Chain Badge ----------------------------------------- */
+
+.web3-chain-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.625rem;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  background-color: var(--brut-accent);
+  color: var(--brut-fg);
+  border: 2px solid var(--brut-fg);
+  border-radius: 0;
+  white-space: nowrap;
+  box-shadow: 2px 2px 0 var(--brut-fg);
+}
+
+/* ----- Transaction Badge ----------------------------------- */
+
+.web3-tx-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.625rem;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  border: 2px solid var(--brut-fg);
+  border-radius: 0;
+  white-space: nowrap;
+  box-shadow: 2px 2px 0 var(--brut-fg);
+}
+
+.web3-tx-badge--idle {
+  background-color: #e5e5e5;
+  color: var(--brut-fg);
+}
+
+.web3-tx-badge--pending {
+  background-color: var(--brut-warning);
+  color: var(--brut-fg);
+}
+
+.web3-tx-badge--confirmed {
+  background-color: var(--brut-success);
+  color: var(--brut-fg);
+}
+
+.web3-tx-badge--failed {
+  background-color: var(--brut-danger);
+  color: #ffffff;
+}
+
+.web3-tx-badge--rejected {
+  background-color: #e5e5e5;
+  color: var(--brut-fg);
+}
+
+/* ----- Action Button --------------------------------------- */
+
+.web3-action-btn {
+  background-color: var(--brut-accent);
+  color: var(--brut-fg);
+  box-shadow: var(--brut-shadow);
+}
+
+.web3-action-btn--pending,
+.web3-action-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
+/* ----- Transaction Hash Link ------------------------------- */
+
+.web3-tx-link {
+  font-family: var(--brut-mono);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--brut-fg);
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
+}
+
+.web3-tx-link:hover {
+  background-color: var(--brut-accent);
+}
+
+/* ----- Receipt --------------------------------------------- */
+
+.web3-receipt {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  background-color: var(--brut-bg);
+  border: var(--brut-border);
+  box-shadow: var(--brut-shadow);
+  font-size: 0.875rem;
+}
+
+.web3-receipt--success {
+  border-color: #000000;
+  background-color: var(--brut-success);
+}
+
+.web3-receipt--failed {
+  border-color: #000000;
+  background-color: var(--brut-danger);
+  color: #ffffff;
+}
+
+.web3-receipt-field {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 0.875rem;
+  border-bottom: 2px solid var(--brut-fg);
+  font-family: var(--brut-mono);
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+.web3-receipt-field:last-child {
+  border-bottom: none;
+}
+
+/* ----- Address Display ------------------------------------- */
+
+.web3-address {
+  font-family: var(--brut-mono);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--brut-fg);
+  text-decoration: none;
+}
+
+a.web3-address {
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+}
+
+a.web3-address:hover {
+  background-color: var(--brut-accent);
+}
+
+/* ----- Balance --------------------------------------------- */
+
+.web3-balance {
+  font-variant-numeric: tabular-nums;
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--brut-fg);
+  letter-spacing: -0.01em;
+}
+
+.web3-balance--loading {
+  background-color: #e5e5e5;
+  color: transparent;
+  border: 2px solid var(--brut-fg);
+  animation: web3-brut-shimmer 1.2s linear infinite;
+  user-select: none;
+  min-width: 5rem;
+  display: inline-block;
+}
+
+@keyframes web3-brut-shimmer {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.5; }
+}
+
+/* ----- Inputs ---------------------------------------------- */
+
+.web3-input-address,
+.web3-input-bigint,
+.web3-input-text,
+.web3-input-bytes {
+  box-sizing: border-box;
+  display: block;
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  font-family: inherit;
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1.5;
+  color: var(--brut-fg);
+  background-color: var(--brut-bg);
+  border: var(--brut-border);
+  border-radius: 0;
+  outline: none;
+  transition: box-shadow 0.1s ease;
+}
+
+.web3-input-address,
+.web3-input-bytes {
+  font-family: var(--brut-mono);
+  font-size: 0.8125rem;
+}
+
+.web3-input-address:focus,
+.web3-input-bigint:focus,
+.web3-input-text:focus,
+.web3-input-bytes:focus {
+  box-shadow: 4px 4px 0 var(--brut-fg);
+}
+
+.web3-input-address--invalid,
+.web3-input-bigint--invalid,
+.web3-input-bytes--invalid {
+  border-color: var(--brut-danger);
+  background-color: #fff0f0;
+}
+
+.web3-input-bool {
+  width: 1.125rem;
+  height: 1.125rem;
+  cursor: pointer;
+  accent-color: var(--brut-fg);
+  border: var(--brut-border);
+}
+
+/* ----- Sign State ------------------------------------------ */
+
+.web3-sign-state {
+  display: inline-block;
+  font-size: 0.875rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--brut-fg);
+}
+
+/* ----- Sign Button ----------------------------------------- */
+
+.web3-sign-btn {
+  background-color: var(--brut-accent-2);
+  color: #ffffff;
+  box-shadow: var(--brut-shadow);
+}
+
+.web3-sign-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
+/* ----- Signature Display ----------------------------------- */
+
+.web3-signature {
+  padding: 0.875rem;
+  background-color: #f5f5f5;
+  border: var(--brut-border);
+  box-shadow: var(--brut-shadow);
+  word-break: break-all;
+}
+
+.web3-signature-value {
+  font-family: var(--brut-mono);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--brut-fg);
+  background: none;
+  padding: 0;
+}
