@@ -31,6 +31,7 @@ Pass `False` to add the `--invalid` modifier class (e.g. after a failed parse).
 import Html exposing (Html)
 import Html.Attributes as Attr
 import Html.Events as Events
+import Web3.Ui.Address as Address
 
 
 {-| Text input for Ethereum address entry (`0x…`).
@@ -44,27 +45,8 @@ address :
     List (Html.Attribute msg)
     -> { value : String, onInput : String -> msg, valid : Bool }
     -> Html msg
-address attrs opts =
-    let
-        invalidClass =
-            if opts.valid then
-                []
-
-            else
-                [ Attr.class "web3-input-address--invalid" ]
-    in
-    Html.input
-        ([ Attr.class "web3-input-address"
-         , Attr.type_ "text"
-         , Attr.attribute "inputmode" "text"
-         , Attr.placeholder "0x…"
-         , Attr.value opts.value
-         , Events.onInput opts.onInput
-         ]
-            ++ invalidClass
-            ++ attrs
-        )
-        []
+address =
+    Address.input
 
 
 {-| Text input for a BigInt / uint256 value.
