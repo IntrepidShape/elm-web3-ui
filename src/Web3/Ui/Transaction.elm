@@ -24,8 +24,9 @@ Pattern-match on `Tx.Status` to render appropriate UI without missing any state.
         hash
 
     -- Hash link extracted from status (Nothing when no hash available):
+    -- Pass Nothing for explorerUrl in local dev — renders a plain span instead of a dead link.
     Web3.Ui.Transaction.statusHashLink []
-        { explorerUrl = "https://etherscan.io/tx/" }
+        { explorerUrl = Just "https://etherscan.io/tx/" }
         tx.status
 
     -- Confirmed receipt display:
@@ -160,30 +161,58 @@ txHashLink attrs opts hash =
         [ Html.text short ]
 
 
-{-| Extract a hash link from a `Tx.Status`. Returns `Nothing` when there is no
-hash (Idle, AwaitingSignature, Failed, Rejected).
+{-| Extract a hash display from a `Tx.Status`. Returns `Nothing` when there is
+no hash (Idle, AwaitingSignature, Failed, Rejected).
 
-Delegates to `txHashLink` so truncation, `rel`, and `target` stay in one place.
+When `explorerUrl` is `Just url`, renders a clickable `<a>` link.
+When `explorerUrl` is `Nothing` (e.g. local Anvil dev), renders a plain
+`<span class="web3-tx-hash">` with the truncated hash instead of a dead link.
 
 -}
 statusHashLink :
     List (Html.Attribute msg)
-    -> { explorerUrl : String }
+    -> { explorerUrl : Maybe String }
     -> Tx.Status
     -> Maybe (Html msg)
 statusHashLink attrs opts status =
     case status of
         Tx.Submitted hash ->
-            Just (txHashLink attrs opts hash)
+            Just (hashDisplay attrs opts hash)
 
         Tx.Confirming hash _ ->
-            Just (txHashLink attrs opts hash)
+            Just (hashDisplay attrs opts hash)
 
         Tx.Confirmed receipt ->
-            Just (txHashLink attrs opts receipt.txHash)
+            Just (hashDisplay attrs opts receipt.txHash)
 
         _ ->
             Nothing
+
+
+hashDisplay : List (Html.Attribute msg) -> { explorerUrl : Maybe String } -> T.TxHash -> Html msg
+hashDisplay attrs opts hash =
+    let
+        full =
+            T.txHashToString hash
+
+        label =
+            String.left 6 full ++ "…" ++ String.right 4 full
+    in
+    case opts.explorerUrl of
+        Just url ->
+            Html.a
+                (Attr.class "web3-tx-link"
+                    :: Attr.href (url ++ full)
+                    :: Attr.target "_blank"
+                    :: Attr.rel "noopener noreferrer"
+                    :: attrs
+                )
+                [ Html.text label ]
+
+        Nothing ->
+            Html.span
+                (Attr.class "web3-tx-hash" :: attrs)
+                [ Html.text label ]
 
 
 {-| Display a confirmed transaction receipt.

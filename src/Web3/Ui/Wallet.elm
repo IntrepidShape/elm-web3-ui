@@ -85,28 +85,40 @@ connectButton attrs callbacks state =
 
 {-| A list of EIP-6963 discovered wallets for the user to pick from.
 
-Each wallet renders as a button with the wallet icon and name.
+Each wallet renders as a button with the wallet icon and name. Pass the RDNS of
+the currently active wallet as `selected` to highlight it.
 
-CSS classes: `web3-wallet-picker` (container), `web3-wallet-option` (each item)
+CSS classes: `web3-wallet-picker` (container), `web3-wallet-option` (each item),
+`web3-wallet-option--selected` (active wallet)
 
 -}
 walletPicker :
     List (Html.Attribute msg)
-    -> (String -> msg)
+    -> { onSelect : String -> msg, selected : Maybe String }
     -> List Wallet.WalletProvider
     -> Html msg
-walletPicker attrs onSelect providers =
+walletPicker attrs opts providers =
     Html.div
         (Attr.class "web3-wallet-picker" :: attrs)
-        (List.map (viewWalletOption onSelect) providers)
+        (List.map (viewWalletOption opts) providers)
 
 
-viewWalletOption : (String -> msg) -> Wallet.WalletProvider -> Html msg
-viewWalletOption onSelect provider =
+viewWalletOption : { onSelect : String -> msg, selected : Maybe String } -> Wallet.WalletProvider -> Html msg
+viewWalletOption opts provider =
+    let
+        selectedClass =
+            if opts.selected == Just provider.rdns then
+                [ Attr.class "web3-wallet-option--selected" ]
+
+            else
+                []
+    in
     Html.button
-        [ Attr.class "web3-wallet-option"
-        , Events.onClick (onSelect provider.rdns)
-        ]
+        ([ Attr.class "web3-wallet-option"
+         , Events.onClick (opts.onSelect provider.rdns)
+         ]
+            ++ selectedClass
+        )
         [ Html.img [ Attr.src provider.icon, Attr.alt provider.name ] []
         , Html.span [] [ Html.text provider.name ]
         ]

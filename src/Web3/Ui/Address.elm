@@ -1,6 +1,7 @@
 module Web3.Ui.Address exposing
     ( view
     , short
+    , shortWith
     , input
     )
 
@@ -14,6 +15,10 @@ module Web3.Ui.Address exposing
     -- Truncated address string (pure, no Html):
     Web3.Ui.Address.short addr  --> "0x1234…abcd"
 
+    -- Truncated with custom lengths (e.g. token detail page):
+    Web3.Ui.Address.shortWith { prefixChars = 8, suffixChars = 6 } addr
+    --> "0x123456…789abc"
+
     -- Address text input:
     Web3.Ui.Address.input []
         { value = model.addressInput
@@ -21,7 +26,7 @@ module Web3.Ui.Address exposing
         , valid = True
         }
 
-@docs view, short, input
+@docs view, short, shortWith, input
 
 -}
 
@@ -70,12 +75,29 @@ view attrs opts addr =
 
 -}
 short : T.Address -> String
-short addr =
+short =
+    shortWith { prefixChars = 6, suffixChars = 4 }
+
+
+{-| Truncate an address with configurable prefix and suffix lengths.
+
+`prefixChars` is the total number of leading characters including `"0x"`.
+`suffixChars` is the number of trailing hex characters.
+
+    shortWith { prefixChars = 6, suffixChars = 4 } addr
+    --> "0x1234…abcd"   (same as short)
+
+    shortWith { prefixChars = 8, suffixChars = 6 } addr
+    --> "0x123456…789abc"
+
+-}
+shortWith : { prefixChars : Int, suffixChars : Int } -> T.Address -> String
+shortWith opts addr =
     let
         s =
             T.addressToString addr
     in
-    String.left 6 s ++ "…" ++ String.right 4 s
+    String.left opts.prefixChars s ++ "…" ++ String.right opts.suffixChars s
 
 
 {-| A text input for address entry. Adds `web3-input-address--invalid` class
