@@ -1,0 +1,217 @@
+module Web3.Ui.Wallet exposing
+    ( connectButton
+    , walletPicker
+    , viewState
+    , chainBadge
+    )
+
+{-| Wallet connection UI components.
+
+All functions accept `List (Html.Attribute msg)` as the first argument — merged
+onto the root element. Pass `[]` for no extra attributes.
+
+No default styles — every element has a semantic class name. Supply your own CSS.
+
+    -- Basic connect/disconnect button:
+    Web3.Ui.Wallet.connectButton []
+        { onConnect = ConnectWallet, onDisconnect = DisconnectWallet }
+        model.wallet
+
+    -- Full wallet UI handling all states:
+    Web3.Ui.Wallet.viewState []
+        { onConnect = ConnectWallet
+        , onSwitchChain = SwitchChain
+        , onDisconnect = DisconnectWallet
+        }
+        model.wallet
+
+@docs connectButton, walletPicker, viewState, chainBadge
+
+-}
+
+import Html exposing (Html)
+import Html.Attributes as Attr
+import Html.Events as Events
+import Web3.Chain as Chain exposing (Chain)
+import Web3.Types as T
+import Web3.Wallet as Wallet
+
+
+{-| A connect/disconnect button. Shows "Connect" in disconnected/error states
+and "Disconnect" in connected states.
+
+CSS classes: `web3-connect-btn`, `web3-disconnect-btn`
+
+-}
+connectButton :
+    List (Html.Attribute msg)
+    -> { onConnect : msg, onDisconnect : msg }
+    -> Wallet.State
+    -> Html msg
+connectButton attrs callbacks state =
+    case state of
+        Wallet.Connected _ ->
+            Html.button
+                (Attr.class "web3-disconnect-btn" :: Events.onClick callbacks.onDisconnect :: attrs)
+                [ Html.text "Disconnect" ]
+
+        Wallet.WrongChain _ _ ->
+            Html.button
+                (Attr.class "web3-disconnect-btn" :: Events.onClick callbacks.onDisconnect :: attrs)
+                [ Html.text "Disconnect" ]
+
+        Wallet.ReadOnly ->
+            Html.button
+                (Attr.class "web3-connect-btn" :: Events.onClick callbacks.onConnect :: attrs)
+                [ Html.text "Connect" ]
+
+        Wallet.Connecting ->
+            Html.button
+                (Attr.class "web3-connect-btn" :: Attr.disabled True :: attrs)
+                [ Html.text "Connecting…" ]
+
+        Wallet.Disconnected ->
+            Html.button
+                (Attr.class "web3-connect-btn" :: Events.onClick callbacks.onConnect :: attrs)
+                [ Html.text "Connect" ]
+
+        Wallet.Error _ ->
+            Html.button
+                (Attr.class "web3-connect-btn" :: Events.onClick callbacks.onConnect :: attrs)
+                [ Html.text "Connect" ]
+
+
+{-| A list of EIP-6963 discovered wallets for the user to pick from.
+
+Each wallet renders as a button with the wallet icon and name.
+
+CSS classes: `web3-wallet-picker` (container), `web3-wallet-option` (each item)
+
+-}
+walletPicker :
+    List (Html.Attribute msg)
+    -> (String -> msg)
+    -> List Wallet.WalletProvider
+    -> Html msg
+walletPicker attrs onSelect providers =
+    Html.div
+        (Attr.class "web3-wallet-picker" :: attrs)
+        (List.map (viewWalletOption onSelect) providers)
+
+
+viewWalletOption : (String -> msg) -> Wallet.WalletProvider -> Html msg
+viewWalletOption onSelect provider =
+    Html.button
+        [ Attr.class "web3-wallet-option"
+        , Events.onClick (onSelect provider.rdns)
+        ]
+        [ Html.img [ Attr.src provider.icon, Attr.alt provider.name ] []
+        , Html.span [] [ Html.text provider.name ]
+        ]
+
+
+{-| Full wallet UI — handles all `Wallet.State` variants with appropriate labels
+and actions.
+
+CSS class: `web3-wallet-state`
+
+-}
+viewState :
+    List (Html.Attribute msg)
+    -> { onConnect : msg, onSwitchChain : msg, onDisconnect : msg }
+    -> Wallet.State
+    -> Html msg
+viewState attrs callbacks state =
+    Html.div
+        (Attr.class "web3-wallet-state" :: attrs)
+        (case state of
+            Wallet.Disconnected ->
+                [ Html.button
+                    [ Attr.class "web3-connect-btn", Events.onClick callbacks.onConnect ]
+                    [ Html.text "Connect Wallet" ]
+                ]
+
+            Wallet.ReadOnly ->
+                [ Html.span [] [ Html.text "Read-only mode" ]
+                , Html.button
+                    [ Attr.class "web3-connect-btn", Events.onClick callbacks.onConnect ]
+                    [ Html.text "Connect Wallet" ]
+                ]
+
+            Wallet.Connecting ->
+                [ Html.span [] [ Html.text "Connecting…" ] ]
+
+            Wallet.Connected info ->
+                [ Html.span [] [ Html.text (shortAddress info.address) ]
+                , Html.button
+                    [ Attr.class "web3-disconnect-btn", Events.onClick callbacks.onDisconnect ]
+                    [ Html.text "Disconnect" ]
+                ]
+
+            Wallet.WrongChain _ _ ->
+                [ Html.span [] [ Html.text "Wrong network" ]
+                , Html.button
+                    [ Attr.class "web3-action-btn", Events.onClick callbacks.onSwitchChain ]
+                    [ Html.text "Switch Network" ]
+                ]
+
+            Wallet.Error err ->
+                [ Html.span [] [ Html.text ("Error: " ++ err) ]
+                , Html.button
+                    [ Attr.class "web3-connect-btn", Events.onClick callbacks.onConnect ]
+                    [ Html.text "Retry" ]
+                ]
+        )
+
+
+{-| Displays the connected chain name, looked up from the supplied chain list.
+Falls back to "Unknown Chain" if not found.
+
+Shows "Wrong Chain" when in `WrongChain` state.
+Shows nothing (empty span) when disconnected.
+
+CSS class: `web3-chain-badge`
+
+-}
+chainBadge :
+    List (Html.Attribute msg)
+    -> List Chain
+    -> Wallet.State
+    -> Html msg
+chainBadge attrs knownChains state =
+    let
+        label =
+            case state of
+                Wallet.Connected info ->
+                    lookupChainName knownChains info.chainId
+
+                Wallet.WrongChain _ _ ->
+                    "Wrong Chain"
+
+                Wallet.ReadOnly ->
+                    ""
+
+                _ ->
+                    ""
+    in
+    Html.span
+        (Attr.class "web3-chain-badge" :: attrs)
+        [ Html.text label ]
+
+
+lookupChainName : List Chain -> T.ChainId -> String
+lookupChainName chains cid =
+    chains
+        |> List.filter (\c -> T.chainIdToInt (Chain.chainId c) == T.chainIdToInt cid)
+        |> List.head
+        |> Maybe.map Chain.name
+        |> Maybe.withDefault "Unknown Chain"
+
+
+shortAddress : T.Address -> String
+shortAddress addr =
+    let
+        s =
+            T.addressToString addr
+    in
+    String.left 6 s ++ "…" ++ String.right 4 s
