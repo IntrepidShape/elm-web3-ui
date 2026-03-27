@@ -1,6 +1,7 @@
 module Web3.Ui.Sign exposing
     ( stateView
     , signButton
+    , signatureView
     )
 
 {-| Signing lifecycle UI components.
@@ -16,7 +17,10 @@ any state.
         { label = "Sign Permit", onSign = RequestSign }
         model.signState
 
-@docs stateView, signButton
+    -- Display the signature once signed:
+    Web3.Ui.Sign.signatureView [] model.signState
+
+@docs stateView, signButton, signatureView
 
 -}
 
@@ -90,3 +94,27 @@ signButton attrs opts state =
             ++ attrs
         )
         [ Html.text opts.label ]
+
+
+{-| Displays the signature value when in the `Signed` state.
+
+Returns an empty text node for all other states — safe to always render.
+
+CSS classes: `web3-signature` (wrapper div), `web3-signature-value` (code element)
+
+-}
+signatureView :
+    List (Html.Attribute msg)
+    -> Sign.SignState
+    -> Html msg
+signatureView attrs state =
+    case state of
+        Sign.Signed _ sig ->
+            Html.div
+                (Attr.class "web3-signature" :: attrs)
+                [ Html.code [ Attr.class "web3-signature-value" ]
+                    [ Html.text sig ]
+                ]
+
+        _ ->
+            Html.text ""

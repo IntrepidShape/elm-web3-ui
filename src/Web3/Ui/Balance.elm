@@ -1,6 +1,8 @@
 module Web3.Ui.Balance exposing
     ( view
     , viewEther
+    , viewMaybe
+    , viewEtherMaybe
     )
 
 {-| Balance display components.
@@ -17,7 +19,17 @@ Uses `Web3.Units.formatUnits` / `Web3.Units.formatEther` internally.
         { symbol = "ETH" }
         weiAmount
 
-@docs view, viewEther
+    -- Balance that may not have loaded yet:
+    Web3.Ui.Balance.viewMaybe []
+        { decimals = 6, symbol = "USDC", loading = "…" }
+        model.balance
+
+    -- Ether balance that may not have loaded yet:
+    Web3.Ui.Balance.viewEtherMaybe []
+        { symbol = "ETH", loading = "…" }
+        model.ethBalance
+
+@docs view, viewEther, viewMaybe, viewEtherMaybe
 
 -}
 
@@ -63,3 +75,45 @@ viewEther attrs opts amount =
     Html.span
         (Attr.class "web3-balance" :: attrs)
         [ Html.text (Units.formatEther amount ++ " " ++ opts.symbol) ]
+
+
+{-| Display a token balance that may not have loaded yet.
+
+Shows `opts.loading` with class `web3-balance--loading` while `Nothing`.
+Renders the same as `view` once the balance arrives.
+
+CSS classes: `web3-balance`, `web3-balance--loading` (loading state only)
+
+-}
+viewMaybe :
+    List (Html.Attribute msg)
+    -> { decimals : Int, symbol : String, loading : String }
+    -> Maybe BigInt
+    -> Html msg
+viewMaybe attrs opts amount =
+    case amount of
+        Nothing ->
+            Html.span
+                (Attr.class "web3-balance" :: Attr.class "web3-balance--loading" :: attrs)
+                [ Html.text opts.loading ]
+
+        Just a ->
+            Html.span
+                (Attr.class "web3-balance" :: attrs)
+                [ Html.text (Units.formatUnits opts.decimals a ++ " " ++ opts.symbol) ]
+
+
+{-| Display a Wei balance that may not have loaded yet (18 decimals).
+
+Delegates to `viewMaybe` with `decimals = 18`.
+
+CSS classes: `web3-balance`, `web3-balance--loading` (loading state only)
+
+-}
+viewEtherMaybe :
+    List (Html.Attribute msg)
+    -> { symbol : String, loading : String }
+    -> Maybe BigInt
+    -> Html msg
+viewEtherMaybe attrs opts amount =
+    viewMaybe attrs { decimals = 18, symbol = opts.symbol, loading = opts.loading } amount

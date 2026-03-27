@@ -2,10 +2,15 @@ module WalletUiTest exposing (suite)
 
 import Expect
 import Test exposing (Test, describe, test)
+import Test.Html.Query as Query
+import Test.Html.Selector as Selector
+import Web3.Chain as Chain
+import Web3.Transaction as Tx
 import Web3.Types as T
 import Web3.Ui.Address as Address
 import Web3.Ui.Transaction as TxUi
-import Web3.Transaction as Tx
+import Web3.Ui.Wallet as WalletUi
+import Web3.Wallet as Wallet
 
 
 suite : Test
@@ -56,9 +61,6 @@ suite =
         , describe "Transaction.statusBadge class names"
             [ test "Idle gets --idle modifier" <|
                 \_ ->
-                    -- We test the label text as a proxy for correct branching,
-                    -- since we can't inspect Html attributes directly in elm-test.
-                    -- The label is what drives the modifier selection.
                     let
                         label =
                             txStatusLabel Tx.Idle
@@ -73,6 +75,63 @@ suite =
             , test "Failed carries message" <|
                 \_ ->
                     Expect.equal "Failed" (txStatusLabel (Tx.Failed "out of gas"))
+            ]
+        , describe "chainBadge"
+            [ test "Connected on known chain shows chain name" <|
+                \_ ->
+                    case T.address "0x1234567890abcdef1234567890abcdef12345678" of
+                        Nothing ->
+                            Expect.fail "test fixture: invalid address"
+
+                        Just addr ->
+                            WalletUi.chainBadge []
+                                [ Chain.pulsechain ]
+                                (Wallet.Connected { address = addr, chainId = Chain.chainId Chain.pulsechain })
+                                |> Query.fromHtml
+                                |> Query.has [ Selector.text "PulseChain" ]
+            , test "Connected on unknown chain shows 'Unknown Chain'" <|
+                \_ ->
+                    case T.address "0x1234567890abcdef1234567890abcdef12345678" of
+                        Nothing ->
+                            Expect.fail "test fixture: invalid address"
+
+                        Just addr ->
+                            WalletUi.chainBadge []
+                                [ Chain.pulsechain ]
+                                (Wallet.Connected { address = addr, chainId = T.chainId 9999 })
+                                |> Query.fromHtml
+                                |> Query.has [ Selector.text "Unknown Chain" ]
+            , test "ReadOnly shows 'Read-only'" <|
+                \_ ->
+                    WalletUi.chainBadge [] [] Wallet.ReadOnly
+                        |> Query.fromHtml
+                        |> Query.has [ Selector.text "Read-only" ]
+            , test "Disconnected shows '—'" <|
+                \_ ->
+                    WalletUi.chainBadge [] [] Wallet.Disconnected
+                        |> Query.fromHtml
+                        |> Query.has [ Selector.text "—" ]
+            ]
+        , describe "viewState"
+            [ test "WrongChain shows target chain name" <|
+                \_ ->
+                    case T.address "0x1234567890abcdef1234567890abcdef12345678" of
+                        Nothing ->
+                            Expect.fail "test fixture: invalid address"
+
+                        Just addr ->
+                            WalletUi.viewState []
+                                { onConnect = ()
+                                , onSwitchChain = ()
+                                , onDisconnect = ()
+                                , knownChains = [ Chain.pulsechain ]
+                                }
+                                (Wallet.WrongChain
+                                    { address = addr, chainId = T.chainId 1 }
+                                    (Chain.chainId Chain.pulsechain)
+                                )
+                                |> Query.fromHtml
+                                |> Query.has [ Selector.text "PulseChain" ]
             ]
         ]
 

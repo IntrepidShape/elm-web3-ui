@@ -2,6 +2,8 @@ module Web3.Ui.Transaction exposing
     ( statusBadge
     , actionButton
     , txHashLink
+    , statusHashLink
+    , receiptView
     )
 
 {-| Transaction lifecycle UI components.
@@ -21,7 +23,17 @@ Pattern-match on `Tx.Status` to render appropriate UI without missing any state.
         { explorerUrl = "https://etherscan.io/tx/" }
         hash
 
-@docs statusBadge, actionButton, txHashLink
+    -- Hash link extracted from status (Nothing when no hash available):
+    Web3.Ui.Transaction.statusHashLink []
+        { explorerUrl = "https://etherscan.io/tx/" }
+        tx.status
+
+    -- Confirmed receipt display:
+    Web3.Ui.Transaction.receiptView []
+        { explorerUrl = "https://etherscan.io/tx/" }
+        receipt
+
+@docs statusBadge, actionButton, txHashLink, statusHashLink, receiptView
 
 -}
 
@@ -146,3 +158,63 @@ txHashLink attrs opts hash =
             :: attrs
         )
         [ Html.text short ]
+
+
+{-| Extract a hash link from a `Tx.Status`. Returns `Nothing` when there is no
+hash (Idle, AwaitingSignature, Failed, Rejected).
+
+Delegates to `txHashLink` so truncation, `rel`, and `target` stay in one place.
+
+-}
+statusHashLink :
+    List (Html.Attribute msg)
+    -> { explorerUrl : String }
+    -> Tx.Status
+    -> Maybe (Html msg)
+statusHashLink attrs opts status =
+    case status of
+        Tx.Submitted hash ->
+            Just (txHashLink attrs opts hash)
+
+        Tx.Confirming hash _ ->
+            Just (txHashLink attrs opts hash)
+
+        Tx.Confirmed receipt ->
+            Just (txHashLink attrs opts receipt.txHash)
+
+        _ ->
+            Nothing
+
+
+{-| Display a confirmed transaction receipt.
+
+Root element: `<div class="web3-receipt web3-receipt--success|failed">`
+
+Each field is wrapped in `<div class="web3-receipt-field">`.
+
+CSS classes: `web3-receipt`, `web3-receipt--success`, `web3-receipt--failed`, `web3-receipt-field`
+
+-}
+receiptView :
+    List (Html.Attribute msg)
+    -> { explorerUrl : String }
+    -> Tx.Receipt
+    -> Html msg
+receiptView attrs opts receipt =
+    let
+        modifier =
+            if receipt.status then
+                "web3-receipt--success"
+
+            else
+                "web3-receipt--failed"
+    in
+    Html.div
+        (Attr.class "web3-receipt" :: Attr.class modifier :: attrs)
+        [ Html.div [ Attr.class "web3-receipt-field" ]
+            [ Html.text ("Block: " ++ String.fromInt receipt.blockNumber) ]
+        , Html.div [ Attr.class "web3-receipt-field" ]
+            [ Html.text ("Gas used: " ++ receipt.gasUsed) ]
+        , Html.div [ Attr.class "web3-receipt-field" ]
+            [ txHashLink [] opts receipt.txHash ]
+        ]

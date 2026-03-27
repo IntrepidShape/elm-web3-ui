@@ -12,11 +12,14 @@ Thin wrappers around `Html.input` with semantic class names and appropriate
 `type` / `inputmode` attributes. No validation — the host app calls
 `T.address`, `BigInt.fromString`, etc. on the string value.
 
+The `address`, `bigInt`, and `bytes` inputs accept a `valid : Bool` field.
+Pass `False` to add the `--invalid` modifier class (e.g. after a failed parse).
+
     Web3.Ui.Input.address []
-        { value = model.toAddress, onInput = ToAddressChanged }
+        { value = model.toAddress, onInput = ToAddressChanged, valid = True }
 
     Web3.Ui.Input.bigInt []
-        { value = model.amount, onInput = AmountChanged }
+        { value = model.amount, onInput = AmountChanged, valid = True }
 
     Web3.Ui.Input.bool []
         { value = model.approve, onToggle = ApproveToggled }
@@ -32,14 +35,24 @@ import Html.Events as Events
 
 {-| Text input for Ethereum address entry (`0x…`).
 
+Adds `web3-input-address--invalid` when `valid` is `False`.
+
 CSS class: `web3-input-address`
 
 -}
 address :
     List (Html.Attribute msg)
-    -> { value : String, onInput : String -> msg }
+    -> { value : String, onInput : String -> msg, valid : Bool }
     -> Html msg
 address attrs opts =
+    let
+        invalidClass =
+            if opts.valid then
+                []
+
+            else
+                [ Attr.class "web3-input-address--invalid" ]
+    in
     Html.input
         ([ Attr.class "web3-input-address"
          , Attr.type_ "text"
@@ -48,6 +61,7 @@ address attrs opts =
          , Attr.value opts.value
          , Events.onInput opts.onInput
          ]
+            ++ invalidClass
             ++ attrs
         )
         []
@@ -56,15 +70,24 @@ address attrs opts =
 {-| Text input for a BigInt / uint256 value.
 
 Uses `inputmode="numeric"` to show the numeric keyboard on mobile.
+Adds `web3-input-bigint--invalid` when `valid` is `False`.
 
 CSS class: `web3-input-bigint`
 
 -}
 bigInt :
     List (Html.Attribute msg)
-    -> { value : String, onInput : String -> msg }
+    -> { value : String, onInput : String -> msg, valid : Bool }
     -> Html msg
 bigInt attrs opts =
+    let
+        invalidClass =
+            if opts.valid then
+                []
+
+            else
+                [ Attr.class "web3-input-bigint--invalid" ]
+    in
     Html.input
         ([ Attr.class "web3-input-bigint"
          , Attr.type_ "text"
@@ -72,6 +95,7 @@ bigInt attrs opts =
          , Attr.value opts.value
          , Events.onInput opts.onInput
          ]
+            ++ invalidClass
             ++ attrs
         )
         []
@@ -121,14 +145,24 @@ text attrs opts =
 
 {-| Text input for hex bytes (`0x…`).
 
+Adds `web3-input-bytes--invalid` when `valid` is `False`.
+
 CSS class: `web3-input-bytes`
 
 -}
 bytes :
     List (Html.Attribute msg)
-    -> { value : String, onInput : String -> msg }
+    -> { value : String, onInput : String -> msg, valid : Bool }
     -> Html msg
 bytes attrs opts =
+    let
+        invalidClass =
+            if opts.valid then
+                []
+
+            else
+                [ Attr.class "web3-input-bytes--invalid" ]
+    in
     Html.input
         ([ Attr.class "web3-input-bytes"
          , Attr.type_ "text"
@@ -137,6 +171,7 @@ bytes attrs opts =
          , Attr.value opts.value
          , Events.onInput opts.onInput
          ]
+            ++ invalidClass
             ++ attrs
         )
         []
