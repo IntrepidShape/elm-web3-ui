@@ -275,6 +275,17 @@ The `styles/` directory contains a few optional CSS files if you want something 
 
 None of these are loaded automatically. Copy or import whichever suits your project.
 
+## Made by
+
+Built and maintained by [Intrepid Development](https://intrepiddev.com.au) — a
+Solidity studio in Perth, AU. Pairs with
+[`intrepidshape/elm-web3`](https://github.com/IntrepidShape/elm-web3); both
+ship together.
+
+If your team is using these in production and wants help wiring up dApp UX,
+hardening contracts, or auditing a deployment, reach out at
+[Jake@intrepiddev.com.au](mailto:Jake@intrepiddev.com.au).
+
 ## License
 
 MIT © Intrepid Development

@@ -1,5 +1,19 @@
 # Changelog
 
+## 2.0.1 — 2026-05-09
+
+### Namespace move
+
+Package and repository moved to the `intrepidshape` namespace, where it lives
+alongside the rest of [Intrepid Development](https://intrepiddev.com.au)'s
+open-source work. Dependency on `elm-web3` updated to the new namespace. No
+source changes — `elm install intrepidshape/elm-web3-ui` is a drop-in
+replacement for the prior namespace.
+
+The `bassradian/elm-web3-ui` namespace is no longer maintained.
+
+---
+
 ## 2.0.0 — 2026-03-27
 
 ### New modules

@@ -3,7 +3,7 @@
     "name": "intrepidshape/elm-web3-ui",
     "summary": "UI primitives for elm-web3: wallet, transaction, address, and input components.",
     "license": "MIT",
-    "version": "2.0.0",
+    "version": "2.0.1",
     "exposed-modules": [
         "Web3.Ui.Wallet",
         "Web3.Ui.Transaction",
