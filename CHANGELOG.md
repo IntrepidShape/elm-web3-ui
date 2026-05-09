@@ -1,6 +1,22 @@
 # Changelog
 
-## 2.0.1 — 2026-05-09
+## 1.0.0 — 2026-05-09
+
+First publish of `intrepidshape/elm-web3-ui` on the Elm package registry.
+Published by [Intrepid Development](https://intrepiddev.com.au).
+
+The Elm registry tracks per-namespace versions, so this package starts at
+1.0.0 under the `intrepidshape` namespace. The internal evolution from
+1.0.0 → 2.0.x continued under earlier namespaces (`intrepidshape`,
+`bassradian`) and is preserved as historical CHANGELOG entries below for
+context. The 2.0.1 source content is what shipped here as 1.0.0. Pairs
+with `intrepidshape/elm-web3` ≥ 1.0.0.
+
+The earlier namespaces are no longer maintained.
+
+---
+
+## 2.0.1 (legacy) — 2026-05-09
 
 ### Namespace move
 
@@ -14,7 +30,7 @@ The `bassradian/elm-web3-ui` namespace is no longer maintained.
 
 ---
 
-## 2.0.0 — 2026-03-27
+## 2.0.0 (legacy) — 2026-03-27
 
 ### New modules
 
