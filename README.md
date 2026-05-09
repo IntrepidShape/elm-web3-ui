@@ -277,4 +277,4 @@ None of these are loaded automatically. Copy or import whichever suits your proj
 
 ## License
 
-MIT © intrepidshape
+MIT © Intrepid Development
