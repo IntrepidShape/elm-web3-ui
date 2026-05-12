@@ -1,5 +1,193 @@
 # Changelog
 
+## 1.6.0 — 2026-05-12
+
+### Added — `Web3.Ui.PendingOverlay.viewMultiStep`
+
+Multi-step approve→call overlay for two-stage write flows where the
+approve toast otherwise fades before the call lands (revealed by the
+ audit's "approve→call gap" finding). One overlay shows the
+full sequence — pending · active · done · failed — so the user never
+loses visibility into which stage just reverted.
+
+```elm
+Web3.Ui.PendingOverlay.viewMultiStep []
+    { steps =
+        [ { label = "Approve $TOKEN", state = StepDone }
+        , { label = "Stake $TOKEN", state = StepActive }
+        , { label = "Confirm on-chain", state = StepPending }
+        ]
+    , currentStatus = model.txStatus
+    }
+```
+
+New exports: `viewMultiStep`, `Step`, `StepState(..)`.
+
+Renders an empty node when every step is `StepPending` AND
+`currentStatus = Tx.Idle`, so callers can leave it in the tree
+without per-page guards.
+
+CSS classes: `web3-pending-overlay-multi`, `web3-pending-step`,
+`web3-pending-step--pending/--active/--done/--failed`,
+`web3-pending-step-glyph`, `web3-pending-step-label`,
+`web3-pending-step-reason`.
+
+## 1.5.0 — 2026-05-11
+
+### Added — `Web3.Ui.Transaction.toast`
+
+The composite every dapp re-implements: a labeled transaction toast with
+status-tone styling, hash pill, copy + explorer action buttons, and
+dismiss. Renders all 7 `Tx.Status` cases — including the new structured
+`Failed FailureDetail` shape — from a single call:
+
+```elm
+Web3.Ui.Transaction.toast []
+    { label = "Approving TKN"
+    , explorerTxUrl = Just (Web3.Chain.txUrl Web3.Chain.pulsechain)
+    , onCopyHash = Just CopyAddress
+    , onDismiss = Just DismissTx
+    }
+    model.txStatus
+```
+
+Pass `Nothing` for any optional callback to suppress that affordance —
+useful for read-only environments (no clipboard) or local dev (no explorer).
+The  consumer dropped ~210 LoC of hand-rolled toast plumbing
+adopting it.
+
+### Added — `Web3.Ui.Transaction.humanFailureLabel`
+
+Maps a `Tx.FailureReason` to a one-line human label. Used internally by
+`toast`; exposed so consumers can render the same labels in their own
+custom layouts (badge, modal, banner, …) without re-implementing the
+string-matching.
+
+### Required upgrade — elm-web3 2.x
+
+This release depends on `intrepidshape/elm-web3 2.x` for the new
+`Tx.FailureReason` ADT and `Web3.Chain.txUrl` / `addressUrl` helpers.
+Consumers upgrading from 1.x must bump both `elm-web3` and `elm-web3-ui`
+together.
+
+## 1.4.0 — 2026-05-11
+
+### Added — `Web3.Ui.Wallet.walletMenu`
+
+A composite dropdown for the connected-wallet case: renders the
+`walletPicker` over the current `WalletProvider` list and tacks on a
+"Disconnect" row below. Fixes the common dapp UX bug where clicking the
+connected-address pill hard-wires to `disconnect`, leaving no path to
+switch wallets without a full disconnect → reconnect cycle.
+
+```elm
+Web3.Ui.Wallet.walletMenu []
+    { onSelect = SelectWallet         -- swap to a different injected wallet
+    , onDisconnect = DisconnectWallet -- exit entirely
+    , selected = Just currentRdns     -- optional highlight
+    }
+    model.walletProviders
+```
+
+Renders `.web3-wallet-menu` containing the existing `.web3-wallet-picker`
+plus a `.web3-wallet-menu-disconnect` button — consumers style as desired.
+
+## 1.3.0 — 2026-05-10
+
+### Added — Vote-escrow, NFT-stake, bond, gauge, and fee-flow primitives
+
+Six new generic primitives shipped together. Each one is protocol-agnostic
+(passes the genericity test in `~/.claude/skills/intrepid-elm-web3-frontend/SKILL.md`)
+and accepts `Web3.BigInt.BigInt` + plain numeric configs — no protocol-specific
+naming.
+
+- **`Web3.Ui.VeLock`** — Lock-duration picker for vote-escrow tokens (Curve
+  veCRV, GMX esGMX, veToken, …). Composes `Amount.amountInput` with
+  a step-snapped range slider; live ve-balance projection via the linear-decay
+  formula `amount * lockSec / maxLockSec`.
+- **`Web3.Ui.VeBalanceChart`** — SVG line chart of ve-balance decaying linearly
+  from `nowSec` to `unlockTime`. Educational primitive, mirrors the
+  `BondingCurve.sparkline` pattern.
+- **`Web3.Ui.NFTStakeCard`** — Card for an ERC-721 stake position. Surfaces
+  `tokenId`, two independent countdowns (principal unlock vs. floor-redemption
+  eligibility), pending yield, and four actions (claim / redeem-at-floor /
+  unstake / transfer).
+- **`Web3.Ui.BondCard`** — Card for a fixed-term bond receipt: principal,
+  maturity countdown, pending yield, claim / redeem / roll actions. Generic
+  for any term-deposit primitive.
+- **`Web3.Ui.GaugeRow`** — One row of a vote-escrow gauge list: gauge label,
+  epoch, total votes, total bribes, your share %, APR estimate, plus
+  vote / bribe / claim actions. Generic for Curve-style gauge voting.
+- **`Web3.Ui.FeeFlowDiagram`** — Educational stacked-bar visualization of a
+  fee split. Pairs with `FeeBreakdown` (the table view); use this one for
+  hero-tier "where does my fee go?" graphics. Segments accept a `kind`
+  string emitted as a CSS modifier suffix (`web3-feeflow__seg--ve`, etc.).
+
+### Changed
+
+- `summary` extended to mention vote-escrow, NFT-stake, bond, and gauge
+  primitives.
+
+## 1.2.0 — 2026-05-10
+
+### Added — Generic DeFi UI primitives (modular by design)
+
+Each module is intentionally protocol-agnostic. APIs accept `Web3.BigInt.BigInt`,
+`Web3.Types.Address`, basis-points integers, or generic record configs — never
+protocol-specific naming. Pass the genericity test from
+`~/.claude/skills/intrepid-elm-web3-frontend/SKILL.md`.
+
+- **`Web3.Ui.RelativeTime`** — "2m ago" / "3h ago" / "1d ago" timestamp
+  rendering with absolute-time tooltip.
+- **`Web3.Ui.StatCell`** — label + value + optional delta + sentiment.
+  Use for any analytics row (TVL, APR, floor, volume, etc.).
+- **`Web3.Ui.TradeTabs`** — single-select tab switcher parameterized by your
+  app's tab `id` type. Buy/Sell/Stake on a launchpad, Long/Short on a perp,
+  Mint/Redeem on a vault — same component.
+- **`Web3.Ui.TokenSearch`** — search input emitting change events; consumer
+  owns filter logic.
+- **`Web3.Ui.ProgressRing`** — circular progress for "X% toward Y" KPIs.
+  SVG; styling via CSS.
+- **`Web3.Ui.BondingCurve`** — SVG sparkline of any `A * x^N` curve. Caller
+  supplies `coeffA`, `exponent`, `supply`, `maxSupply`, optional `floorPrice`
+  marker. Generic over any sub-/super-linear issuance model.
+- **`Web3.Ui.ActivityRow`** — one row of an on-chain activity feed with a
+  `Kind` enum (Buy / Sell / Stake / Unstake / Penalty / Create / Graduate /
+  Claim / Other). The `Other String` escape-hatch covers any DeFi event.
+
+### Changed
+
+- `summary` rewritten to emphasize modular DeFi-generic positioning.
+- `dependencies`: added `elm/svg` (used by `ProgressRing` and `BondingCurve`).
+
+## 1.1.0 — 2026-05-10
+
+### Added — DeFi-flavored UI primitives
+
+- **`Web3.Ui.SupplyBar`** — progress bar for supply caps, graduation reserves,
+  vault deposit limits. Optional milestone marker for thresholds.
+- **`Web3.Ui.LockPeriod`** — native range slider for stake-lock-days picker
+  with optional early-exit penalty hint.
+- **`Web3.Ui.HoldClock`** — visual countdown of a graduated-fee tier
+  (e.g., 5% → 1% over N days).
+- **`Web3.Ui.TrendIndicator`** — Up/Neutral/Down arrow with paired buy/sell
+  volume pills; `fromVolumes` derives Trend from a basis-point threshold.
+- **`Web3.Ui.FeeBreakdown`** — multi-slice fee table showing bps + Wei amount
+  per slice + optional recipient address.
+- **`Web3.Ui.SlippageInput`** — preset chips + custom-percent input;
+  `minOutFromBps` helper for slippage-protected `minTokensOut` / `minPlsOut`.
+- **`Web3.Ui.StakeCard`** — generic stake-position card: amount, lock countdown,
+  accrued yield, eligibility badges, claim/unstake actions.
+
+All seven primitives ship with `web3-<module>-*` BEM-ish CSS classes (no inline
+semantic colors), accept `Web3.BigInt.BigInt` and `Web3.Types.Address` directly,
+and follow the existing `Web3.Ui.Amount`-style record-config API shape.
+
+### Changed
+
+- `elm.json` `dependencies`: added `elm/json` (used by `SlippageInput` for the
+  custom-input change handler).
+
 ## 1.0.0 — 2026-05-09
 
 First publish of `intrepidshape/elm-web3-ui` on the Elm package registry.
