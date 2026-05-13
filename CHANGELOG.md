@@ -1,5 +1,42 @@
 # Changelog
 
+## 1.7.0 — 2026-05-13
+
+### Added — DeFi UI surface expansion
+
+Twenty new exposed modules covering the full DeFi frontend surface:
+
+- `Web3.Ui.ActivityRow` — typed activity-feed row (swap / stake / claim / vote).
+- `Web3.Ui.BondCard` — bond-buy card with vesting and discount display.
+- `Web3.Ui.BondingCurve` — bonding-curve plot with current-price marker.
+- `Web3.Ui.FeeBreakdown` — protocol-fee disclosure list (% of headline, never absolute decimals).
+- `Web3.Ui.FeeFlowDiagram` — fee-routing Sankey diagram, SVG.
+- `Web3.Ui.GaugeRow` — gauge-vote row with weight, emissions, voter count.
+- `Web3.Ui.HoldClock` — countdown display for time-locked positions.
+- `Web3.Ui.LockPeriod` — lock-period selector (range slider + presets).
+- `Web3.Ui.NFTStakeCard` — NFT stake card with image, lock, reward APR.
+- `Web3.Ui.ProgressRing` — SVG progress ring for time or completion.
+- `Web3.Ui.RelativeTime` — humanised relative-time renderer ("3m ago", "in 2d").
+- `Web3.Ui.SlippageInput` — slippage-tolerance input with preset chips.
+- `Web3.Ui.StakeCard` — generic stake card: deposit / withdraw / claim / APR.
+- `Web3.Ui.StatCell` — single-stat tile with label, value, unit, delta.
+- `Web3.Ui.SupplyBar` — total-supply / circulating-supply bar with burn segment.
+- `Web3.Ui.TokenSearch` — token search with logo, symbol, balance.
+- `Web3.Ui.TradeTabs` — buy / sell / wrap / unwrap tab selector.
+- `Web3.Ui.TrendIndicator` — typed trend arrow (Up / Flat / Down) with magnitude.
+- `Web3.Ui.VeBalanceChart` — vote-escrow balance decay chart, SVG.
+- `Web3.Ui.VeLock` — vote-escrow lock card with lock-up display.
+
+All follow the existing design rules: plain `Html msg`, attribute passthrough, no internal `Msg`, no subscriptions, semantic class names.
+
+### Changed
+
+- Corrected `intrepidshape/elm-web3` dependency range to `1.0.0 <= v < 2.0.0` (registry-published version line under the `intrepidshape` namespace).
+- README rewrite: leads with the frontend-security positioning, exhaustive benefit list (supply chain, type safety, state machines, auditability, sec-gap closure), tightened "Made by" section.
+- `docs.json` now tracked in repo; regenerated against all 31 exposed modules.
+
+---
+
 ## 1.6.0 — 2026-05-12
 
 ### Added — `Web3.Ui.PendingOverlay.viewMultiStep`

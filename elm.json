@@ -3,7 +3,7 @@
     "name": "intrepidshape/elm-web3-ui",
     "summary": "Modular DeFi UI primitives for elm-web3: wallet, stake, fee, vote, gauge.",
     "license": "MIT",
-    "version": "1.6.0",
+    "version": "1.7.0",
     "exposed-modules": [
         "Web3.Ui.Wallet",
         "Web3.Ui.Transaction",
@@ -43,7 +43,7 @@
         "elm/html": "1.0.0 <= v < 2.0.0",
         "elm/json": "1.1.3 <= v < 2.0.0",
         "elm/svg": "1.0.1 <= v < 2.0.0",
-        "intrepidshape/elm-web3": "2.0.0 <= v < 3.0.0"
+        "intrepidshape/elm-web3": "1.0.0 <= v < 2.0.0"
     },
     "test-dependencies": {
         "elm-explorations/test": "2.2.1 <= v < 3.0.0"
