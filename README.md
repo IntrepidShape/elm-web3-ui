@@ -4,45 +4,7 @@ Type-safe DeFi UI primitives for [elm-web3](https://package.elm-lang.org/package
 
 No internal `Msg`, no subscriptions, no state of their own. You pass the state in, the component renders it, your `msg` comes back. The compiler enforces the rest.
 
-## Why elm-web3-ui
-
-Most DeFi exploits hit the frontend, not the contracts. The JS dapp stack maximises that surface. This lib collapses it.
-
-### Supply chain & JS surface
-- **Next to no JavaScript.** App compiles to one small ES5 artifact. Runtime is ~20 KB.
-- **No React.** No reconciler, no JSX-as-string, no `dangerouslySetInnerHTML`.
-- **No Next.js, no Vite, no Webpack.** No middleware, no SSR proxy, no plugin chain.
-- **No npm dependency tree.** Elm packages are curated; transitive supply-chain attacks have nowhere to land.
-- **No `eval`, no template-string code execution.** Elm has neither primitive.
-- **Reproducible builds.** Same input → byte-identical output. Audit the bundle, ship the bundle.
-- **No mutable globals.** No `window` prototype-pollution surface.
-
-### Type safety where it matters
-- **Addresses are opaque.** You cannot construct an invalid address. Compiler refuses.
-- **BigInt is opaque.** You cannot do float math on wei. Compiler refuses.
-- **Chain IDs are tagged.** You cannot mix mainnet and testnet. Compiler refuses.
-- **No `any`, no casts, no escape hatches.** Anywhere.
-- **Signatures carry their EIP type.** EIP-191, EIP-712, raw — never confused.
-- **Decoders fail typed.** Malformed RPC → typed `Msg`, never a crash.
-
-### State machines, not booleans
-- **Wallet state is a union.** Disconnected, Connecting, Connected, WrongChain — handled or it doesn't compile.
-- **Transaction state is a union.** Idle, Pending, Confirmed, Failed — handled or it doesn't compile.
-- **Signature state is a union.** Same discipline.
-- **Cannot send a tx from a disconnected wallet.** Compile error, not runtime undefined.
-- **Cannot read a balance from the wrong chain.** Compile error, not stale UI.
-
-### Auditable, the way contracts are
-- **Pure functions.** No mocks needed in tests.
-- **Total view functions.** No "what if this prop is undefined" branch.
-- **Single compiled artifact.** What you audit is what you ship.
-- **No async/await footguns.** Cmds are explicit, traced through `update`.
-
-### Closing the frontend security gap
-- Phishing-UI address swaps depend on string-typed addresses. Ours aren't strings.
-- Fake-balance overlays depend on mutable view state. Ours isn't mutable.
-- Wallet-bridge spoofs depend on prototype pollution. There's no prototype chain to pollute.
-- The frontend deserves the same rigour as the contracts. This is what that looks like.
+For the underlying correctness / supply-chain / frontend-security pitch — why this stack at all — see [`intrepidshape/elm-web3`](https://github.com/IntrepidShape/elm-web3#why-elm-web3). This package is the rendering layer on top.
 
 ## Install
 
