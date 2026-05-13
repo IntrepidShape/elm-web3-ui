@@ -5,13 +5,13 @@ module Web3.Ui.LockPeriod exposing
 
 {-| Slider for picking a lock-period (in days) with an optional penalty-curve
 hint underneath. Designed for stake-and-lock contracts where users choose
-how long to commit (e.g., 7-90 day range).
+how long to commit (any min/max range; pass what your contract enforces).
 
     Web3.Ui.LockPeriod.view
         { value = model.lockDays
         , onChange = LockDaysChanged
-        , min = 7
-        , max = 90
+        , min = 1
+        , max = 365
         , penaltyAtMax = Just 35  -- 35% penalty at full early-exit
         }
 

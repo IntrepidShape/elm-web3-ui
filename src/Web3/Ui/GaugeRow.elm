@@ -6,7 +6,7 @@ module Web3.Ui.GaugeRow exposing
 {-| One row of a vote-escrow gauge list: gauge label, current epoch, total
 votes on the gauge, total bribes pooled for voters, your vote share, and
 optional vote / bribe / claim actions. Generic for any Curve-style gauge
-voting design (Curve, Aerodrome, Velodrome, `BribeMarket`).
+voting design (Curve, Aerodrome, Velodrome, bribe markets generally).
 
 The available actions depend on epoch state:
 

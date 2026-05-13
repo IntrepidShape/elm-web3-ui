@@ -5,7 +5,7 @@ module Web3.Ui.TrendIndicator exposing
     )
 
 {-| Compact Up/Neutral/Down arrow with paired volume pills. Useful for any
-trend-aware contract — TrendDetector, lending-rate sentiment,
+trend-aware contract — trend-detector outputs, lending-rate sentiment,
 DAO vote pressure indicators, etc.
 
     -- From explicit trend:

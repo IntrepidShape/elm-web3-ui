@@ -6,7 +6,7 @@ module Web3.Ui.BondCard exposing
 {-| Card for a fixed-term bond receipt: principal locked for a maturity
 period, accruing some pro-rata yield from a shared pool, redeemable at
 maturity (or rolled for another term). Generic for any term-deposit
-primitive (`FloorBond`, OHM-style bonds, treasury bills, …).
+primitive (OHM-style bonds, fixed-term deposits, treasury bills, …).
 
 ```elm
 Web3.Ui.BondCard.view
