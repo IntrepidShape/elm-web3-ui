@@ -436,28 +436,40 @@ parseSlotScalar kind raw =
     in
     case kind of
         AddressK ->
-            case T.address trimmed of
-                Just a ->
-                    Ok (Calldata.address a)
+            if String.isEmpty trimmed then
+                Err "address required"
 
-                Nothing ->
-                    Err ("Invalid address: " ++ trimmed)
+            else
+                case T.address trimmed of
+                    Just a ->
+                        Ok (Calldata.address a)
+
+                    Nothing ->
+                        Err ("not a 20-byte hex address: " ++ trimmed)
 
         UintK ->
-            case BigInt.fromString trimmed of
-                Just b ->
-                    Ok (Calldata.uint256 b)
+            if String.isEmpty trimmed then
+                Err "uint required"
 
-                Nothing ->
-                    Err ("Invalid uint: " ++ trimmed)
+            else
+                case BigInt.fromString trimmed of
+                    Just b ->
+                        Ok (Calldata.uint256 b)
+
+                    Nothing ->
+                        Err ("not an integer: " ++ trimmed)
 
         IntK ->
-            case BigInt.fromString trimmed of
-                Just b ->
-                    Ok (Calldata.int256 b)
+            if String.isEmpty trimmed then
+                Err "int required"
 
-                Nothing ->
-                    Err ("Invalid int: " ++ trimmed)
+            else
+                case BigInt.fromString trimmed of
+                    Just b ->
+                        Ok (Calldata.int256 b)
+
+                    Nothing ->
+                        Err ("not an integer: " ++ trimmed)
 
         BoolK ->
             case String.toLower trimmed of
@@ -471,20 +483,26 @@ parseSlotScalar kind raw =
                     Ok (Calldata.bool False)
 
                 _ ->
-                    Err ("Expected true/false, got: " ++ trimmed)
+                    Err ("expected true/false, got: " ++ trimmed)
 
         StringK ->
             Ok (Calldata.string raw)
 
         BytesK ->
-            if isHex trimmed then
+            if String.isEmpty trimmed then
+                Err "hex bytes required"
+
+            else if isHex trimmed then
                 Ok (Calldata.bytes trimmed)
 
             else
-                Err ("Expected 0x… hex, got: " ++ trimmed)
+                Err ("not 0x-prefixed hex: " ++ trimmed)
 
         FixedBytesK n ->
-            if isHex trimmed && String.length trimmed == 2 + 2 * n then
+            if String.isEmpty trimmed then
+                Err ("bytes" ++ String.fromInt n ++ " required")
+
+            else if isHex trimmed && String.length trimmed == 2 + 2 * n then
                 Ok (Calldata.bytesN n trimmed)
 
             else

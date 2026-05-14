@@ -1,5 +1,33 @@
 # Changelog
 
+## 1.10.0 — 2026-05-14
+
+### Added — Trustpilot-style security pre-flight card
+
+- **`Web3.Ui.SecurityCard`** — renders static-analysis findings (from
+  Slither / Aderyn / Mythril, or any tool that produces severity-bucketed
+  findings) as a breakdown card. Five-stop severity counter (critical /
+  high / medium / low / info), top-3 findings inline, tool-versions
+  badges, prominent disclaimer.
+  
+  Design intent: **never a Pass/Fail verdict**. Static analyzers have
+  false-positive rates; the card surfaces signal, not judgement.
+
+### Added — Community-funded audit panel
+
+- **`Web3.Ui.AuditPool`** — render the on-chain audit-pool state
+  (target / balance / deadline / pledger count) with pledge / refund /
+  view-report CTAs that vary by status (`Open` / `Funded` / `Closed`).
+  Status pill, top-pledger list, progress bar, service-prepayment
+  disclaimer. Stateless — caller owns the `Pool` value and supplies
+  `msg`s for each action.
+
+Used by the hosted forge above every generated dapp page, paired with
+`Web3.Ui.SecurityCard` to give the static-analysis signal plus the
+community-funding pathway in one surface.
+
+---
+
 ## 1.9.0 — 2026-05-14
 
 ### Added — typed-slot parser for the pure-Elm calldata path
