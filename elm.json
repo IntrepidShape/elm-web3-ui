@@ -1,10 +1,13 @@
 {
     "type": "package",
     "name": "intrepidshape/elm-web3-ui",
-    "summary": "Modular DeFi UI primitives for elm-web3: wallet, stake, fee, vote, gauge.",
+    "summary": "Type-safe dapp UI primitives for elm-web3 — any contract, zero runtime errs.",
     "license": "MIT",
-    "version": "1.7.0",
+    "version": "1.8.0",
     "exposed-modules": [
+        "Web3.Ui.AbiInput",
+        "Web3.Ui.ContractRead",
+        "Web3.Ui.ContractWrite",
         "Web3.Ui.Wallet",
         "Web3.Ui.Transaction",
         "Web3.Ui.Address",

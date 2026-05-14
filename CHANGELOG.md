@@ -1,5 +1,38 @@
 # Changelog
 
+## 1.8.0 — 2026-05-14
+
+### Added — Tier-1 primitives (any-contract dapp surface)
+
+Three generic primitives that let a dapp render *any* Solidity contract
+from its ABI alone, without bespoke per-function code. These are the
+target API for the upcoming `dapp-gen` CLI.
+
+- **`Web3.Ui.AbiInput`** — Typed input for any Solidity arg shape:
+  `address`, `uint*`, `int*`, `bool`, `string`, `bytes`, `bytesN`, `T[]`,
+  `T[N]`, and `tuple` (recursive). Returns a `Value` the caller stores
+  and a `parse` function that produces a `Json.Encode.Value` ready for
+  the port. Recursive tuple / array rendering composes the existing
+  `Web3.Ui.Input.*` primitives.
+- **`Web3.Ui.ContractRead`** — Renders a `view`/`pure` call as a typed
+  form: name header, one `AbiInput` per argument, "Read" button, result
+  panel with explicit `Idle / Pending / Success / Failed` lifecycle.
+- **`Web3.Ui.ContractWrite`** — Renders a state-changing call:
+  same arg-input shape, optional `msg.value` for `payable`, "Send" button
+  wired through `Web3.Transaction.Status`, status badge, hash link, and
+  failure-reason readout.
+
+All three follow the existing design contract: plain `Html msg`, attribute
+passthrough, no internal `Msg`, no subscriptions, semantic class names
+(`web3-abi-input`, `web3-contract-read`, `web3-contract-write` + BEM
+modifiers).
+
+### Changed
+
+- `summary` updated to reflect the any-contract framing.
+
+---
+
 ## 1.7.0 — 2026-05-13
 
 ### Added — DeFi UI surface expansion
