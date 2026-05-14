@@ -1,5 +1,26 @@
 # Changelog
 
+## 1.9.0 — 2026-05-14
+
+### Added — typed-slot parser for the pure-Elm calldata path
+
+- **`Web3.Ui.AbiInput.parseSlot : Field -> Value -> Result String Calldata.Slot`** —
+  produces a [`Web3.Abi.Calldata.Slot`](https://package.elm-lang.org/packages/intrepidshape/elm-web3/1.2.0/Web3-Abi-Calldata#Slot)
+  ready to feed into the pure-Elm calldata path. The existing `parse`
+  (returns `Json.Encode.Value` for the legacy method+args port shape) is
+  unchanged.
+
+Generated dapps from `@intrepidshape/dapp-gen` 0.2+ use `parseSlot`,
+which keeps the entire calldata-encoding path inside Elm and drops the JS
+side to a pure pass-through.
+
+### Requires
+
+Bumps the `intrepidshape/elm-web3` dep floor to **1.2.0** (introduced
+`Web3.Abi.Calldata`).
+
+---
+
 ## 1.8.0 — 2026-05-14
 
 ### Added — Tier-1 primitives (any-contract dapp surface)

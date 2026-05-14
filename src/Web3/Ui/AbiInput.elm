@@ -3,7 +3,7 @@ module Web3.Ui.AbiInput exposing
     , Field, field, fieldName, fieldSolType, fieldChildren
     , Value, valueString, valueList, valueTuple
     , stringValue, listValues, tupleValues
-    , initFor, parse
+    , initFor, parse, parseSlot
     )
 
 {-| Render a typed input for any Solidity argument shape — `address`,
@@ -44,7 +44,7 @@ A complete write flow looks like this:
 @docs Field, field, fieldName, fieldSolType, fieldChildren
 @docs Value, valueString, valueList, valueTuple
 @docs stringValue, listValues, tupleValues
-@docs initFor, parse
+@docs initFor, parse, parseSlot
 
 -}
 
@@ -52,6 +52,7 @@ import Html exposing (Html)
 import Html.Attributes as Attr
 import Html.Events as Events
 import Json.Encode as E
+import Web3.Abi.Calldata as Calldata
 import Web3.Abi.Encode as AbiEncode
 import Web3.BigInt as BigInt
 import Web3.Types as T
@@ -363,6 +364,191 @@ parseTuple fields values =
     else
         List.foldr step (Ok []) zipped
             |> Result.map (\jvs -> E.list identity jvs)
+
+
+
+-- PARSE → CALLDATA SLOT -----------------------------------------------------
+
+
+{-| Parse a `Value` against its `Field` into a [`Calldata.Slot`](Web3-Abi-Calldata#Slot).
+
+This is the canonical parser for the pure-Elm calldata path — codegen tools
+emit `parseSlot` calls and feed the resulting slots to
+[`Web3.Abi.Calldata.calldata`](Web3-Abi-Calldata#calldata) plus a baked
+selector, producing complete `"0x…"` calldata with zero JavaScript
+involvement.
+
+Use `parseSlot` when building `readCallRaw` / `writeCallRaw`; use the
+existing [`parse`](#parse) when you need the legacy method+args port shape.
+-}
+parseSlot : Field -> Value -> Result String Calldata.Slot
+parseSlot (Field f) value =
+    case classify f.solType of
+        Scalar kind ->
+            case value of
+                VString raw ->
+                    parseSlotScalar kind raw
+
+                _ ->
+                    Err ("Expected scalar for " ++ f.solType)
+
+        DynArray inner ->
+            case value of
+                VList xs ->
+                    parseSlotList (innerField inner f.children) xs
+
+                _ ->
+                    Err ("Expected list for " ++ f.solType)
+
+        FixedArray inner n ->
+            case value of
+                VList xs ->
+                    if List.length xs == n then
+                        parseSlotList (innerField inner f.children) xs
+
+                    else
+                        Err
+                            ("Expected "
+                                ++ String.fromInt n
+                                ++ " elements for "
+                                ++ f.solType
+                                ++ ", got "
+                                ++ String.fromInt (List.length xs)
+                            )
+
+                _ ->
+                    Err ("Expected list for " ++ f.solType)
+
+        Tuple_ ->
+            case value of
+                VTuple xs ->
+                    parseSlotTuple f.children xs
+
+                _ ->
+                    Err "Expected tuple"
+
+
+parseSlotScalar : ScalarKind -> String -> Result String Calldata.Slot
+parseSlotScalar kind raw =
+    let
+        trimmed =
+            String.trim raw
+    in
+    case kind of
+        AddressK ->
+            case T.address trimmed of
+                Just a ->
+                    Ok (Calldata.address a)
+
+                Nothing ->
+                    Err ("Invalid address: " ++ trimmed)
+
+        UintK ->
+            case BigInt.fromString trimmed of
+                Just b ->
+                    Ok (Calldata.uint256 b)
+
+                Nothing ->
+                    Err ("Invalid uint: " ++ trimmed)
+
+        IntK ->
+            case BigInt.fromString trimmed of
+                Just b ->
+                    Ok (Calldata.int256 b)
+
+                Nothing ->
+                    Err ("Invalid int: " ++ trimmed)
+
+        BoolK ->
+            case String.toLower trimmed of
+                "true" ->
+                    Ok (Calldata.bool True)
+
+                "false" ->
+                    Ok (Calldata.bool False)
+
+                "" ->
+                    Ok (Calldata.bool False)
+
+                _ ->
+                    Err ("Expected true/false, got: " ++ trimmed)
+
+        StringK ->
+            Ok (Calldata.string raw)
+
+        BytesK ->
+            if isHex trimmed then
+                Ok (Calldata.bytes trimmed)
+
+            else
+                Err ("Expected 0x… hex, got: " ++ trimmed)
+
+        FixedBytesK n ->
+            if isHex trimmed && String.length trimmed == 2 + 2 * n then
+                Ok (Calldata.bytesN n trimmed)
+
+            else
+                Err
+                    ("Expected 0x followed by "
+                        ++ String.fromInt (2 * n)
+                        ++ " hex chars for bytes"
+                        ++ String.fromInt n
+                    )
+
+
+parseSlotList : Field -> List Value -> Result String Calldata.Slot
+parseSlotList innerF xs =
+    let
+        innerEncoder v =
+            parseSlot innerF v
+
+        step v acc =
+            case acc of
+                Err e ->
+                    Err e
+
+                Ok slots ->
+                    case innerEncoder v of
+                        Err e ->
+                            Err e
+
+                        Ok s ->
+                            Ok (s :: slots)
+    in
+    List.foldr step (Ok []) xs
+        |> Result.map (Calldata.list identity)
+
+
+parseSlotTuple : List Field -> List Value -> Result String Calldata.Slot
+parseSlotTuple fields values =
+    if List.length fields /= List.length values then
+        Err
+            ("Tuple field count mismatch: expected "
+                ++ String.fromInt (List.length fields)
+                ++ ", got "
+                ++ String.fromInt (List.length values)
+            )
+
+    else
+        let
+            zipped =
+                List.map2 Tuple.pair fields values
+
+            step ( f, v ) acc =
+                case acc of
+                    Err e ->
+                        Err e
+
+                    Ok slots ->
+                        case parseSlot f v of
+                            Err e ->
+                                Err e
+
+                            Ok s ->
+                                Ok (s :: slots)
+        in
+        List.foldr step (Ok []) zipped
+            |> Result.map Calldata.tuple
 
 
 
