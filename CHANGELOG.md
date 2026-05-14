@@ -1,5 +1,23 @@
 # Changelog
 
+## 1.10.1 — 2026-05-14
+
+### Changed — generalised the audit-pool primitive
+
+- **`Web3.Ui.AuditPool` → `Web3.Ui.FundingPool`** — the structural
+  shape (target + balance + deadline + pledger count + refund-by-
+  deadline fallback) is universal across any crowd-funded escrow
+  mechanism, not just audits. Renamed and parameterised every
+  user-facing string via a [`Labels`](Web3-Ui-FundingPool#Labels)
+  record. `defaultLabels` give generic copy; callers (forge.intrepiddev,
+  bug-bounty pools, feature-funding kickstarters) override per
+  mechanism.
+
+  Migration: replace `import Web3.Ui.AuditPool as Pool` with
+  `import Web3.Ui.FundingPool as Pool` and pass a `labels` field on
+  the `Config`. All type names are identical; only the module name
+  and the new `labels` field change.
+
 ## 1.10.0 — 2026-05-14
 
 ### Added — Trustpilot-style security pre-flight card
