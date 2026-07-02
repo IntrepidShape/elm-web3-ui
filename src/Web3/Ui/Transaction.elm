@@ -130,35 +130,26 @@ actionButton attrs opts status =
         [ Html.text label ]
 
 
-{-| A clickable link displaying a truncated tx hash.
+{-| A truncated tx-hash display, linked to a block explorer when one is
+configured.
 
-The `explorerUrl` is prepended to the full hash to build the href.
-Example: `{ explorerUrl = "https://etherscan.io/tx/" }`
+When `explorerUrl` is `Just url`, the url is prepended to the full hash to
+build the href. When `Nothing` (e.g. local Anvil dev), renders a plain
+`<span class="web3-tx-hash">` instead of a dead link — the same convention
+as [`statusHashLink`](#statusHashLink) and `Web3.Ui.Address`.
 
-CSS class: `web3-tx-link`
+Example: `{ explorerUrl = Just "https://etherscan.io/tx/" }`
+
+CSS classes: `web3-tx-link` (linked), `web3-tx-hash` (plain)
 
 -}
 txHashLink :
     List (Html.Attribute msg)
-    -> { explorerUrl : String }
+    -> { explorerUrl : Maybe String }
     -> T.TxHash
     -> Html msg
-txHashLink attrs opts hash =
-    let
-        full =
-            T.txHashToString hash
-
-        short =
-            String.left 6 full ++ "…" ++ String.right 4 full
-    in
-    Html.a
-        (Attr.class "web3-tx-link"
-            :: Attr.href (opts.explorerUrl ++ full)
-            :: Attr.target "_blank"
-            :: Attr.rel "noopener noreferrer"
-            :: attrs
-        )
-        [ Html.text short ]
+txHashLink =
+    hashDisplay
 
 
 {-| Extract a hash display from a `Tx.Status`. Returns `Nothing` when there is
@@ -226,7 +217,7 @@ CSS classes: `web3-receipt`, `web3-receipt--success`, `web3-receipt--failed`, `w
 -}
 receiptView :
     List (Html.Attribute msg)
-    -> { explorerUrl : String }
+    -> { explorerUrl : Maybe String }
     -> Tx.Receipt
     -> Html msg
 receiptView attrs opts receipt =

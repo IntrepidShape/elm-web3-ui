@@ -1,16 +1,44 @@
 # Changelog
 
-## Unreleased
+## 2.0.0 — 2026-07-02
+
+> Registry note: versions 1.6.0–1.10.1 were tagged in git but never
+> `elm publish`ed, and the Elm registry only accepts exactly-next versions —
+> so those tags are permanently unpublishable (registry had only 1.0.0).
+> This release publishes everything since 1.0.0, under the MAJOR bump the
+> accumulated API changes require anyway. Git history and the entries below
+> preserve the 1.x story.
+
+### Breaking — explorer links unified on `Maybe String`
+
+- **`Transaction.txHashLink` and `Transaction.receiptView`** now take
+  `{ explorerUrl : Maybe String }`, matching `statusHashLink`,
+  `hashDisplay`, `Web3.Ui.Address`, and `ContractWrite`. `Nothing` renders a
+  plain `<span class="web3-tx-hash">` instead of a dead link (local
+  Anvil/Hardhat dev). Migration: wrap your url in `Just`.
+  `txHashLink` is now literally `hashDisplay` — one rendering path.
+
+### Changed
 
 - **Require `intrepidshape/elm-web3 ≥ 1.2.1`** — 1.2.1 fixes three wallet /
   transaction state-machine bugs this UI's flows rely on (WrongChain recovery
   via `chainChanged`, `readOnly` no longer tearing down a live session,
   monotonic confirmation counts). The constraint encodes that assumption.
-- Fixed stale `TransactionUiTest` call sites (the `explorerUrl : Maybe String`
-  API change in `statusHashLink` was never reflected in the tests; the suite
-  had been failing to compile). All 66 tests green.
 
-## 1.10.1 — 2026-05-14
+### Added
+
+- **`PRIMITIVES.md`** — exhaustive taxonomy of every primitive and generic a
+  web3 UI package needs, graded against the 36 shipped modules, with the
+  ranked 2.x roadmap (headline gaps: `RemoteCall` generic, `ApprovalFlow`,
+  revert-reason surfacing, `AccountPill`, chain selector).
+
+### Fixed
+
+- `TransactionUiTest` had been failing to compile since the
+  `statusHashLink` API change (stale non-`Maybe` call sites). All 66 tests
+  green.
+
+## 1.10.1 — 2026-05-14 (git tag only — never published)
 
 ### Changed — generalised the audit-pool primitive
 

@@ -111,7 +111,7 @@ suite =
 
                         Just hash ->
                             TxUi.receiptView []
-                                { explorerUrl = "https://etherscan.io/tx/" }
+                                { explorerUrl = Just "https://etherscan.io/tx/" }
                                 { txHash = hash
                                 , blockNumber = 100
                                 , gasUsed = "21000"
@@ -128,7 +128,7 @@ suite =
 
                         Just hash ->
                             TxUi.receiptView []
-                                { explorerUrl = "https://etherscan.io/tx/" }
+                                { explorerUrl = Just "https://etherscan.io/tx/" }
                                 { txHash = hash
                                 , blockNumber = 100
                                 , gasUsed = "21000"
@@ -145,7 +145,7 @@ suite =
 
                         Just hash ->
                             TxUi.receiptView []
-                                { explorerUrl = "https://etherscan.io/tx/" }
+                                { explorerUrl = Just "https://etherscan.io/tx/" }
                                 { txHash = hash
                                 , blockNumber = 100
                                 , gasUsed = "21000"
