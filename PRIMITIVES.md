@@ -3,8 +3,9 @@
 An exhaustive taxonomy of every primitive and generic a web3 UI package needs,
 graded against what `intrepidshape/elm-web3-ui` ships today. This is the
 package's map and roadmap — the UI-layer companion to elm-web3's
-`proofs/EVM_API_COVERAGE.md`. Audited 2026-07-02 against the 36 exposed
-modules.
+`proofs/EVM_API_COVERAGE.md`. Audited 2026-07-02 against the exposed
+modules; regraded same day after the 2.1.0 primitive build (46 modules).
+Every generic primitive is demonstrated live in `examples/gallery/`.
 
 Grading: ✅ shipped · 🟡 partial (exists but missing listed capability) ·
 ❌ missing (verdict: **build** = roadmap, **skip** = deliberately out of scope).
@@ -32,26 +33,26 @@ wrapper for port round-trips, not a spinner).
 | Trend indicator | up/down/flat with delta | ✅ `TrendIndicator` |
 | Progress ring / bar | vesting, caps, graduation | ✅ `ProgressRing`, `SupplyBar` |
 | Percentage / bps | basis-point rendering, fee slices | ✅ `FeeBreakdown`, `FeeFlowDiagram` |
-| Identicon / blockie | deterministic avatar from address | ❌ **build** — pure-Elm blockies is a contained fun problem; big UX win for address recognition |
+| Identicon / blockie | deterministic avatar from address | ✅ `Identicon` — canonical blockies algorithm, pure Elm (SVG); raw `cells` exposed for canvas renderers |
 | Token logo/symbol | logo url + symbol fallback | ❌ **build** (list-driven; `TokenSearch` already has the data shape) |
 | QR code | address receive flow | ❌ **skip** — belongs to a general QR package, not web3-ui |
-| Skeleton / shimmer | loading placeholder shaped like the atoms above | ❌ **build** — every read-heavy dapp needs it; ship as variants (`Address.skeleton`, `Amount.skeleton`, …) |
+| Skeleton / shimmer | loading placeholder shaped like the atoms above | ✅ `Skeleton.line/block/circle/pill/address/amount` — aria-hidden bones, shimmer is pure CSS |
 | Empty state | "no positions yet" | ❌ **skip** — not web3-specific |
-| Revert reason display | decoded `Error(string)` → human banner | ❌ **build** — elm-web3 already decodes it; the UI never renders it. Highest-value missing atom |
+| Revert reason display | decoded `Error(string)` → human banner | ✅ `Revert.banner/toast/reason` — decodes via elm-web3, honest labelled fallback for custom errors |
 
 ## Layer 1 — Input atoms (validated, typed)
 
 | Primitive | What | Status |
 |---|---|---|
-| Amount input | decimals-aware, BigInt-backed, paste-sanitizing | ✅ `Amount.amountInput`, `Input.bigInt` — 🟡 no Max button / balance-% presets (25/50/75/MAX) (**build**) |
+| Amount input | decimals-aware, BigInt-backed, paste-sanitizing | ✅ `Amount.amountInput`, `Input.bigInt`, `Amount.presetRow` (25/50/75/MAX chips) |
 | Address input | validation + visual confirm | ✅ `Address.input`, `Input.address` |
 | Typed ABI inputs | every solidity type incl. arrays/tuples | ✅ `AbiInput` (uint*/int*/bool/string/bytes/bytesN/T[]/T[N]) |
 | Slippage control | presets + custom bps | ✅ `SlippageInput` |
 | Lock period | slider snapped to contract-valid periods | ✅ `LockPeriod` |
 | Token selector | search + pick from a list | ✅ `TokenSearch` |
 | Tab switcher | buy/sell, stake/unstake | ✅ `TradeTabs` |
-| Deadline control | tx deadline minutes | ❌ **build** (small; sibling of `SlippageInput`) |
-| Chain selector | pick from configured chains, triggers switch flow | ❌ **build** — `chainBadge` exists but there's no picker bound to `Wallet.switchChain`/`addChain` |
+| Deadline control | tx deadline minutes | ✅ `Deadline` — presets + custom, `toUnixDeadline` helper |
+| Chain selector | pick from configured chains, triggers switch flow | ✅ `ChainSelector` — radiogroup semantics; renders truth from `Wallet.State`, never optimistic |
 | Token-amount pair | token selector + amount input + balance + max, as one unit | ❌ **build** — the swap/deposit workhorse; compose from existing atoms |
 
 ## Layer 2 — State-machine-bound components (the elm-web3 glue)
@@ -62,19 +63,19 @@ wrapper for port round-trips, not a spinner).
 | Wallet picker | EIP-6963 provider list modal | ✅ `Wallet.walletPicker/viewWalletOption` |
 | Chain gate | blocks children until on expected chain, switch CTA | ✅ `ChainGate` |
 | Tx action button | `Tx.Status`-driven: disabled/pending/label states | ✅ `Transaction.actionButton/statusBadge` |
-| Tx status + hash | badge, link, confirmation display | ✅ — 🟡 no n/N confirmation progress binding (`transactionConfirmations` exists in elm-web3; wire it to `ProgressRing`) (**build**) |
+| Tx status + hash | badge, link, confirmation display | ✅ incl. `Transaction.confirmationProgress` (n/N dots — monotonicity guaranteed upstream) |
 | Pending overlay | modal scrim during signature/pending | ✅ `PendingOverlay` |
 | Receipt view | success/fail, gas, block, logs link | ✅ `Transaction.receiptView` |
 | Sign flow | `SignState`-driven button + signature display | ✅ `Sign.stateView/signButton/signatureView` |
 | Gas estimate flow | estimate → display → proceed | ✅ `GasEstimate` + `ContractWrite` |
 | Generic read form | any fn: AbiInputs → call → decoded result | ✅ `ContractRead` |
 | Generic write form | any fn: AbiInputs → estimate → send → track | ✅ `ContractWrite` |
-| Account pill | address + balance + chain + disconnect menu, one compound | ❌ **build** — the standard dapp header unit (RainbowKit's core loop); compose from shipped atoms |
-| Approval flow | allowance read → approve tx → action tx, as ONE component | ❌ **build** — the single most-repeated flow in all of web3; every ERC-20 interaction needs it |
+| Account pill | address + balance + chain + disconnect menu, one compound | ✅ `AccountPill` — all six wallet states, identicon included |
+| Approval flow | allowance read → approve tx → action tx, as ONE component | ✅ `ApprovalFlow` — guarded machine, fuzz-tested AND TLC-model-checked (`proofs/tla/ApprovalSpec.tla`) |
 | Event feed | live log subscription → prepend-rendered rows | 🟡 `ActivityRow` renders; no binder to `Web3.Subscription` (**build**: `EventFeed` = subscription plumbing + `ActivityRow`) |
 | Balance watcher | re-fetch balances on new block | ❌ **build** (thin: `watchBlockNumber` → refetch policy) |
-| Tx toast / queue | multiple in-flight txs, corner toasts | ❌ **build** (needs the `TxQueue` generic below) |
-| Revert toast | failed tx → decoded reason, retry affordance | ❌ **build** (pairs with the L0 revert atom) |
+| Tx toast / queue | multiple in-flight txs, corner toasts | ✅ `TxQueue.toastStack` — id-routed, aria-live |
+| Revert toast | failed tx → decoded reason, retry affordance | ✅ `Revert.toast` |
 
 ## Layer 3 — Flow generics (type-level machinery)
 
@@ -83,12 +84,12 @@ smaller. These are what "generics" means for a web3 UI package.
 
 | Generic | Type sketch | Status |
 |---|---|---|
-| Remote call | `RemoteCall a = NotAsked \| Loading CorrelationId \| Success a \| Failure Web3Error` — RemoteData specialised to correlation-id port round-trips, with `update`/`view` helpers | ❌ **build first** — every module above reinvents this shape ad hoc; it is the package's missing foundation |
-| Two-step tx | `TwoStep = CheckingAllowance \| NeedsApproval Tx.Status \| Acting Tx.Status \| Done` — the approve-then-act machine behind `ApprovalFlow` | ❌ **build** (with a TLA+ spec in elm-web3 style — it IS a state machine) |
-| Tx queue | `TxQueue = Dict CorrelationId Tx.Status` + fold-into-view — many in-flight txs without Model gymnastics | ❌ **build** |
+| Remote call | `RemoteCall a` — RemoteData specialised to correlation-id port round-trips | ✅ `RemoteCall` — id-guarded `resolve` (stale answers dropped; the SignSpec no-cross-confusion rule applied to reads) |
+| Two-step tx | the approve-then-act machine behind `ApprovalFlow` | ✅ `ApprovalFlow.Step/update` — TLA+-specced and TLC-verified, elm-web3 style |
+| Tx queue | many in-flight txs without Model gymnastics | ✅ `TxQueue` — opaque, id-routed, no ghost entries |
 | Simulate-first write | run `readCall withFrom` preview, show result, then send — wraps `ContractWrite` | ❌ **build** (elm-web3 already has the simulate capability) |
 | Block-refresh policy | `Refresh = EveryBlock \| EveryNBlocks Int \| Manual` driving re-fetch of a `RemoteCall` | ❌ **build** |
-| Validated form | combine typed inputs into `Result (List FieldError) args` | 🟡 per-input validation exists; no combinator (**build**: small applicative) |
+| Validated form | combine typed inputs into `Result (List FieldError) args` | ✅ `Form` — accumulating applicative (`succeed`/`andMap`), no short-circuit |
 | Paginated logs | block-range windowed `getLogs` loader with "load more" | ❌ **build** (nice-to-have) |
 | Optimistic update | show expected post-state, reconcile on receipt | ❌ **skip for now** — high complexity, easy to get dishonest UX; revisit with demand |
 
@@ -119,17 +120,22 @@ them cheap to assemble.
 
 ---
 
-## The roadmap, ranked (what 2.x should build)
+## The roadmap, ranked (what remains after 2.1.0)
 
-1. **`RemoteCall` generic** — the foundation everything else binds to
-2. **`ApprovalFlow`** (+ `TwoStep` machine, TLA+-specced) — web3's most repeated flow
-3. **Revert reason atom + toast** — elm-web3 decodes it; users never see it
-4. **`AccountPill`** — the standard header compound
-5. **Chain selector** bound to switch/add flows
-6. **Confirmation progress** (`transactionConfirmations` × `ProgressRing`)
-7. **Max/percent presets** on amount input; **token-amount pair** compound
-8. **`EventFeed`** subscription binder
-9. **Skeleton variants** for the read-heavy atoms
-10. **Blockies/identicon** (pure Elm)
+The 2.1.0 build shipped the previous top of this list: `RemoteCall`,
+`ApprovalFlow` (+ TLC-checked `ApprovalSpec.tla`), `Revert`, `AccountPill`,
+`ChainSelector`, `Deadline`, `TxQueue`, `Form`, `Skeleton`, `Identicon`,
+`Amount.presetRow`, `Transaction.confirmationProgress`. Still open:
+
+1. **Token-amount pair** — token selector + amount + balance + max as one
+   unit (compose from shipped atoms)
+2. **`EventFeed`** — bind `Web3.Subscription` log streams to `ActivityRow`
+3. **Block-refresh policy** + balance watcher (re-fetch `RemoteCall`s on
+   new blocks)
+4. **Simulate-first write** (elm-web3 already has the capability)
+5. Token logo/symbol atom; `Address.copyable`; dust convention in `Amount`
+6. Paginated logs loader
+7. a11y sweep (`aria-busy`/`aria-live` audit across the older modules —
+   the 2.1.0 modules ship with it)
 
 Done ⇒ this package covers every layer of the taxonomy that is web3's to own.

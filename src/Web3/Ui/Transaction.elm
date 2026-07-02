@@ -4,6 +4,7 @@ module Web3.Ui.Transaction exposing
     , txHashLink
     , statusHashLink
     , receiptView
+    , confirmationProgress
     )
 
 {-| Transaction lifecycle UI components.
@@ -35,6 +36,7 @@ Pattern-match on `Tx.Status` to render appropriate UI without missing any state.
         receipt
 
 @docs statusBadge, actionButton, txHashLink, statusHashLink, receiptView
+@docs confirmationProgress
 
 -}
 
@@ -238,3 +240,59 @@ receiptView attrs opts receipt =
         , Html.div [ Attr.class "web3-receipt-field" ]
             [ txHashLink [] opts receipt.txHash ]
         ]
+
+
+{-| Confirmation progress as a row of dots — one per required confirmation,
+filled as they land. Renders only in `Confirming`; every other status is
+`Html.text ""` so it composes inline without layout cost.
+
+The count comes straight from the `Confirming _ n` state, which the
+`Web3.Transaction` machine guarantees is strictly increasing (see
+`MonotonicConfirmations` in elm-web3's `proofs/tla/TransactionSpec.tla`) —
+these dots can never un-fill.
+
+CSS classes: `web3-confirmations`, `web3-confirmations__dot`,
+`web3-confirmations__dot--filled`, `web3-confirmations__count`.
+
+-}
+confirmationProgress :
+    List (Html.Attribute msg)
+    -> { required : Int }
+    -> Tx.Status
+    -> Html msg
+confirmationProgress attrs opts status =
+    case status of
+        Tx.Confirming _ count ->
+            Html.span
+                (Attr.class "web3-confirmations"
+                    :: Attr.attribute "role" "status"
+                    :: Attr.attribute "aria-label"
+                        (String.fromInt count
+                            ++ " of "
+                            ++ String.fromInt opts.required
+                            ++ " confirmations"
+                        )
+                    :: attrs
+                )
+                (List.map
+                    (\i ->
+                        Html.span
+                            [ Attr.class "web3-confirmations__dot"
+                            , Attr.classList
+                                [ ( "web3-confirmations__dot--filled", i <= count ) ]
+                            ]
+                            []
+                    )
+                    (List.range 1 opts.required)
+                    ++ [ Html.span [ Attr.class "web3-confirmations__count" ]
+                            [ Html.text
+                                (String.fromInt (min count opts.required)
+                                    ++ "/"
+                                    ++ String.fromInt opts.required
+                                )
+                            ]
+                       ]
+                )
+
+        _ ->
+            Html.text ""

@@ -1,5 +1,46 @@
 # Changelog
 
+## 2.1.0 — 2026-07-02
+
+### Added — the generic primitive build (10 new modules + gallery)
+
+Twelve items off the top of the PRIMITIVES.md roadmap, all
+protocol-agnostic, all CSS-class themeable, aria-annotated:
+
+- **`RemoteCall`** — the correlation-id remote-data foundation. Id-guarded
+  `resolve`: a stale response for a superseded request is dropped, never
+  rendered (the SignSpec no-cross-confusion rule applied to reads).
+- **`ApprovalFlow`** — the approve-then-act machine behind every ERC-20
+  interaction. Structurally safe (Acting is unreachable without a verified
+  allowance), rejection ≠ failure, confirmed approvals re-check the chain.
+  Fuzz-tested (10 properties) **and TLC-model-checked** — this repo now has
+  its own `proofs/tla/ApprovalSpec.tla` + `check-tla.sh`, wired into CI.
+- **`AccountPill`** — the wallet header compound, all six states, identicon
+  included.
+- **`Identicon`** — canonical Ethereum blockies in pure Elm (faithful
+  xorshift port, SVG, `cells` exposed for canvas renderers).
+- **`TxQueue`** — many in-flight transactions, id-routed, toast stack view.
+- **`Revert`** — decoded `Error(string)` revert reasons as banner/toast,
+  honest fallback for custom errors.
+- **`ChainSelector`** — radiogroup chain picker for the switch flow.
+- **`Skeleton`** — six loading bones shaped like the atoms they replace.
+- **`Deadline`** — tx deadline picker, sibling of `SlippageInput`.
+- **`Form`** — accumulating validation applicative (all errors, not the
+  first).
+- `Transaction.confirmationProgress` — n/N confirmation dots (additive).
+- `Amount.presetRow` — 25/50/75/MAX chips (additive).
+
+### Added — the gallery
+
+`examples/gallery/` — every generic primitive in every state on one page,
+driven entirely by simulated messages (the state machines are pure, so the
+whole dapp surface demos without a wallet, a node, or JS). `gallery.css` is
+the reference theme: every `web3-*` class styled from a handful of tokens —
+copy it and re-color to rice the entire kit.
+
+27 new tests (93 total). Pure additive — compiler-verified MINOR.
+
+
 ## 2.0.0 — 2026-07-02
 
 > Registry note: versions 1.6.0–1.10.1 were tagged in git but never

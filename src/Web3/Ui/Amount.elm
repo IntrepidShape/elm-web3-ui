@@ -1,6 +1,7 @@
 module Web3.Ui.Amount exposing
     ( amountInput
     , formatWei
+    , presetRow
     )
 
 {-| Token amount input and display with SI suffix formatting.
@@ -18,7 +19,7 @@ module Web3.Ui.Amount exposing
     Web3.Ui.Amount.formatWei 18 weiAmount ++ " PLS"
     --> "1.23M PLS"
 
-@docs amountInput, formatWei
+@docs amountInput, formatWei, presetRow
 
 -}
 
@@ -129,3 +130,40 @@ siFormat f =
 round2 : Float -> String
 round2 f =
     String.fromFloat (toFloat (round (f * 100)) / 100)
+
+
+{-| A row of balance-percentage chips — 25% / 50% / 75% / MAX — the
+companion every [`amountInput`](#amountInput) deserves. Emits the chosen
+percentage (100 = MAX); the app computes the actual amount from the live
+balance, so the chips never display a stale number.
+
+    Web3.Ui.Amount.presetRow [] { onPick = FillPercent }
+
+    -- FillPercent 100 -> set input to formatUnits decimals balance
+
+CSS classes: `web3-amount-presets`, `web3-amount-presets__chip`,
+`web3-amount-presets__chip--max`.
+
+-}
+presetRow : List (Html.Attribute msg) -> { onPick : Int -> msg } -> Html msg
+presetRow attrs opts =
+    Html.div
+        (Attr.class "web3-amount-presets" :: attrs)
+        (List.map
+            (\pct ->
+                Html.button
+                    [ Attr.class "web3-amount-presets__chip"
+                    , Attr.classList [ ( "web3-amount-presets__chip--max", pct == 100 ) ]
+                    , Events.onClick (opts.onPick pct)
+                    ]
+                    [ Html.text
+                        (if pct == 100 then
+                            "MAX"
+
+                         else
+                            String.fromInt pct ++ "%"
+                        )
+                    ]
+            )
+            [ 25, 50, 75, 100 ]
+        )

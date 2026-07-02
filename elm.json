@@ -1,9 +1,9 @@
 {
     "type": "package",
     "name": "intrepidshape/elm-web3-ui",
-    "summary": "Type-safe dapp UI primitives for elm-web3 — any contract, zero runtime errs.",
+    "summary": "Type-safe dapp UI primitives for elm-web3 - any contract, zero runtime errs.",
     "license": "MIT",
-    "version": "2.0.0",
+    "version": "2.1.0",
     "exposed-modules": [
         "Web3.Ui.AbiInput",
         "Web3.Ui.ContractRead",
@@ -40,7 +40,17 @@
         "Web3.Ui.NFTStakeCard",
         "Web3.Ui.BondCard",
         "Web3.Ui.GaugeRow",
-        "Web3.Ui.FeeFlowDiagram"
+        "Web3.Ui.FeeFlowDiagram",
+        "Web3.Ui.RemoteCall",
+        "Web3.Ui.ApprovalFlow",
+        "Web3.Ui.AccountPill",
+        "Web3.Ui.Identicon",
+        "Web3.Ui.Skeleton",
+        "Web3.Ui.Revert",
+        "Web3.Ui.ChainSelector",
+        "Web3.Ui.Deadline",
+        "Web3.Ui.TxQueue",
+        "Web3.Ui.Form"
     ],
     "elm-version": "0.19.0 <= v < 0.20.0",
     "dependencies": {
