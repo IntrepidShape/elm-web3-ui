@@ -61,19 +61,19 @@ suite =
             [ test "Idle returns Nothing" <|
                 \_ ->
                     Expect.equal Nothing
-                        (TxUi.statusHashLink [] { explorerUrl = "https://etherscan.io/tx/" } Tx.Idle)
+                        (TxUi.statusHashLink [] { explorerUrl = Just "https://etherscan.io/tx/" } Tx.Idle)
             , test "AwaitingSignature returns Nothing" <|
                 \_ ->
                     Expect.equal Nothing
-                        (TxUi.statusHashLink [] { explorerUrl = "https://etherscan.io/tx/" } Tx.AwaitingSignature)
+                        (TxUi.statusHashLink [] { explorerUrl = Just "https://etherscan.io/tx/" } Tx.AwaitingSignature)
             , test "Failed returns Nothing" <|
                 \_ ->
                     Expect.equal Nothing
-                        (TxUi.statusHashLink [] { explorerUrl = "https://etherscan.io/tx/" } (Tx.Failed "err"))
+                        (TxUi.statusHashLink [] { explorerUrl = Just "https://etherscan.io/tx/" } (Tx.Failed "err"))
             , test "Rejected returns Nothing" <|
                 \_ ->
                     Expect.equal Nothing
-                        (TxUi.statusHashLink [] { explorerUrl = "https://etherscan.io/tx/" } Tx.Rejected)
+                        (TxUi.statusHashLink [] { explorerUrl = Just "https://etherscan.io/tx/" } Tx.Rejected)
             , test "Submitted returns Just" <|
                 \_ ->
                     case T.txHash "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef" of
@@ -81,7 +81,7 @@ suite =
                             Expect.fail "test fixture: invalid tx hash"
 
                         Just hash ->
-                            TxUi.statusHashLink [] { explorerUrl = "https://etherscan.io/tx/" } (Tx.Submitted hash)
+                            TxUi.statusHashLink [] { explorerUrl = Just "https://etherscan.io/tx/" } (Tx.Submitted hash)
                                 |> Expect.notEqual Nothing
             , test "Confirmed returns Just" <|
                 \_ ->
@@ -91,7 +91,7 @@ suite =
 
                         Just hash ->
                             TxUi.statusHashLink []
-                                { explorerUrl = "https://etherscan.io/tx/" }
+                                { explorerUrl = Just "https://etherscan.io/tx/" }
                                 (Tx.Confirmed
                                     { txHash = hash
                                     , blockNumber = 1

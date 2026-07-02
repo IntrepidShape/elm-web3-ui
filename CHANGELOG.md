@@ -1,5 +1,15 @@
 # Changelog
 
+## Unreleased
+
+- **Require `intrepidshape/elm-web3 ≥ 1.2.1`** — 1.2.1 fixes three wallet /
+  transaction state-machine bugs this UI's flows rely on (WrongChain recovery
+  via `chainChanged`, `readOnly` no longer tearing down a live session,
+  monotonic confirmation counts). The constraint encodes that assumption.
+- Fixed stale `TransactionUiTest` call sites (the `explorerUrl : Maybe String`
+  API change in `statusHashLink` was never reflected in the tests; the suite
+  had been failing to compile). All 66 tests green.
+
 ## 1.10.1 — 2026-05-14
 
 ### Changed — generalised the audit-pool primitive
