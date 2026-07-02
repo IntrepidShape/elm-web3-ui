@@ -35,13 +35,19 @@ import Web3.Ui.PendingOverlay as PendingOverlay
 import Web3.Ui.PriceDisplay as PriceDisplay
 import Web3.Ui.ProgressRing as ProgressRing
 import Web3.Ui.RelativeTime as RelativeTime
+import Web3.Ui.BlockRefresh as BlockRefresh
+import Web3.Ui.EventFeed as EventFeed
+import Web3.Ui.PaginatedLogs as PaginatedLogs
 import Web3.Ui.RemoteCall as RemoteCall exposing (RemoteCall)
+import Web3.Ui.SimulateFirst as SimulateFirst
 import Web3.Ui.Revert as Revert
 import Web3.Ui.Sign as SignUi
 import Web3.Ui.Skeleton as Skeleton
 import Web3.Ui.SlippageInput as SlippageInput
 import Web3.Ui.StatCell as StatCell
 import Web3.Ui.SupplyBar as SupplyBar
+import Web3.Ui.TokenAmountPair as Pair
+import Web3.Ui.TokenLogo as TokenLogo
 import Web3.Ui.TokenSearch as TokenSearch
 import Web3.Ui.TradeTabs as TradeTabs
 import Web3.Ui.Transaction as TxUi
@@ -127,6 +133,10 @@ type alias Model =
     , remote : RemoteCall String
     , queue : TxQueue.TxQueue
     , revertDismissed : Bool
+    , pairValue : String
+    , feed : EventFeed.Feed String
+    , sim : SimulateFirst.Step
+    , pager : PaginatedLogs.Pager
     }
 
 
@@ -154,6 +164,14 @@ init =
             |> TxQueue.update "q1" (Tx.TxSubmitted demoHashStr)
             |> TxQueue.begin "q2" "Stake 50k FOO"
     , revertDismissed = False
+    , pairValue = "50000"
+    , feed =
+        EventFeed.init { cap = 4 }
+            |> EventFeed.onSubscribed { open = True }
+            |> EventFeed.push "0xbeef… bought 1.2M FOO"
+            |> EventFeed.push "0x1234… staked 50k FOO"
+    , sim = SimulateFirst.Idle
+    , pager = Tuple.first (PaginatedLogs.init { latest = 21688204, window = 5000 })
     }
 
 
@@ -183,6 +201,15 @@ type Msg
     | QueueAdvance String
     | QueueDismiss String
     | DismissRevert
+    | SetPairValue String
+    | PairPercent Int
+    | FeedPush
+    | SimStart
+    | SimOk
+    | SimConfirm
+    | SimTx Tx.Msg
+    | SimReset
+    | PagerMore
     | Noop
 
 
@@ -265,6 +292,41 @@ update msg model =
         DismissRevert ->
             { model | revertDismissed = True }
 
+        SetPairValue v ->
+            { model | pairValue = v }
+
+        PairPercent pct ->
+            { model | pairValue = String.fromInt (4206900 * pct // 100) }
+
+        FeedPush ->
+            { model | feed = EventFeed.push "0xcafe… claimed rewards" model.feed }
+
+        SimStart ->
+            { model | sim = SimulateFirst.start model.sim }
+
+        SimOk ->
+            { model | sim = SimulateFirst.onSimResult (Ok "You would receive 1,204,776 FOO") model.sim }
+
+        SimConfirm ->
+            { model | sim = SimulateFirst.confirm model.sim }
+
+        SimTx txMsg ->
+            { model | sim = SimulateFirst.onTx txMsg model.sim }
+
+        SimReset ->
+            { model | sim = SimulateFirst.reset model.sim }
+
+        PagerMore ->
+            { model
+                | pager =
+                    case PaginatedLogs.next model.pager of
+                        Just ( p2, _ ) ->
+                            PaginatedLogs.onLoaded 137 p2
+
+                        Nothing ->
+                            model.pager
+            }
+
         Noop ->
             model
 
@@ -314,6 +376,12 @@ advanceSign state =
 
         Sign.SignPending id ->
             Sign.signUpdate (Sign.SignResponse id "0xdeadbeef5161…") state
+
+        Sign.Signed _ _ ->
+            Sign.SignFailed "sig-1" "wallet error"
+
+        Sign.SignFailed _ _ ->
+            Sign.SignRejected "sig-1"
 
         _ ->
             Sign.SignIdle
@@ -538,6 +606,75 @@ view model =
                     , onRetry = FlowMsg Flow.Retry
                     }
                     model.flow
+                )
+            ]
+        , layer "New in 2.2 – 2.3"
+            [ demo "TokenLogo / TokenAmountPair"
+                "Logo atom with deterministic letter-tile fallback; the swap/deposit compound."
+                (Html.div [ Attr.class "col" ]
+                    [ Html.div [ Attr.class "row" ]
+                        [ TokenLogo.view { logoUrl = Nothing, symbol = "FOO", size = 28 }
+                        , TokenLogo.view { logoUrl = Nothing, symbol = "PLS", size = 28 }
+                        , TokenLogo.view { logoUrl = Nothing, symbol = "USDC", size = 28 }
+                        ]
+                    , Pair.view []
+                        { symbol = "FOO"
+                        , logoUrl = Nothing
+                        , balance = Just "4,206,900 FOO"
+                        , value = model.pairValue
+                        , onInput = SetPairValue
+                        , onPercent = PairPercent
+                        , onOpenSelector = Just Noop
+                        , valid = True
+                        }
+                    ]
+                )
+            , demo "Address.copyable / formatWeiDust"
+                "Copy emits intent (the app owns the clipboard); dust says <0.0001, never a lying zero."
+                (Html.div [ Attr.class "row" ]
+                    [ Address.copyable [] { onCopy = \_ -> Noop, explorerUrl = Nothing } demoAddress
+                    , Html.text ("1 wei → " ++ Amount.formatWeiDust 18 (wei "1"))
+                    , Html.text ("1e18 → " ++ Amount.formatWeiDust 18 (wei "1000000000000000000"))
+                    ]
+                )
+            , demoWith "EventFeed"
+                "Live-vs-fallback honesty chip; capped, newest first, aria-live."
+                [ button FeedPush "push event" ]
+                (EventFeed.view { onLoadMore = Nothing } Html.text model.feed)
+            , demoWith "SimulateFirst"
+                "A transaction cannot be sent without a completed simulation — confirm is the only door."
+                [ button SimStart "simulate"
+                , button SimOk "sim ok"
+                , button SimConfirm "confirm"
+                , button (SimTx (Tx.TxSubmitted demoHashStr)) "submitted"
+                , button (SimTx (Tx.TxConfirmed demoReceiptJson)) "confirmed"
+                , button (SimTx Tx.TxRejected) "reject"
+                , button SimReset "reset"
+                ]
+                (SimulateFirst.view
+                    { simulateLabel = "Preview buy"
+                    , confirmLabel = "Buy 1.2M FOO"
+                    , onStart = SimStart
+                    , onConfirm = SimConfirm
+                    , onReset = SimReset
+                    }
+                    model.sim
+                )
+            , demoWith "PaginatedLogs"
+                "Windowed getLogs walker — exact tiling to genesis, fuzz-proved."
+                [ button PagerMore "load older" ]
+                (Html.div [ Attr.class "row" ]
+                    [ Html.text (String.fromInt (PaginatedLogs.loadedCount model.pager) ++ " logs loaded")
+                    , PaginatedLogs.loadMoreButton { onLoadMore = PagerMore, label = "Load older" } model.pager
+                    ]
+                )
+            , demo "Revert.bannerWith (typed custom error)"
+                "elm-web3 1.4.0 decodeCustomError fragments render named errors with args."
+                (Revert.bannerWith []
+                    { onDismiss = Nothing
+                    , decode = \_ -> Just { name = "InsufficientBalance", args = [ "5", "10" ] }
+                    }
+                    "0xcf479181…"
                 )
             ]
         , Html.footer [ Attr.class "gallery__footer" ]

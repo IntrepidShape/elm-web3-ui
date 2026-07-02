@@ -284,3 +284,51 @@ button.web3-pill:hover { border-color: var(--accent-dim); }
 .web3-relativetime { color: var(--muted); }
 .web3-fee-breakdown, .web3-feebreakdown { font-size: 13px; }
 .web3-supplybar, .web3-supply-bar { min-width: 180px; }
+
+
+/* ─── light rice — same tokens, re-colored; proves the theming contract.
+   Auto via prefers-color-scheme; copy the block to force it. ─── */
+@media (prefers-color-scheme: light) {
+  :root {
+    --bg: #f5f7f9; --panel: #ffffff; --panel-2: #eef1f4; --line: #d7dde3;
+    --text: #1c2430; --muted: #5d6b7a; --accent: #0aa06a; --accent-dim: #7fd4b4;
+    --danger: #c93a4a; --warn: #b97b1e;
+  }
+  body { background: var(--bg); }
+  .web3-revert, .web3-revert-toast { background: #fdecee; border-color: #f2c1c7; color: #8f2330; }
+  .web3-form-errors { background: #fdecee; border-color: #f2c1c7; }
+  .web3-form-errors__item { color: #8f2330; }
+}
+
+/* 2.2–2.3 primitives */
+.web3-tokenlogo { display: inline-flex; vertical-align: middle; border-radius: 50%; overflow: hidden; }
+.web3-tokenlogo--tile { align-items: center; justify-content: center; font-size: 10px; font-weight: 700; color: var(--bg); width: 28px; height: 28px; }
+.web3-tokenlogo--hue-0 { background: #37e08d; } .web3-tokenlogo--hue-1 { background: #6ab7ff; }
+.web3-tokenlogo--hue-2 { background: #ffb454; } .web3-tokenlogo--hue-3 { background: #ff5d6c; }
+.web3-tokenlogo--hue-4 { background: #b48cff; } .web3-tokenlogo--hue-5 { background: #2bb3a3; }
+.web3-tokenlogo--hue-6 { background: #ff8fd6; } .web3-tokenlogo--hue-7 { background: #c9d34e; }
+.web3-tokenamount { display: flex; flex-direction: column; gap: 8px; max-width: 380px; background: var(--panel-2); border: 1px solid var(--line); border-radius: 12px; padding: 12px; }
+.web3-tokenamount__token { display: inline-flex; align-items: center; gap: 8px; font: inherit; color: var(--text); background: none; border: 0; cursor: pointer; align-self: flex-start; }
+.web3-tokenamount__input { font: inherit; font-size: 20px; color: var(--text); background: none; border: 0; outline: none; }
+.web3-tokenamount__input--invalid { color: var(--danger); }
+.web3-tokenamount__balance { color: var(--muted); font-size: 12px; }
+.web3-tokenamount__presets { display: flex; gap: 6px; }
+.web3-tokenamount__chip { font: inherit; font-size: 11px; color: var(--muted); background: var(--panel); border: 1px solid var(--line); border-radius: 999px; padding: 2px 10px; cursor: pointer; }
+.web3-tokenamount__chip--max { color: var(--accent); border-color: var(--accent-dim); }
+.web3-eventfeed { max-width: 420px; }
+.web3-eventfeed__status { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; border-radius: 999px; padding: 2px 10px; border: 1px solid var(--line); }
+.web3-eventfeed__status--live { color: var(--accent); border-color: var(--accent-dim); }
+.web3-eventfeed__status--fallback { color: var(--warn); }
+.web3-eventfeed__list { list-style: none; margin: 10px 0 0; padding: 0; }
+.web3-eventfeed__list li { padding: 6px 0; border-bottom: 1px dashed var(--line); font-size: 13px; }
+.web3-simulate { display: flex; flex-direction: column; gap: 10px; max-width: 380px; }
+.web3-simulate__preview { margin: 0; padding: 10px 14px; background: #0f1f17; border: 1px solid var(--accent-dim); border-radius: 8px; color: var(--accent); font-size: 13px; }
+.web3-simulate__button { font: inherit; font-weight: 600; color: var(--bg); background: var(--accent); border: 0; border-radius: 8px; padding: 10px 20px; cursor: pointer; align-self: flex-start; }
+.web3-simulate__button:disabled { background: var(--line); color: var(--muted); }
+.web3-simulate__error { margin: 0; color: #ffb9c0; font-size: 13px; }
+.web3-pagedlogs__more { font: inherit; font-size: 12px; color: var(--muted); background: var(--panel-2); border: 1px solid var(--line); border-radius: 999px; padding: 4px 14px; cursor: pointer; }
+.web3-pagedlogs__more:hover { color: var(--accent); border-color: var(--accent-dim); }
+.web3-revert--custom, .web3-revert-toast--custom { background: #241a10; border-color: #4d3a1e; color: var(--warn); }
+.web3-revert__name { font-weight: 700; }
+.web3-address__copy { background: none; border: 0; color: var(--muted); cursor: pointer; font-size: 13px; }
+.web3-address__copy:hover { color: var(--accent); }

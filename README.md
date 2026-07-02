@@ -1,6 +1,6 @@
 # elm-web3-ui
 
-Type-safe DeFi UI primitives for [elm-web3](https://package.elm-lang.org/packages/intrepidshape/elm-web3/latest/). Drop-in wallet, transaction, address, balance, signing, staking, voting, bonding-curve, fee, gauge and price components — all returning plain `Html msg`, all closing the frontend security gap that owns DeFi.
+Type-safe DeFi UI primitives for [elm-web3](https://package.elm-lang.org/packages/intrepidshape/elm-web3/latest/). 57 modules: wallet, transaction, address, balance, signing, token, approval-flow, event-feed, simulate-first, staking, voting, bonding-curve, fee, gauge and price primitives — all returning plain `Html msg`, all closing the frontend security gap that owns DeFi.
 
 No internal `Msg`, no subscriptions, no state of their own. You pass the state in, the component renders it, your `msg` comes back. The compiler enforces the rest.
 

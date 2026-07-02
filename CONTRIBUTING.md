@@ -32,9 +32,13 @@ CI runs both on every PR.
    state machines; Layer 3 generics carry the type-level machinery
    (see `PRIMITIVES.md`). Domain compounds (Layer 4) need a real consuming
    project, not speculation.
-5. **Tests + docs.** Every exposed function gets doc comments (the docs
+5. **Gallery in the same PR.** Every new primitive lands with its gallery
+   section in `examples/gallery/` — the gallery is the fourth checker (it
+   caught two shipped bugs in one page-load) and its coverage is regression
+   surface, not decoration.
+6. **Tests + docs.** Every exposed function gets doc comments (the docs
    build is a hard gate) and view tests for its state variants.
-6. **Update `PRIMITIVES.md` and `CHANGELOG.md`** in the same PR — the
+7. **Update `PRIMITIVES.md` and `CHANGELOG.md`** in the same PR — the
    taxonomy's grades must stay true, exactly like elm-web3's coverage doc.
 
 ## Good first contributions (from the ranked roadmap)
