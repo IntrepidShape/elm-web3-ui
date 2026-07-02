@@ -1,0 +1,47 @@
+name: Deploy gallery to Pages
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install elm 0.19.1
+        run: |
+          curl -sSL https://github.com/elm/compiler/releases/download/0.19.1/binary-for-linux-64-bit.gz \
+            | gunzip > /usr/local/bin/elm
+          chmod +x /usr/local/bin/elm
+
+      - name: Build gallery
+        run: |
+          cd examples/gallery
+          elm make Main.elm --optimize --output=elm.js
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: examples/gallery
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

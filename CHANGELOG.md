@@ -1,5 +1,32 @@
 # Changelog
 
+## 2.1.1 — 2026-07-02
+
+### Fixed
+
+- **`Identicon.view` crashed at runtime when passed `Html.Attributes.class`**
+  (which every caller does — including our own `AccountPill`): the
+  `className` property is read-only on SVG elements. The user attrs now land
+  on an `Html.span` wrapper (class `web3-identicon`), making any
+  `Html.Attribute` safe. Found by opening the gallery — the page died on
+  first render in 2.1.0.
+- **Require `intrepidshape/elm-web3 ≥ 1.2.2`** — 1.2.2 fixes the
+  `Error(string)` selector typo (`08c379a2` → `08c379a0`) that meant NO real
+  on-chain revert reason ever decoded; `Revert` is only useful with it. Also
+  found via the gallery: a canonical solc payload refused to decode on
+  screen.
+- Gallery: reference CSS now covers the real class names of `ProgressRing`,
+  `SupplyBar`, `Sign`, `FeeBreakdown`, and `SlippageInput`'s custom-input
+  wrapper; SupplyBar demo data at 18-decimal scale; interactions click-tested
+  end-to-end headlessly (stale-answer drop, full ApprovalFlow, tx lifecycle
+  through receipt).
+
+### Added
+
+- GitHub Pages deploy for the gallery (`.github/workflows/pages.yml`) — the
+  demo is its own public page, rebuilt on every push to master.
+
+
 ## 2.1.0 — 2026-07-02
 
 ### Added — the generic primitive build (10 new modules + gallery)

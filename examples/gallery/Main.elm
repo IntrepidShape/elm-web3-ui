@@ -359,7 +359,7 @@ view model =
                 "Progress toward caps and thresholds; block-time phrasing."
                 (Html.div [ Attr.class "row" ]
                     [ ProgressRing.view { current = wei "68", target = wei "100", size = 56, label = Just "68%" }
-                    , SupplyBar.view { current = wei "6800", max = wei "10000", label = Just "graduation" }
+                    , SupplyBar.view { current = wei "6800000000000000000000", max = wei "10000000000000000000000", label = Just "graduation" }
                     , RelativeTime.view { nowSec = 1000000, atSec = 999160 }
                     ]
                 )

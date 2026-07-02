@@ -26,6 +26,7 @@ CSS class: `web3-identicon`.
 -}
 
 import Bitwise
+import Html.Attributes as Attr
 import Html exposing (Html)
 import Svg exposing (Svg)
 import Svg.Attributes as SA
@@ -44,7 +45,14 @@ type alias Cells =
     }
 
 
-{-| Render the identicon for an address at a given pixel size. -}
+{-| Render the identicon for an address at a given pixel size.
+
+The `attrs` land on an `Html.span` wrapper (class `web3-identicon`), not on
+the SVG itself — `Html.Attributes.class` sets the `className` *property*,
+which is read-only on SVG nodes and would crash at runtime. The wrapper
+makes any `Html.Attribute` safe to pass.
+
+-}
 view : List (Html.Attribute msg) -> { size : Int } -> T.Address -> Html msg
 view attrs opts addr =
     let
@@ -54,19 +62,20 @@ view attrs opts addr =
         px =
             String.fromInt opts.size
     in
-    Svg.svg
-        (SA.class "web3-identicon"
-            :: SA.viewBox "0 0 8 8"
-            :: SA.width px
-            :: SA.height px
-            :: SA.shapeRendering "crispEdges"
-            :: attrs
-        )
-        (Svg.rect
-            [ SA.x "0", SA.y "0", SA.width "8", SA.height "8", SA.fill c.bgColor ]
-            []
-            :: List.filterMap identity (List.indexedMap (cell c) c.grid)
-        )
+    Html.span
+        (Attr.class "web3-identicon" :: attrs)
+        [ Svg.svg
+            [ SA.viewBox "0 0 8 8"
+            , SA.width px
+            , SA.height px
+            , SA.shapeRendering "crispEdges"
+            ]
+            (Svg.rect
+                [ SA.x "0", SA.y "0", SA.width "8", SA.height "8", SA.fill c.bgColor ]
+                []
+                :: List.filterMap identity (List.indexedMap (cell c) c.grid)
+            )
+        ]
 
 
 cell : Cells -> Int -> Int -> Maybe (Svg msg)
