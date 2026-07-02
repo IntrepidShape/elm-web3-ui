@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.3.1 — 2026-07-02
+
+- Docs-only: README refresh (module count, gallery/theme/proofs links) so
+  the registry page carries the current front door. No code changes.
+
+
 ## 2.3.0 — 2026-07-02
 
 ### Added — the flow-generic completion

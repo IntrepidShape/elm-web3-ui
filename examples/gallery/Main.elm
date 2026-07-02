@@ -397,7 +397,7 @@ view model =
         [ Html.header [ Attr.class "gallery__header" ]
             [ Html.h1 [] [ Html.text "elm-web3-ui" ]
             , Html.nav [ Attr.class "gallery__links" ]
-                [ Html.span [ Attr.class "gallery__version" ] [ Html.text "v2.3.0" ]
+                [ Html.span [ Attr.class "gallery__version" ] [ Html.text "v2.3.1" ]
                 , Html.a [ Attr.href "https://package.elm-lang.org/packages/intrepidshape/elm-web3-ui/latest/" ] [ Html.text "package docs" ]
                 , Html.a [ Attr.href "https://intrepidshape.github.io/elm-web3/" ] [ Html.text "what is actually proved" ]
                 , Html.a [ Attr.href "https://github.com/IntrepidShape/elm-web3-ui" ] [ Html.text "source" ]
