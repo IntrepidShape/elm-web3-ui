@@ -1,0 +1,37 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+jobs:
+  elm:
+    name: Build + tests (elm)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install elm 0.19.1
+        run: |
+          curl -sSL https://github.com/elm/compiler/releases/download/0.19.1/binary-for-linux-64-bit.gz \
+            | gunzip > /usr/local/bin/elm
+          chmod +x /usr/local/bin/elm
+          elm --version
+
+      - name: Cache ELM_HOME
+        uses: actions/cache@v4
+        with:
+          path: ~/.elm
+          key: elm-home-${{ hashFiles('elm.json') }}
+
+      # elm-test is a Node CLI; Bun cannot currently drive it.
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Verify docs build
+        run: elm make --docs=/tmp/docs.json
+
+      - name: Run test suite
+        run: npx --yes elm-test --compiler /usr/local/bin/elm
