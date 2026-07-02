@@ -30,6 +30,9 @@ import Web3.Ui.Deadline as Deadline
 import Web3.Ui.FeeBreakdown as FeeBreakdown
 import Web3.Ui.Form as Form
 import Web3.Ui.GasEstimate as GasEstimate
+import Web3.Ui.GaugeRow as GaugeRow
+import Web3.Ui.StakeCard as StakeCard
+import Web3.Ui.VeLock as VeLock
 import Web3.Ui.Identicon as Identicon
 import Web3.Ui.PendingOverlay as PendingOverlay
 import Web3.Ui.PriceDisplay as PriceDisplay
@@ -137,6 +140,8 @@ type alias Model =
     , feed : EventFeed.Feed String
     , sim : SimulateFirst.Step
     , pager : PaginatedLogs.Pager
+    , veAmount : String
+    , veLockSec : Int
     }
 
 
@@ -172,6 +177,8 @@ init =
             |> EventFeed.push "0x1234… staked 50k FOO"
     , sim = SimulateFirst.Idle
     , pager = Tuple.first (PaginatedLogs.init { latest = 21688204, window = 5000 })
+    , veAmount = "100000"
+    , veLockSec = 26 * 7 * 86400
     }
 
 
@@ -210,6 +217,8 @@ type Msg
     | SimTx Tx.Msg
     | SimReset
     | PagerMore
+    | SetVeAmount String
+    | SetVeLock Int
     | Noop
 
 
@@ -326,6 +335,12 @@ update msg model =
                         Nothing ->
                             model.pager
             }
+
+        SetVeAmount v ->
+            { model | veAmount = v }
+
+        SetVeLock sec ->
+            { model | veLockSec = sec }
 
         Noop ->
             model
@@ -683,8 +698,62 @@ view model =
                     "0xcf479181…"
                 )
             ]
+        , layer "Layer 4 — domain compounds (a sample)"
+            [ demo "StakeCard"
+                "A live staking position: amount, lock progress, accrued yield, eligibility badges."
+                (StakeCard.view
+                    { amount = wei "50000000000000000000000"
+                    , symbol = "FOO"
+                    , decimals = 18
+                    , startTimeSec = 999000
+                    , lockDays = 90
+                    , nowSec = 999000 + 40 * 86400
+                    , yieldAccrued = wei "1234000000000000000000"
+                    , yieldSymbol = "PLS"
+                    , badges = [ { active = True, label = "floor-protected" }, { active = False, label = "boosted" } ]
+                    , onClaimYield = Just Noop
+                    , onUnstake = Just Noop
+                    , unstakeLabel = "Unstake"
+                    }
+                )
+            , demo "VeLock"
+                "Vote-escrow lock builder — amount plus a period slider snapped to contract steps."
+                (VeLock.view
+                    { amount = Maybe.withDefault B.zero (B.fromString (model.veAmount ++ "000000000000000000"))
+                    , amountInput = model.veAmount
+                    , decimals = 18
+                    , symbol = "VOTE"
+                    , veSymbol = "veVOTE"
+                    , lockSec = model.veLockSec
+                    , minLockSec = 7 * 86400
+                    , maxLockSec = 104 * 7 * 86400
+                    , stepSec = 7 * 86400
+                    , onAmountInput = SetVeAmount
+                    , onLockChange = SetVeLock
+                    }
+                )
+            , demo "GaugeRow"
+                "One gauge in a vote market: votes, bribes, your share, APR, and the three actions."
+                (GaugeRow.view
+                    { gaugeLabel = "FOO / PLS"
+                    , epoch = 42
+                    , currentEpoch = 42
+                    , totalVotes = wei "8400000000000000000000000"
+                    , totalBribes = wei "1250000000000000000000"
+                    , bribeSymbol = "PLS"
+                    , bribeDecimals = 18
+                    , veSymbol = "veVOTE"
+                    , veDecimals = 18
+                    , yourVote = wei "120000000000000000000000"
+                    , aprBps = Just 3420
+                    , onVote = Just Noop
+                    , onBribe = Just Noop
+                    , onClaim = Just Noop
+                    }
+                )
+            ]
         , Html.footer [ Attr.class "gallery__footer" ]
-            [ Html.text "Domain compounds (StakeCard, BondCard, VeLock, GaugeRow, FundingPool, SecurityCard, …) and the generic contract forms (ContractRead/Write, AbiInput) live in the "
+            [ Html.text "More domain compounds (BondCard, FundingPool, SecurityCard, BondingCurve, NFTStakeCard, …) and the generic contract forms (ContractRead/Write, AbiInput) live in the "
             , Html.a [ Attr.href "https://package.elm-lang.org/packages/intrepidshape/elm-web3-ui/latest/" ] [ Html.text "package docs" ]
             , Html.text ". Taxonomy and roadmap: PRIMITIVES.md."
             ]
