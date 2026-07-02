@@ -332,3 +332,8 @@ button.web3-pill:hover { border-color: var(--accent-dim); }
 .web3-revert__name { font-weight: 700; }
 .web3-address__copy { background: none; border: 0; color: var(--muted); cursor: pointer; font-size: 13px; }
 .web3-address__copy:hover { color: var(--accent); }
+
+.gallery__links { display: flex; gap: 16px; align-items: center; margin: 10px 0 4px; flex-wrap: wrap; }
+.gallery__links a { color: var(--accent); text-decoration: none; border-bottom: 1px dotted var(--accent-dim); font-size: 13px; }
+.gallery__links a:hover { border-bottom-style: solid; }
+.gallery__version { font-size: 11px; color: var(--bg); background: var(--accent); border-radius: 999px; padding: 2px 10px; font-weight: 700; }

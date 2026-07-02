@@ -30,6 +30,8 @@ jobs:
         run: |
           cd examples/gallery
           elm make Main.elm --optimize --output=elm.js
+          # cache-bust assets per deploy (Pages serves max-age=600)
+          sed -i "s/elm.js/elm.js?v=${GITHUB_SHA::8}/; s/gallery.css/gallery.css?v=${GITHUB_SHA::8}/" index.html
 
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
