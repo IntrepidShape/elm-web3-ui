@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.1.2 — 2026-07-02
+
+- README: prominent links to the [live gallery](https://intrepidshape.github.io/elm-web3-ui/),
+  the reference theme, `PRIMITIVES.md`, and elm-web3's
+  [proofs page](https://intrepidshape.github.io/elm-web3/) — so all of it
+  surfaces on the package registry too. Docs-only release.
+
+
 ## 2.1.1 — 2026-07-02
 
 ### Fixed

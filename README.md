@@ -4,6 +4,8 @@ Type-safe DeFi UI primitives for [elm-web3](https://package.elm-lang.org/package
 
 No internal `Msg`, no subscriptions, no state of their own. You pass the state in, the component renders it, your `msg` comes back. The compiler enforces the rest.
 
+> **[Live gallery →](https://intrepidshape.github.io/elm-web3-ui/)** every generic primitive in every state, driven entirely by simulated messages — no wallet, no node, no JS. The kit is riced from ~10 CSS tokens; [`examples/gallery/gallery.css`](https://github.com/IntrepidShape/elm-web3-ui/blob/master/examples/gallery/gallery.css) is the reference theme. Map and roadmap: [`PRIMITIVES.md`](https://github.com/IntrepidShape/elm-web3-ui/blob/master/PRIMITIVES.md). The proofs behind the machines: [what is actually proved](https://intrepidshape.github.io/elm-web3/).
+
 For the underlying correctness / supply-chain / frontend-security pitch — why this stack at all — see [`intrepidshape/elm-web3`](https://github.com/IntrepidShape/elm-web3#why-elm-web3). This package is the rendering layer on top.
 
 ## Install
