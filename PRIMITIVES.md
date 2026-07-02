@@ -21,9 +21,9 @@ wrapper for port round-trips, not a spinner).
 
 | Primitive | What | Status |
 |---|---|---|
-| Address display | truncated, full, explorer-linked (`Maybe` url), copyable | ✅ `Address.view/short/shortWith` — 🟡 no copy-to-clipboard affordance (**build**: `Address.copyable`) |
+| Address display | truncated, full, explorer-linked (`Maybe` url), copyable | ✅ `Address.view/short/shortWith/copyable` (copy affordance emits intent; app owns the clipboard — zero JS here) |
 | Tx-hash display | truncated, explorer-linked, plain fallback | ✅ `Transaction.txHashLink/hashDisplay` |
-| Token amount | BigInt+decimals → human string; SI notation; rounding | ✅ `Amount.formatWei/siFormat/round2` — 🟡 no dust convention (`<0.0001`) or locale grouping (**build**) |
+| Token amount | BigInt+decimals → human string; SI notation; rounding | ✅ `Amount.formatWei/formatWeiDust` — dust convention shipped (2.3.0); locale grouping stays out of scope (documented seam) |
 | Fiat equivalent | amount × price feed → `$1,234.56` | ✅ `PriceDisplay` |
 | Balance | live balance for an address, with loading/absent states | ✅ `Balance.view/viewEther/viewMaybe` |
 | Chain badge | chain name/logo pill from chainId | ✅ `Wallet.chainBadge/lookupChainName` |
@@ -53,7 +53,7 @@ wrapper for port round-trips, not a spinner).
 | Tab switcher | buy/sell, stake/unstake | ✅ `TradeTabs` |
 | Deadline control | tx deadline minutes | ✅ `Deadline` — presets + custom, `toUnixDeadline` helper |
 | Chain selector | pick from configured chains, triggers switch flow | ✅ `ChainSelector` — radiogroup semantics; renders truth from `Wallet.State`, never optimistic |
-| Token-amount pair | token selector + amount input + balance + max, as one unit | ❌ **build** — the swap/deposit workhorse; compose from existing atoms |
+| Token-amount pair | token selector + amount input + balance + max, as one unit | ✅ `TokenAmountPair` (2.3.0) — token trigger + decimals-aware input + balance + percent presets |
 
 ## Layer 2 — State-machine-bound components (the elm-web3 glue)
 
@@ -72,10 +72,10 @@ wrapper for port round-trips, not a spinner).
 | Generic write form | any fn: AbiInputs → estimate → send → track | ✅ `ContractWrite` |
 | Account pill | address + balance + chain + disconnect menu, one compound | ✅ `AccountPill` — all six wallet states, identicon included |
 | Approval flow | allowance read → approve tx → action tx, as ONE component | ✅ `ApprovalFlow` — guarded machine, fuzz-tested AND TLC-model-checked (`proofs/tla/ApprovalSpec.tla`) |
-| Event feed | live log subscription → prepend-rendered rows | 🟡 `ActivityRow` renders; no binder to `Web3.Subscription` (**build**: `EventFeed` = subscription plumbing + `ActivityRow`) |
-| Balance watcher | re-fetch balances on new block | ❌ **build** (thin: `watchBlockNumber` → refetch policy) |
+| Event feed | live log subscription → prepend-rendered rows | ✅ `EventFeed` (2.3.0) — status chip (live/fallback honest), capped newest-first list, aria-live, load-more hook |
+| Balance watcher | re-fetch balances on new block | ✅ `BlockRefresh` (2.3.0) — block-cadence policies; balance watcher is its documented worked example |
 | Tx toast / queue | multiple in-flight txs, corner toasts | ✅ `TxQueue.toastStack` — id-routed, aria-live |
-| Revert toast | failed tx → decoded reason, retry affordance | ✅ `Revert.toast` |
+| Revert toast | failed tx → decoded reason, retry affordance | ✅ `Revert.toast` + `bannerWith`/`toastWith` for typed custom errors (pair with elm-web3 ≥ 1.4.0 `decodeCustomError`) |
 
 ## Layer 3 — Flow generics (type-level machinery)
 
@@ -87,10 +87,10 @@ smaller. These are what "generics" means for a web3 UI package.
 | Remote call | `RemoteCall a` — RemoteData specialised to correlation-id port round-trips | ✅ `RemoteCall` — id-guarded `resolve` (stale answers dropped; the SignSpec no-cross-confusion rule applied to reads) |
 | Two-step tx | the approve-then-act machine behind `ApprovalFlow` | ✅ `ApprovalFlow.Step/update` — TLA+-specced and TLC-verified, elm-web3 style |
 | Tx queue | many in-flight txs without Model gymnastics | ✅ `TxQueue` — opaque, id-routed, no ghost entries |
-| Simulate-first write | run `readCall withFrom` preview, show result, then send — wraps `ContractWrite` | ❌ **build** (elm-web3 already has the simulate capability) |
-| Block-refresh policy | `Refresh = EveryBlock \| EveryNBlocks Int \| Manual` driving re-fetch of a `RemoteCall` | ❌ **build** |
+| Simulate-first write | preview a write before signing | ✅ `SimulateFirst` (2.3.0) — confirm is the only door into Sending; rejection returns to the still-true preview |
+| Block-refresh policy | block-cadence re-fetch driver | ✅ `BlockRefresh` (2.3.0) |
 | Validated form | combine typed inputs into `Result (List FieldError) args` | ✅ `Form` — accumulating applicative (`succeed`/`andMap`), no short-circuit |
-| Paginated logs | block-range windowed `getLogs` loader with "load more" | ❌ **build** (nice-to-have) |
+| Paginated logs | block-range windowed `getLogs` loader with "load more" | ✅ `PaginatedLogs` (2.3.0) — exact tiling to genesis, fuzz-proved no-overlap/no-gap |
 | Optimistic update | show expected post-state, reconcile on receipt | ❌ **skip for now** — high complexity, easy to get dishonest UX; revisit with demand |
 
 ## Layer 4 — Domain compounds (batteries included)
@@ -114,7 +114,7 @@ them cheap to assemble.
 | Concern | Status |
 |---|---|
 | Theming | ✅ every component uses stable `web3-*` CSS classes, zero inline styles — themes are pure CSS. Keep this contract |
-| Accessibility | 🟡 buttons/tabs are semantic; async states need `aria-busy`/`aria-live` sweep (**build**: one audit pass) |
+| Accessibility | ✅ 2.1.0+ modules ship aria by design; legacy sweep 2.3.0 added tab roles (TradeTabs) and status/busy (PendingOverlay); remaining legacy modules are static text (no async surfaces to announce) |
 | Locale number formatting | ❌ **skip** — Elm-side locale formatting is a separate concern (`cuducos/elm-format-number` exists); document the seam |
 | Responsive | ✅ CSS-side by design (classes, no fixed widths) |
 

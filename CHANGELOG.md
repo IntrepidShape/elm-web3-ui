@@ -1,5 +1,35 @@
 # Changelog
 
+## 2.3.0 — 2026-07-02
+
+### Added — the flow-generic completion
+
+- **`TokenAmountPair`** — the swap/deposit workhorse compound.
+- **`EventFeed`** — Subscription→rows binder: honest live/fallback status
+  chip, capped newest-first list (fuzz: cap never exceeded), aria-live.
+- **`BlockRefresh`** — block-cadence refetch policies (EveryBlock /
+  EveryNBlocks / Manual); the balance watcher is its documented example.
+  Fuzz: fires exactly on gap ≥ N, Manual never fires.
+- **`SimulateFirst`** — preview-before-sign machine: `confirm` is the only
+  door into Sending (fuzz: unreachable without it); wallet rejection
+  returns to the still-true preview.
+- **`PaginatedLogs`** — windowed getLogs walker; fuzz-proved exact tiling
+  to genesis (no overlap, no gap).
+- **`Address.copyable`** — copy affordance emitting intent (app owns the
+  clipboard; zero JS here, one-line port documented).
+- **`Amount.formatWeiDust`** — `"<0.0001"` dust convention ("0" must mean
+  zero).
+- **`Revert.bannerWith`/`toastWith`** — typed custom-error rendering; pass
+  elm-web3 ≥ 1.4.0's `decodeCustomError fragments`.
+
+### Accessibility
+
+- TradeTabs: proper `role="tab"` + `aria-selected`; PendingOverlay:
+  `role="status"` + `aria-busy`.
+
+113+ tests green (structural fuzz for every new machine).
+
+
 ## 2.2.0 — 2026-07-02
 
 ### Added

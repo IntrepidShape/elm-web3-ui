@@ -1,4 +1,4 @@
-module Web3.Ui.Revert exposing (banner, toast, reason)
+module Web3.Ui.Revert exposing (banner, toast, reason, bannerWith, toastWith)
 
 {-| Human-readable revert reasons. elm-web3 can decode `Error(string)`
 revert data (`Web3.Abi.Decode.decodeRevertReason`) — this module is the
@@ -21,6 +21,7 @@ CSS classes: `web3-revert`, `web3-revert--decoded`, `web3-revert--raw`,
 `web3-revert__reason`, `web3-revert__dismiss`, `web3-revert-toast`.
 
 @docs banner, toast, reason
+@docs bannerWith, toastWith
 
 -}
 
@@ -109,3 +110,71 @@ shorten raw =
 
     else
         String.left 40 raw
+
+
+{-| Like [`banner`](#banner), but tries a typed custom-error decoder first —
+pass elm-web3's `Abi.Decode.decodeCustomError yourFragments` (>= 1.4.0). A
+decoded custom error renders its name and args
+(`web3-revert--custom`, name in `web3-revert__name`); anything else falls
+through to the standard `Error(string)` path.
+-}
+bannerWith :
+    List (Html.Attribute msg)
+    -> { onDismiss : Maybe msg
+       , decode : String -> Maybe { name : String, args : List String }
+       }
+    -> String
+    -> Html msg
+bannerWith =
+    withCustom "web3-revert"
+
+
+{-| Toast-shaped sibling of [`bannerWith`](#bannerWith). -}
+toastWith :
+    List (Html.Attribute msg)
+    -> { onDismiss : Maybe msg
+       , decode : String -> Maybe { name : String, args : List String }
+       }
+    -> String
+    -> Html msg
+toastWith =
+    withCustom "web3-revert-toast"
+
+
+withCustom :
+    String
+    -> List (Html.Attribute msg)
+    -> { onDismiss : Maybe msg
+       , decode : String -> Maybe { name : String, args : List String }
+       }
+    -> String
+    -> Html msg
+withCustom baseClass attrs opts raw =
+    case opts.decode raw of
+        Just err ->
+            Html.div
+                (Attr.class baseClass
+                    :: Attr.class (baseClass ++ "--custom")
+                    :: Attr.attribute "role" "alert"
+                    :: attrs
+                )
+                (Html.span [ Attr.class "web3-revert__name" ] [ Html.text err.name ]
+                    :: Html.span [ Attr.class "web3-revert__reason" ]
+                        [ Html.text (String.join ", " err.args) ]
+                    :: (case opts.onDismiss of
+                            Just msg ->
+                                [ Html.button
+                                    [ Attr.class "web3-revert__dismiss"
+                                    , Attr.attribute "aria-label" "Dismiss"
+                                    , Events.onClick msg
+                                    ]
+                                    [ Html.text "×" ]
+                                ]
+
+                            Nothing ->
+                                []
+                       )
+                )
+
+        Nothing ->
+            body baseClass attrs { onDismiss = opts.onDismiss } raw

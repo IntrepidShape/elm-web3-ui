@@ -2,6 +2,7 @@ module Web3.Ui.Amount exposing
     ( amountInput
     , formatWei
     , presetRow
+    , formatWeiDust
     )
 
 {-| Token amount input and display with SI suffix formatting.
@@ -19,7 +20,7 @@ module Web3.Ui.Amount exposing
     Web3.Ui.Amount.formatWei 18 weiAmount ++ " PLS"
     --> "1.23M PLS"
 
-@docs amountInput, formatWei, presetRow
+@docs amountInput, formatWei, presetRow, formatWeiDust
 
 -}
 
@@ -27,6 +28,7 @@ import Html exposing (Html)
 import Html.Attributes as Attr
 import Html.Events as Events
 import Web3.BigInt exposing (BigInt)
+import Web3.BigInt
 import Web3.Units as Units
 
 
@@ -167,3 +169,25 @@ presetRow attrs opts =
             )
             [ 25, 50, 75, 100 ]
         )
+
+
+{-| Like [`formatWei`](#formatWei), with the dust convention: a nonzero
+amount that would display as zero (below 0.0001 of the unit) renders as
+`"<0.0001"` instead — "0" must mean zero, never "too small to show".
+-}
+formatWeiDust : Int -> BigInt -> String
+formatWeiDust decimals amount =
+    if Web3.BigInt.isZero amount then
+        "0"
+
+    else
+        case String.toFloat (Units.formatUnits decimals amount) of
+            Just f ->
+                if f < 0.0001 then
+                    "<0.0001"
+
+                else
+                    formatWei decimals amount
+
+            Nothing ->
+                formatWei decimals amount

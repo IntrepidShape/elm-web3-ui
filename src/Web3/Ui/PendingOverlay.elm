@@ -60,7 +60,7 @@ view :
     -> Html msg
 view attrs opts =
     Html.div
-        (Attr.class "web3-pending-overlay" :: attrs)
+        (Attr.class "web3-pending-overlay" :: Attr.attribute "role" "status" :: Attr.attribute "aria-busy" "true" :: attrs)
         [ Html.div
             [ Attr.class "web3-pending-overlay-inner" ]
             [ Html.div [ Attr.class "web3-pending-spinner" ] []

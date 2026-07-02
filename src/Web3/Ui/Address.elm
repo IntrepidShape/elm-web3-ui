@@ -3,6 +3,7 @@ module Web3.Ui.Address exposing
     , short
     , shortWith
     , input
+    , copyable
     )
 
 {-| Address display and input components.
@@ -27,6 +28,7 @@ module Web3.Ui.Address exposing
         }
 
 @docs view, short, shortWith, input
+@docs copyable
 
 -}
 
@@ -133,3 +135,33 @@ input attrs opts =
             ++ attrs
         )
         []
+
+
+{-| The short address display plus a copy affordance.
+
+The button emits `onCopy <full 0x address>` — the component states intent,
+the APP performs the copy. This package ships zero JavaScript, so wire the
+message to a one-line port:
+
+    -- JS side of your app:
+    app.ports.copyToClipboard.subscribe(s => navigator.clipboard.writeText(s))
+
+CSS classes: `web3-address`, `web3-address__copy` (aria-label "Copy address").
+
+-}
+copyable :
+    List (Html.Attribute msg)
+    -> { onCopy : String -> msg, explorerUrl : Maybe String }
+    -> T.Address
+    -> Html msg
+copyable attrs opts addr =
+    Html.span
+        (Attr.class "web3-address" :: attrs)
+        [ view [] { explorerUrl = opts.explorerUrl } addr
+        , Html.button
+            [ Attr.class "web3-address__copy"
+            , Attr.attribute "aria-label" "Copy address"
+            , Events.onClick (opts.onCopy (T.addressToString addr))
+            ]
+            [ Html.text "⧉" ]
+        ]
