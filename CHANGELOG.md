@@ -1,5 +1,15 @@
 # Changelog
 
+## 2.2.0 — 2026-07-02
+
+### Added
+
+- **`TokenLogo`** — token logo atom: lazy-loaded `<img>` when a url is
+  known, deterministic letter-tile fallback when not (tile hue derived from
+  the symbol via class buckets — zero inline styles, riceable like
+  everything else). Closes the PRIMITIVES.md token-logo gap.
+
+
 ## 2.1.2 — 2026-07-02
 
 - README: prominent links to the [live gallery](https://intrepidshape.github.io/elm-web3-ui/),

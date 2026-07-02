@@ -34,7 +34,7 @@ wrapper for port round-trips, not a spinner).
 | Progress ring / bar | vesting, caps, graduation | ✅ `ProgressRing`, `SupplyBar` |
 | Percentage / bps | basis-point rendering, fee slices | ✅ `FeeBreakdown`, `FeeFlowDiagram` |
 | Identicon / blockie | deterministic avatar from address | ✅ `Identicon` — canonical blockies algorithm, pure Elm (SVG); raw `cells` exposed for canvas renderers |
-| Token logo/symbol | logo url + symbol fallback | ❌ **build** (list-driven; `TokenSearch` already has the data shape) |
+| Token logo/symbol | logo url + symbol fallback | ✅ `TokenLogo` — img with lazy loading, deterministic letter-tile fallback (hue from symbol, class-based, zero inline styles) |
 | QR code | address receive flow | ❌ **skip** — belongs to a general QR package, not web3-ui |
 | Skeleton / shimmer | loading placeholder shaped like the atoms above | ✅ `Skeleton.line/block/circle/pill/address/amount` — aria-hidden bones, shimmer is pure CSS |
 | Empty state | "no positions yet" | ❌ **skip** — not web3-specific |
