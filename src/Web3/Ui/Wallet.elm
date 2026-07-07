@@ -67,7 +67,7 @@ connectButton attrs callbacks state =
                 (Attr.class "web3-connect-btn" :: Events.onClick callbacks.onConnect :: attrs)
                 [ Html.text "Connect" ]
 
-        Wallet.Connecting ->
+        Wallet.Connecting _ ->
             Html.button
                 (Attr.class "web3-connect-btn" :: Attr.disabled True :: attrs)
                 [ Html.text "Connecting…" ]
@@ -150,7 +150,7 @@ viewState attrs callbacks state =
                 , connectButton [] { onConnect = callbacks.onConnect, onDisconnect = callbacks.onDisconnect } state
                 ]
 
-            Wallet.Connecting ->
+            Wallet.Connecting _ ->
                 [ Html.span [] [ Html.text "Connecting…" ] ]
 
             Wallet.Connected info ->
@@ -204,7 +204,7 @@ chainBadge attrs knownChains state =
                 Wallet.ReadOnly ->
                     "Read-only"
 
-                Wallet.Connecting ->
+                Wallet.Connecting _ ->
                     "—"
 
                 Wallet.Disconnected ->

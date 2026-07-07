@@ -59,7 +59,7 @@ view cfg state =
         Wallet.Error _ ->
             connectButton cfg "connect" False "Reconnect"
 
-        Wallet.Connecting ->
+        Wallet.Connecting _ ->
             connectButton cfg "connecting" True "Connecting…"
 
         Wallet.ReadOnly ->
