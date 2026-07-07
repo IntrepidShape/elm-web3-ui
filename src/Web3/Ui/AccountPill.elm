@@ -60,7 +60,12 @@ view cfg state =
             connectButton cfg "connect" False "Reconnect"
 
         Wallet.Connecting _ ->
-            connectButton cfg "connecting" True "Connecting…"
+            -- busy=False (not disabled): Wallet.startConnect allows a fresh
+            -- attempt to supersede one already in flight, so this must stay
+            -- clickable — see Web3.Ui.Wallet.connectButton's Connecting
+            -- branch for the full reasoning. aria-busy still communicates
+            -- "in progress" without removing the control from the tab order.
+            connectButton cfg "connecting" False "Connecting…"
 
         Wallet.ReadOnly ->
             Html.div

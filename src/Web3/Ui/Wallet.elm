@@ -68,8 +68,15 @@ connectButton attrs callbacks state =
                 [ Html.text "Connect" ]
 
         Wallet.Connecting _ ->
+            -- Deliberately NOT disabled: Wallet.startConnect allows a fresh
+            -- attempt to supersede one already in flight (e.g. the user's
+            -- first wallet prompt is stuck, or they meant to pick a
+            -- different wallet) — a disabled button would make that
+            -- supersession unreachable from this control. onConnect re-fires
+            -- with a new RequestId; the stale response from whatever was
+            -- already in flight is safely dropped by Wallet.update.
             Html.button
-                (Attr.class "web3-connect-btn" :: Attr.disabled True :: attrs)
+                (Attr.class "web3-connect-btn web3-connect-btn--connecting" :: Events.onClick callbacks.onConnect :: attrs)
                 [ Html.text "Connecting…" ]
 
         Wallet.Disconnected ->
@@ -151,7 +158,12 @@ viewState attrs callbacks state =
                 ]
 
             Wallet.Connecting _ ->
-                [ Html.span [] [ Html.text "Connecting…" ] ]
+                -- Reuses connectButton's own Connecting branch, which is
+                -- deliberately clickable (not disabled) so a stuck/ignored
+                -- prompt can be superseded by trying again — see its doc
+                -- comment. A bare, non-interactive "Connecting…" span here
+                -- would be a dead end with no way to retry.
+                [ connectButton [] { onConnect = callbacks.onConnect, onDisconnect = callbacks.onDisconnect } state ]
 
             Wallet.Connected info ->
                 [ Html.span [] [ Html.text (Address.short info.address) ]
