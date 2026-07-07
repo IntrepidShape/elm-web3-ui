@@ -3,6 +3,7 @@ module Web3.Ui.Wallet exposing
     , walletPicker
     , viewState
     , chainBadge
+    , disconnectPopover
     )
 
 {-| Wallet connection UI components.
@@ -26,7 +27,7 @@ No default styles — every element has a semantic class name. Supply your own C
         }
         model.wallet
 
-@docs connectButton, walletPicker, viewState, chainBadge
+@docs connectButton, walletPicker, viewState, chainBadge, disconnectPopover
 
 -}
 
@@ -237,3 +238,39 @@ lookupChainName chains cid =
         |> List.head
         |> Maybe.map Chain.name
         |> Maybe.withDefault "Unknown Chain"
+
+
+{-| The connected-state address control: short address (with copy button and
+optional explorer link, via `Web3.Ui.Address.copyable`) plus a disconnect
+button. Intended to render inside a caller-controlled dropdown/popover —
+this component doesn't manage its own open/closed state, since that's
+inherently the consumer's UI decision (a click-triggered popover, an
+always-visible panel, etc.).
+
+CSS class: `web3-disconnect-popover`
+
+    Web3.Ui.Wallet.disconnectPopover []
+        { onCopy = CopyToClipboard
+        , onDisconnect = DisconnectWallet
+        , explorerUrl = Just (Chain.blockExplorer Chain.pulsechain ++ "/address/")
+        }
+        info
+
+-}
+disconnectPopover :
+    List (Html.Attribute msg)
+    -> { onCopy : String -> msg, onDisconnect : msg, explorerUrl : Maybe String }
+    -> Wallet.ConnectedInfo
+    -> Html msg
+disconnectPopover attrs opts info =
+    Html.div
+        (Attr.class "web3-disconnect-popover" :: attrs)
+        [ Address.copyable [ Attr.class "web3-disconnect-popover__address" ]
+            { onCopy = opts.onCopy, explorerUrl = opts.explorerUrl }
+            info.address
+        , Html.button
+            [ Attr.class "web3-disconnect-popover__btn"
+            , Events.onClick opts.onDisconnect
+            ]
+            [ Html.text "Disconnect" ]
+        ]
