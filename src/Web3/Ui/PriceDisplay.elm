@@ -14,7 +14,7 @@ range-checking logic.
         priceWei
 
     Web3.Ui.PriceDisplay.format 18 priceWei
-    --> "0.00042"   (fixed for normal range)
+    --> "0.0042"    (fixed for normal range)
     --> "1.23M"     (SI suffix for large)
     --> "4.56e-10"  (scientific for tiny)
 
@@ -25,6 +25,7 @@ range-checking logic.
 import Html exposing (Html)
 import Html.Attributes as Attr
 import Web3.BigInt exposing (BigInt)
+import Web3.Ui.Internal.Decimal as Decimal
 import Web3.Units as Units
 
 
@@ -57,120 +58,125 @@ See `view` for notation selection rules.
 -}
 format : Int -> BigInt -> String
 format decimals amount =
-    case String.toFloat (Units.formatUnits decimals amount) of
-        Nothing ->
-            "0"
-
-        Just f ->
-            let
-                a =
-                    abs f
-            in
-            if a == 0 then
-                "0"
-
-            else if a >= 1.0e3 then
-                siFormat f
-
-            else if a >= 0.001 then
-                fixedFormat f
-
-            else
-                sciFormat f
-
-
-siFormat : Float -> String
-siFormat f =
-    let
-        a =
-            abs f
-
-        sign =
-            if f < 0 then
-                "-"
-
-            else
-                ""
-
-        fmt n suffix =
-            sign ++ round2 n ++ suffix
-    in
-    if a >= 1.0e12 then
-        fmt (a / 1.0e12) "T"
-
-    else if a >= 1.0e9 then
-        fmt (a / 1.0e9) "B"
-
-    else if a >= 1.0e6 then
-        fmt (a / 1.0e6) "M"
+    if Web3.BigInt.isZero amount then
+        "0"
 
     else
-        fmt (a / 1.0e3) "K"
+        let
+            ( sign, intPart, fracPart ) =
+                Decimal.splitDecimal (Units.formatUnits decimals amount)
+
+            intLen =
+                String.length intPart
+
+            intIsZero =
+                String.isEmpty intPart || intPart == "0"
+        in
+        if intLen > 3 then
+            -- ≥ 1000
+            siFormat sign intPart
+
+        else if not (intIsZero && String.left 3 (fracPart ++ "000") == "000") then
+            -- 0.001 ≤ value < 1000
+            fixedFormat sign intPart fracPart
+
+        else
+            -- 0 < value < 0.001
+            sciFormat sign fracPart
 
 
-fixedFormat : Float -> String
-fixedFormat f =
+{-| SI-suffix an integer-part string, truncating to 2 decimals. Pure string math. -}
+siFormat : String -> String -> String
+siFormat sign intPart =
     let
-        sign =
-            if f < 0 then
-                "-"
+        intLen =
+            String.length intPart
 
-            else
-                ""
+        ( exp, suffix ) =
+            Decimal.siSuffix intLen
 
-        a =
-            abs f
+        wholeLen =
+            intLen - exp
+
+        wholePart =
+            String.left wholeLen intPart
+
+        frac =
+            Decimal.trimTrailingZeros (String.slice wholeLen (wholeLen + 2) intPart)
+    in
+    if String.isEmpty frac then
+        sign ++ wholePart ++ suffix
+
+    else
+        sign ++ wholePart ++ "." ++ frac ++ suffix
+
+
+{-| Fixed-decimal notation with magnitude-adaptive precision (more decimals for
+smaller magnitudes), trailing zeros trimmed. Pure string math — no `Float`. -}
+fixedFormat : String -> String -> String -> String
+fixedFormat sign intPart fracPart =
+    let
+        intLen =
+            String.length intPart
+
+        intIsZero =
+            String.isEmpty intPart || intPart == "0"
 
         dp =
-            if a >= 100 then
+            if intLen >= 3 then
                 0
 
-            else if a >= 10 then
+            else if intLen == 2 then
                 1
 
-            else if a >= 1 then
+            else if not intIsZero then
                 2
 
-            else if a >= 0.1 then
+            else if String.left 1 fracPart /= "0" then
                 3
 
             else
                 4
 
-        factor =
-            toFloat (10 ^ dp)
-
-        rounded =
-            toFloat (round (a * factor)) / factor
-    in
-    sign ++ String.fromFloat rounded
-
-
-sciFormat : Float -> String
-sciFormat f =
-    let
-        sign =
-            if f < 0 then
-                "-"
+        intNonEmpty =
+            if String.isEmpty intPart then
+                "0"
 
             else
-                ""
+                intPart
 
-        a =
-            abs f
+        frac =
+            Decimal.trimTrailingZeros (String.left dp fracPart)
+    in
+    if dp == 0 || String.isEmpty frac then
+        sign ++ intNonEmpty
+
+    else
+        sign ++ intNonEmpty ++ "." ++ frac
+
+
+{-| Scientific notation for values below 0.001, computed in string space so the
+exponent and mantissa are exact for arbitrarily tiny amounts. -}
+sciFormat : String -> String -> String
+sciFormat sign fracPart =
+    let
+        zeros =
+            Decimal.leadingZeros fracPart
 
         exp =
-            floor (logBase 10 a)
+            -(zeros + 1)
 
-        mantissa =
-            a / (10.0 ^ toFloat exp)
+        sig =
+            String.dropLeft zeros fracPart
 
-        mantissaStr =
-            round2 mantissa
+        d1 =
+            String.left 1 sig
+
+        rest =
+            Decimal.trimTrailingZeros (String.left 2 (String.dropLeft 1 sig))
     in
-    sign ++ mantissaStr ++ "e" ++ String.fromInt exp
+    if String.isEmpty rest then
+        sign ++ d1 ++ "e" ++ String.fromInt exp
 
-
-round2 : Float -> String
-round2 f =
-    String.fromFloat (toFloat (round (f * 100)) / 100)
+    else
+        sign ++ d1 ++ "." ++ rest ++ "e" ++ String.fromInt exp

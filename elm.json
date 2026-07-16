@@ -3,7 +3,7 @@
     "name": "intrepidshape/elm-web3-ui",
     "summary": "Type-safe dapp UI primitives for elm-web3 - any contract, zero runtime errs.",
     "license": "MIT",
-    "version": "2.3.1",
+    "version": "2.4.0",
     "exposed-modules": [
         "Web3.Ui.AbiInput",
         "Web3.Ui.ContractRead",

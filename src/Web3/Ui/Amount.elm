@@ -29,6 +29,7 @@ import Html.Attributes as Attr
 import Html.Events as Events
 import Web3.BigInt exposing (BigInt)
 import Web3.BigInt
+import Web3.Ui.Internal.Decimal as Decimal
 import Web3.Units as Units
 
 
@@ -84,54 +85,83 @@ spacing and placement.
 
 SI suffixes: K (10³), M (10⁶), B (10⁹), T (10¹²).
 Values below 1000 are shown with up to 2 decimal places, trailing zeros trimmed.
+A nonzero value under 0.01 (which a flat 2dp would render as `"0.00"`) instead
+shows its first two significant fractional digits (e.g. `"0.0000019"`) so real
+sub-cent balances never vanish.
+
+All formatting stays in integer/string space — the amount is never routed
+through `Float`, so neither very small nor very large values lose precision.
 
 -}
 formatWei : Int -> BigInt -> String
 formatWei decimals amount =
-    case String.toFloat (Units.formatUnits decimals amount) of
-        Nothing ->
-            Units.formatUnits decimals amount
-
-        Just f ->
-            siFormat f
+    formatDecimalString (Units.formatUnits decimals amount)
 
 
-siFormat : Float -> String
-siFormat f =
+{-| Format a lossless `formatUnits` decimal string: SI suffix at/above 1000, and
+a significant-figures fallback below 0.01 so tiny balances stay visible. -}
+formatDecimalString : String -> String
+formatDecimalString s =
     let
-        a =
-            abs f
+        ( sign, intPart, fracPart ) =
+            Decimal.splitDecimal s
 
-        sign =
-            if f < 0 then
-                "-"
-
-            else
-                ""
-
-        fmt n suffix =
-            sign ++ round2 n ++ suffix
+        intLen =
+            String.length intPart
     in
-    if a >= 1.0e12 then
-        fmt (a / 1.0e12) "T"
-
-    else if a >= 1.0e9 then
-        fmt (a / 1.0e9) "B"
-
-    else if a >= 1.0e6 then
-        fmt (a / 1.0e6) "M"
-
-    else if a >= 1.0e3 then
-        fmt (a / 1.0e3) "K"
+    if intLen > 3 then
+        siFormat sign intPart
 
     else
-        sign ++ round2 a
+        let
+            twoDp =
+                Decimal.trimTrailingZeros (String.left 2 (fracPart ++ "00"))
+
+            intNonEmpty =
+                if String.isEmpty intPart then
+                    "0"
+
+                else
+                    intPart
+        in
+        if intNonEmpty == "0" && twoDp == "" && not (Decimal.isAllZeros fracPart) then
+            -- Nonzero but under 0.01: a flat 2dp renders a real balance as
+            -- "0.00" (bit us live — USDC-pair LP units are ~1e12 smaller than
+            -- DAI-pair's). Show leading zeros + first 2 significant digits.
+            sign ++ "0." ++ Decimal.significantFrac fracPart
+
+        else if String.isEmpty twoDp then
+            sign ++ intNonEmpty
+
+        else
+            sign ++ intNonEmpty ++ "." ++ twoDp
 
 
-{-| Round to 2 decimal places, trimming trailing zeros. -}
-round2 : Float -> String
-round2 f =
-    String.fromFloat (toFloat (round (f * 100)) / 100)
+{-| SI-suffix an integer-part string (no sign, no leading zeros), truncating the
+scaled value to 2 decimal places with trailing zeros trimmed. Pure string math. -}
+siFormat : String -> String -> String
+siFormat sign intPart =
+    let
+        intLen =
+            String.length intPart
+
+        ( exp, suffix ) =
+            Decimal.siSuffix intLen
+
+        wholeLen =
+            intLen - exp
+
+        wholePart =
+            String.left wholeLen intPart
+
+        frac =
+            Decimal.trimTrailingZeros (String.slice wholeLen (wholeLen + 2) intPart)
+    in
+    if String.isEmpty frac then
+        sign ++ wholePart ++ suffix
+
+    else
+        sign ++ wholePart ++ "." ++ frac ++ suffix
 
 
 {-| A row of balance-percentage chips — 25% / 50% / 75% / MAX — the
@@ -181,13 +211,17 @@ formatWeiDust decimals amount =
         "0"
 
     else
-        case String.toFloat (Units.formatUnits decimals amount) of
-            Just f ->
-                if f < 0.0001 then
-                    "<0.0001"
+        let
+            ( _, intPart, fracPart ) =
+                Decimal.splitDecimal (Units.formatUnits decimals amount)
 
-                else
-                    formatWei decimals amount
+            intIsZero =
+                String.isEmpty intPart || intPart == "0"
+        in
+        -- "below 0.0001" in pure string space: integer part zero and the first
+        -- four fractional digits all zero (0.00009999 < 0.0001 ≤ 0.0001).
+        if intIsZero && String.left 4 (fracPart ++ "0000") == "0000" then
+            "<0.0001"
 
-            Nothing ->
-                formatWei decimals amount
+        else
+            formatWei decimals amount

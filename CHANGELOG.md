@@ -1,5 +1,28 @@
 # Changelog
 
+## 2.4.0 — 2026-07-16
+
+### Fixed — small balances no longer vanish to "0"
+
+- **`Amount.formatWei` / `Amount.formatWeiDust`** and **`PriceDisplay.format`**
+  no longer round-trip token amounts through `Float`. A `Float` holds only
+  ~15-17 significant digits, so converting an amount to `Float` corrupted both
+  very large values and — the bug that bit a live app — very small ones: a
+  USDC-pair LP unit is ~1e12 smaller than a DAI-pair one (USDC has 6 decimals),
+  so a real ~$100 holding of ~0.0000019 LP rendered as a flat `"0.00"`. All
+  three formatters now stay entirely in integer/string space.
+- **`Amount.formatWei`**: a nonzero value under 0.01 (which a flat 2dp would
+  show as `"0.00"`) now falls back to its first two significant fractional
+  digits — e.g. `formatWei 18 (1.9e12 wei) == "0.0000019"`,
+  `formatWei 6 (1 wei) == "0.000001"`, `formatWei 18 (1e15 wei) == "0.001"`.
+  Large values, SI suffixes (K/M/B/T) and the `formatWeiDust` `"<0.0001"`
+  convention are unchanged. Sub-1000 values now truncate (rather than round) at
+  the 2nd decimal, a consequence of dropping `Float`.
+- Public API and every type signature are unchanged — a drop-in upgrade. The
+  string math lives in a new internal (unexposed) `Web3.Ui.Internal.Decimal`
+  module shared by both formatters.
+
+
 ## 2.3.1 — 2026-07-02
 
 - Docs-only: README refresh (module count, gallery/theme/proofs links) so
