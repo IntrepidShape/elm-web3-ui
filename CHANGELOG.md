@@ -1,6 +1,11 @@
 # Changelog
 
-## 2.4.0 — 2026-07-16
+## 2.3.2 — 2026-07-16
+
+Requires `intrepidshape/elm-web3` ≥ 2.0.0 (the RequestId-tracked wallet connect
+release). This is a PATCH: the public API is byte-identical — only formatting
+behaviour and the elm-web3 lower bound changed — so `elm bump` classifies it as
+a patch, not a minor.
 
 ### Fixed — small balances no longer vanish to "0"
 
