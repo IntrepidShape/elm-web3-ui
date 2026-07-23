@@ -4,7 +4,7 @@ module Web3.Ui.Skeleton exposing (line, block, circle, pill, address, amount)
 
 Every read-heavy dapp needs these; pairing each atom with a skeleton of the
 same silhouette keeps layouts from jumping when data lands. All shimmer and
-color comes from your CSS — the classes are the whole API:
+color comes from your CSS -- the classes are the whole API:
 
     .web3-skeleton {
         background: linear-gradient(90deg, #222 25%, #333 50%, #222 75%);
@@ -17,10 +17,10 @@ color comes from your CSS — the classes are the whole API:
     }
 
 Each helper renders a `<span>` (or `<div>` for `block`) that is
-`aria-hidden` — the loading announcement belongs on the container (see
+`aria-hidden` -- the loading announcement belongs on the container (see
 `Web3.Ui.RemoteCall.view`, which sets `aria-busy`), not on each bone.
 
-CSS classes: `web3-skeleton`, plus a shape modifier —
+CSS classes: `web3-skeleton`, plus a shape modifier --
 `web3-skeleton--line`, `--block`, `--circle`, `--pill`, `--address`,
 `--amount`.
 
@@ -56,7 +56,7 @@ pill =
     bone Html.span "pill"
 
 
-{-| Sized like a truncated address (`0x1234…abcd`). -}
+{-| Sized like a truncated address (`0x1234...abcd`). -}
 address : List (Html.Attribute msg) -> Html msg
 address =
     bone Html.span "address"

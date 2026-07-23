@@ -1,19 +1,19 @@
 module Web3.Ui.Identicon exposing (view, cells, Cells)
 
-{-| Deterministic address identicons — the classic 8×8 "blockies" every
+{-| Deterministic address identicons -- the classic 8x8 "blockies" every
 wallet renders, in pure Elm.
 
 Faithful port of the canonical `ethereum/blockies` algorithm (xorshift PRNG
 seeded from the lowercased address, three HSL colors, 8-wide vertically
 mirrored grid), so the identicon for an address here matches the one users
 already recognise from MetaMask et al. Recognition is the whole point of an
-identicon — a pretty-but-different avatar would be worse than none.
+identicon -- a pretty-but-different avatar would be worse than none.
 
     Identicon.view [] { size = 24 } holderAddress
 
 Rendered as an inline SVG (`viewBox 0 0 8 8`, crisp edges) so it scales
-losslessly to any `size`. The three colors are data — derived from the
-address — so they are set as SVG `fill` attributes; everything else
+losslessly to any `size`. The three colors are data -- derived from the
+address -- so they are set as SVG `fill` attributes; everything else
 (border-radius for circular crops, borders, drop shadows) belongs to your
 CSS via the `web3-identicon` class.
 
@@ -48,7 +48,7 @@ type alias Cells =
 {-| Render the identicon for an address at a given pixel size.
 
 The `attrs` land on an `Html.span` wrapper (class `web3-identicon`), not on
-the SVG itself — `Html.Attributes.class` sets the `className` *property*,
+the SVG itself -- `Html.Attributes.class` sets the `className` *property*,
 which is read-only on SVG nodes and would crash at runtime. The wrapper
 makes any `Html.Attribute` safe to pass.
 
@@ -107,7 +107,7 @@ cell c index value =
 
 
 {-| Compute the colors and grid for any seed string (normally the lowercase
-`0x…` address — [`view`](#view) handles that for you). Deterministic: the
+`0x...` address -- [`view`](#view) handles that for you). Deterministic: the
 same seed always yields the same `Cells`.
 -}
 cells : String -> Cells
@@ -228,7 +228,7 @@ nextColor seed0 =
 
 
 {-| 8 rows; each row draws 4 values and mirrors them, so the icon is
-symmetric about its vertical axis — the trait that makes blockies read as
+symmetric about its vertical axis -- the trait that makes blockies read as
 "faces".
 -}
 buildGrid : Seed -> ( List Int, Seed )

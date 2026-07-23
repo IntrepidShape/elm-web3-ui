@@ -7,12 +7,12 @@ module Web3.Ui.Internal.Decimal exposing
     , isAllZeros
     )
 
-{-| Internal string-space decimal helpers — NOT part of the public API.
+{-| Internal string-space decimal helpers -- NOT part of the public API.
 
 Token amounts routinely span 30+ orders of magnitude (a USDC-pair LP unit is
 ~1e12 smaller than a DAI-pair one because USDC has 6 decimals). A `Float` holds
 only ~15-17 significant digits, so round-tripping an amount through `Float` both
-corrupts large values and rounds tiny ones to zero — a real balance vanishing to
+corrupts large values and rounds tiny ones to zero -- a real balance vanishing to
 "0.00" bit a live app. These helpers keep every formatter in integer/string
 space so precision is never lost.
 
@@ -77,8 +77,8 @@ trimTrailingZeros s =
 
 
 {-| The leading zeros of a fraction plus its first two significant digits:
-`"0000019…" -> "0000019"`. This is the "sub-0.01 balance stays visible"
-fallback — instead of a flat `"0.00"`, the caller renders `"0." ++ significantFrac`.
+`"0000019..." -> "0000019"`. This is the "sub-0.01 balance stays visible"
+fallback -- instead of a flat `"0.00"`, the caller renders `"0." ++ significantFrac`.
 Assumes at least one nonzero digit; returns the (all-zero) string otherwise.
 -}
 significantFrac : String -> String
@@ -88,7 +88,7 @@ significantFrac frac =
 
 {-| SI divisor exponent and suffix for an integer part of the given digit
 length. Returns `( exponent, suffix )` with exponent in `{3, 6, 9, 12}` for
-`K` / `M` / `B` / `T`. Anything ≥ 1e12 stays on `T`.
+`K` / `M` / `B` / `T`. Anything >= 1e12 stays on `T`.
 -}
 siSuffix : Int -> ( Int, String )
 siSuffix intLen =

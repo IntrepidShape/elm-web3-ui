@@ -1,6 +1,6 @@
 module Web3.Ui.ProgressRing exposing (view)
 
-{-| Circular progress ring (SVG) for "X% toward Y" displays — graduation
+{-| Circular progress ring (SVG) for "X% toward Y" displays -- graduation
 progress, vesting unlock, vault deposit cap. The circular variant of
 `Web3.Ui.SupplyBar`.
 
@@ -13,7 +13,7 @@ progress, vesting unlock, vault deposit cap. The circular variant of
 
 CSS classes: `web3-progressring`, `web3-progressring__track`,
 `web3-progressring__fill`, `web3-progressring__label`. Stroke width and color
-come from CSS — set `stroke` and `stroke-width` on the `__track` and `__fill`
+come from CSS -- set `stroke` and `stroke-width` on the `__track` and `__fill`
 elements; geometry is inline for SVG.
 
 @docs view

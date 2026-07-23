@@ -34,7 +34,7 @@ import Web3.Units as Units
 
 
 {-| Numeric text input for a token amount. `value` is a plain decimal string
-(e.g. `"1000.5"`). No parsing is done here — call `Web3.Units.parseUnits` in
+(e.g. `"1000.5"`). No parsing is done here -- call `Web3.Units.parseUnits` in
 your `update` to convert to Wei.
 
 Adds `web3-amount-input--invalid` when `valid` is `False`.
@@ -76,20 +76,20 @@ amountInput attrs opts =
 
 {-| Format a Wei BigInt as a human-readable string with SI suffix.
 
-The symbol is not appended — concatenate it yourself so the caller controls
+The symbol is not appended -- concatenate it yourself so the caller controls
 spacing and placement.
 
     formatWei 18 onePls   --> "1"
     formatWei 18 largePls --> "1.23M"
     formatWei 6  oneUsdc  --> "1"
 
-SI suffixes: K (10³), M (10⁶), B (10⁹), T (10¹²).
+SI suffixes: K (10^3), M (10^6), B (10^9), T (10^12).
 Values below 1000 are shown with up to 2 decimal places, trailing zeros trimmed.
 A nonzero value under 0.01 (which a flat 2dp would render as `"0.00"`) instead
 shows its first two significant fractional digits (e.g. `"0.0000019"`) so real
 sub-cent balances never vanish.
 
-All formatting stays in integer/string space — the amount is never routed
+All formatting stays in integer/string space -- the amount is never routed
 through `Float`, so neither very small nor very large values lose precision.
 
 -}
@@ -164,7 +164,7 @@ siFormat sign intPart =
         sign ++ wholePart ++ "." ++ frac ++ suffix
 
 
-{-| A row of balance-percentage chips — 25% / 50% / 75% / MAX — the
+{-| A row of balance-percentage chips -- 25% / 50% / 75% / MAX -- the
 companion every [`amountInput`](#amountInput) deserves. Emits the chosen
 percentage (100 = MAX); the app computes the actual amount from the live
 balance, so the chips never display a stale number.
@@ -203,7 +203,7 @@ presetRow attrs opts =
 
 {-| Like [`formatWei`](#formatWei), with the dust convention: a nonzero
 amount that would display as zero (below 0.0001 of the unit) renders as
-`"<0.0001"` instead — "0" must mean zero, never "too small to show".
+`"<0.0001"` instead -- "0" must mean zero, never "too small to show".
 -}
 formatWeiDust : Int -> BigInt -> String
 formatWeiDust decimals amount =

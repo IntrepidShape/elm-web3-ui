@@ -4,17 +4,17 @@ module Web3.Ui.FundingPool exposing
     , pool
     )
 
-{-| Render a **crowd-funded pool** panel — generic shape for any
+{-| Render a **crowd-funded pool** panel -- generic shape for any
 "escrowed funding with a target, deadline, and refund fallback"
 mechanism.
 
 Use cases:
 
-  - Community-funded audits (pledgers crowdfund a security review →
-    auditor delivers report → escrow releases).
+  - Community-funded audits (pledgers crowdfund a security review ->
+    auditor delivers report -> escrow releases).
   - Bug-bounty / vulnerability-fix pools.
-  - Open-source-feature crowdfunding (pledgers fund a feature →
-    maintainer ships → escrow releases).
+  - Open-source-feature crowdfunding (pledgers fund a feature ->
+    maintainer ships -> escrow releases).
   - Refundable kickstarter-style commitments where the deliverable
     is on-chain verifiable.
 
@@ -29,9 +29,9 @@ The structural pattern is universal:
 
 Three lifecycle states swap the primary CTA:
 
-  - `Open` — collecting pledges, deadline ahead.
-  - `Funded` — target reached, awaiting release.
-  - `Closed` — released (with deliverable URL) or expired (refunds).
+  - `Open` -- collecting pledges, deadline ahead.
+  - `Funded` -- target reached, awaiting release.
+  - `Closed` -- released (with deliverable URL) or expired (refunds).
 
 The panel title, status pill copy, CTA verbs, and disclaimer are all
 configurable via [`Labels`](#Labels) so the panel can speak in the
@@ -56,7 +56,7 @@ voice of whichever mechanism the caller is exposing.
         , onViewReport = Nothing
         }
 
-Stateless — caller owns the `Pool` and emits the appropriate `msg`.
+Stateless -- caller owns the `Pool` and emits the appropriate `msg`.
 
 CSS classes follow BEM: `web3-funding-pool`,
 `web3-funding-pool__head`, `web3-funding-pool__title`,
@@ -99,7 +99,7 @@ type alias Pledger =
 
 
 {-| The pool's current observable state. Values are pre-formatted
-strings because amount/unit/precision is the caller's concern — this
+strings because amount/unit/precision is the caller's concern -- this
 primitive is rendering, not arithmetic.
 -}
 type Pool
@@ -219,7 +219,7 @@ defaultLabels =
 -- VIEW ----------------------------------------------------------------------
 
 
-{-| Configuration for `view`. Each `onXxx` is optional — pass `Nothing`
+{-| Configuration for `view`. Each `onXxx` is optional -- pass `Nothing`
 to disable that affordance.
 -}
 type alias Config msg =

@@ -21,12 +21,12 @@ Uses `Web3.Units.formatUnits` / `Web3.Units.formatEther` internally.
 
     -- Balance that may not have loaded yet:
     Web3.Ui.Balance.viewMaybe []
-        { decimals = 6, symbol = "USDC", loading = "…" }
+        { decimals = 6, symbol = "USDC", loading = "..." }
         model.balance
 
     -- Ether balance that may not have loaded yet:
     Web3.Ui.Balance.viewEtherMaybe []
-        { symbol = "ETH", loading = "…" }
+        { symbol = "ETH", loading = "..." }
         model.ethBalance
 
 @docs view, viewEther, viewMaybe, viewEtherMaybe

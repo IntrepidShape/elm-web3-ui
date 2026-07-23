@@ -5,10 +5,10 @@ module Web3.Ui.RemoteCall exposing
     , view, Slots
     )
 
-{-| The remote-data type for correlation-id port round-trips — the missing
+{-| The remote-data type for correlation-id port round-trips -- the missing
 foundation under every read in a dapp.
 
-Every elm-web3 read (balance, contract call, fee, block…) is fire-and-forget
+Every elm-web3 read (balance, contract call, fee, block...) is fire-and-forget
 through a port, matched back by a correlation id. Modelling each one by hand
 means every dapp reinvents `Maybe (Result String a)` plus an in-flight flag
 plus id bookkeeping. `RemoteCall` is that shape, once, with the id
@@ -22,7 +22,7 @@ bookkeeping built in:
     , web3Cmd (Call.encode reservesCall)
     )
 
-    -- resolve (ONLY applies if the id matches the one in flight —
+    -- resolve (ONLY applies if the id matches the one in flight --
     -- a stale response for an earlier request cannot clobber a newer one)
     { model | reserves = RemoteCall.resolve incomingId result model.reserves }
 
@@ -66,7 +66,7 @@ notAsked =
 
 
 {-| Mark a request in flight under the given correlation id. Always
-transitions — firing a new request supersedes whatever came before, and its
+transitions -- firing a new request supersedes whatever came before, and its
 id becomes the only one `resolve` will accept.
 -}
 request : String -> RemoteCall a -> RemoteCall a
@@ -74,7 +74,7 @@ request id _ =
     Loading id
 
 
-{-| Apply a response — but only if its correlation id matches the request in
+{-| Apply a response -- but only if its correlation id matches the request in
 flight. A stale or misrouted response (an earlier request answered late,
 another component's id) is dropped on the floor, never shown as fresh data.
 -}
@@ -167,7 +167,7 @@ correlationId call =
 
 
 {-| What to render for the non-`Ready` states. `NotAsked` renders the
-skeleton too — from the user's point of view "not fetched yet" and
+skeleton too -- from the user's point of view "not fetched yet" and
 "fetching" look the same.
 -}
 type alias Slots msg =
@@ -177,7 +177,7 @@ type alias Slots msg =
 
 
 {-| Render a `RemoteCall`, wrapped in a `<div class="web3-remote">` whose
-modifier tracks the state — `--loading` carries `aria-busy="true"` so
+modifier tracks the state -- `--loading` carries `aria-busy="true"` so
 assistive tech knows the region is settling.
 
 CSS classes: `web3-remote`, `web3-remote--loading`, `web3-remote--ready`,

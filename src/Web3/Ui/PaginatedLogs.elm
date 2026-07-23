@@ -4,7 +4,7 @@ module Web3.Ui.PaginatedLogs exposing
     , loadMoreButton
     )
 
-{-| Block-range windowed `eth_getLogs` paging — newest window first, walking
+{-| Block-range windowed `eth_getLogs` paging -- newest window first, walking
 back toward genesis without overlaps or gaps.
 
     -- start: latest window
@@ -19,7 +19,7 @@ back toward genesis without overlaps or gaps.
         Nothing -> at genesis; nothing older exists
 
 Ranges tile exactly: `[latest-window+1 .. latest]`, then
-`[latest-2w+1 .. latest-w]`, … clamped at 0.
+`[latest-2w+1 .. latest-w]`, ... clamped at 0.
 
 CSS classes: `web3-pagedlogs__more`.
 
@@ -48,7 +48,7 @@ type Pager
         }
 
 
-{-| The newest window. `window` is clamped to ≥ 1. -}
+{-| The newest window. `window` is clamped to >= 1. -}
 init : { latest : Int, window : Int } -> ( Pager, Range )
 init opts =
     let

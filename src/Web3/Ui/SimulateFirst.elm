@@ -7,7 +7,7 @@ module Web3.Ui.SimulateFirst exposing
 {-| Simulate-then-send: preview a write's outcome before asking for a
 signature. The structural guarantee, in the family of
 [`ApprovalFlow`](Web3-Ui-ApprovalFlow): **a transaction cannot be sent
-without a completed simulation** — `confirm` is the only door into
+without a completed simulation** -- `confirm` is the only door into
 `Sending`, and it only opens from `Previewing`.
 
 elm-web3 already has the capability: `Contract.Call.withFrom` runs the
@@ -31,7 +31,7 @@ the transaction *would* do (or its revert) for free.
     { model | sim = SimulateFirst.onTx txMsg model.sim }
 
 Wallet rejection is not failure: rejecting the signature returns to
-`Previewing` — the preview is still true; the user just declined.
+`Previewing` -- the preview is still true; the user just declined.
 
 CSS classes: `web3-simulate`, `web3-simulate--idle/--simulating/--preview/
 --sending/--done/--refused`, `web3-simulate__preview`,
@@ -89,7 +89,7 @@ onSimResult result step =
             step
 
 
-{-| `Previewing -> Sending AwaitingSignature` — the only door into
+{-| `Previewing -> Sending AwaitingSignature` -- the only door into
 `Sending`; unreachable without a completed simulation.
 -}
 confirm : Step -> Step
@@ -103,7 +103,7 @@ confirm step =
 
 
 {-| Drive the inner transaction. Only meaningful in `Sending`:
-confirmed → `Done`, failed → `Refused`, wallet-rejected → back to
+confirmed -> `Done`, failed -> `Refused`, wallet-rejected -> back to
 `Previewing` (the preview is still valid).
 -}
 onTx : Tx.Msg -> Step -> Step

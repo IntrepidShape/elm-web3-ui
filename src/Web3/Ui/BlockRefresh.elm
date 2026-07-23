@@ -3,7 +3,7 @@ module Web3.Ui.BlockRefresh exposing
     , init, withPolicy, onBlock, markRefreshed
     )
 
-{-| A refresh policy for chain-derived data — the missing piece between
+{-| A refresh policy for chain-derived data -- the missing piece between
 `Block.watchBlockNumber` and your `RemoteCall`s.
 
 Chain data goes stale exactly once per block, so refetch cadence should be
@@ -39,8 +39,8 @@ driven by chain time. Any `RemoteCall` slots in the same way.
 -}
 
 
-{-| `EveryBlock` — refetch on every new block. `EveryNBlocks n` — refetch
-when at least `n` blocks have passed since the last refresh. `Manual` —
+{-| `EveryBlock` -- refetch on every new block. `EveryNBlocks n` -- refetch
+when at least `n` blocks have passed since the last refresh. `Manual` --
 never fire from block signals (the app refetches explicitly).
 -}
 type Policy
@@ -70,7 +70,7 @@ withPolicy policy (Ticker t) =
 
 
 {-| Feed a new block number in; the `Bool` says "fire your refetch now".
-The first observed block always fires (except under `Manual`) — data that
+The first observed block always fires (except under `Manual`) -- data that
 has never been fetched is infinitely stale.
 -}
 onBlock : Int -> Ticker -> ( Ticker, Bool )

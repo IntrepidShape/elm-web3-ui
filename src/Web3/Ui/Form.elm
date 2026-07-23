@@ -4,7 +4,7 @@ module Web3.Ui.Form exposing
     , errors, isValid, errorList
     )
 
-{-| Accumulating form validation — combine per-field results into one
+{-| Accumulating form validation -- combine per-field results into one
 `Validated args` where **every** problem is collected, not just the first.
 The applicative sibling of the per-field validation the input atoms
 (`Web3.Ui.Input`, `Web3.Ui.Amount`) already do.
@@ -19,10 +19,10 @@ The applicative sibling of the per-field validation the input atoms
             |> andMap (fromMaybe "Amount is not a valid number" model.parsedAmount)
 
     -- in view: disable the button and show ALL the problems
-    button [ disabled (not (Form.isValid v)) ] …
+    button [ disabled (not (Form.isValid v)) ] ...
     Form.errorList [] v
 
-`Result` short-circuits on the first `Err`; forms shouldn't — a user fixing
+`Result` short-circuits on the first `Err`; forms shouldn't -- a user fixing
 a three-field form one error at a time is the classic papercut this type
 removes.
 

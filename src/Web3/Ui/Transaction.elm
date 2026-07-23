@@ -16,7 +16,7 @@ Pattern-match on `Tx.Status` to render appropriate UI without missing any state.
 
     -- Action button disabled while in-flight:
     Web3.Ui.Transaction.actionButton []
-        { label = "Buy", pendingLabel = "Buying…", onPress = SubmitBuy }
+        { label = "Buy", pendingLabel = "Buying...", onPress = SubmitBuy }
         tx.status
 
     -- Clickable tx hash link:
@@ -25,7 +25,7 @@ Pattern-match on `Tx.Status` to render appropriate UI without missing any state.
         hash
 
     -- Hash link extracted from status (Nothing when no hash available):
-    -- Pass Nothing for explorerUrl in local dev — renders a plain span instead of a dead link.
+    -- Pass Nothing for explorerUrl in local dev -- renders a plain span instead of a dead link.
     Web3.Ui.Transaction.statusHashLink []
         { explorerUrl = Just "https://etherscan.io/tx/" }
         tx.status
@@ -137,7 +137,7 @@ configured.
 
 When `explorerUrl` is `Just url`, the url is prepended to the full hash to
 build the href. When `Nothing` (e.g. local Anvil dev), renders a plain
-`<span class="web3-tx-hash">` instead of a dead link — the same convention
+`<span class="web3-tx-hash">` instead of a dead link -- the same convention
 as [`statusHashLink`](#statusHashLink) and `Web3.Ui.Address`.
 
 Example: `{ explorerUrl = Just "https://etherscan.io/tx/" }`
@@ -242,13 +242,13 @@ receiptView attrs opts receipt =
         ]
 
 
-{-| Confirmation progress as a row of dots — one per required confirmation,
+{-| Confirmation progress as a row of dots -- one per required confirmation,
 filled as they land. Renders only in `Confirming`; every other status is
 `Html.text ""` so it composes inline without layout cost.
 
 The count comes straight from the `Confirming _ n` state, which the
 `Web3.Transaction` machine guarantees is strictly increasing (see
-`MonotonicConfirmations` in elm-web3's `proofs/tla/TransactionSpec.tla`) —
+`MonotonicConfirmations` in elm-web3's `proofs/tla/TransactionSpec.tla`) --
 these dots can never un-fill.
 
 CSS classes: `web3-confirmations`, `web3-confirmations__dot`,

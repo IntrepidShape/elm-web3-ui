@@ -5,7 +5,7 @@ module Web3.Ui.VeLock exposing
     )
 
 {-| Lock-duration picker for vote-escrow tokens (Curve veCRV, GMX esGMX,
-veToken, …). Renders an amount input, a lock-period slider snapped
+veToken, ...). Renders an amount input, a lock-period slider snapped
 to a configurable step (typically 1 week, the Curve standard), and a live
 projection of the resulting ve-balance.
 
@@ -49,7 +49,7 @@ import Web3.Ui.Amount as Amount
 {-| All configuration. `amount` is the principal as `BigInt` (used for the
 ve-balance projection). `amountInput` is the live string in the input box
 (separate so the consumer owns parse/validation state). `lockSec` is the
-chosen lock duration in seconds. `stepSec` is the slider granularity —
+chosen lock duration in seconds. `stepSec` is the slider granularity --
 pass `604800` (1 week) to match Curve's snap-to-week semantics.
 -}
 type alias Config msg =

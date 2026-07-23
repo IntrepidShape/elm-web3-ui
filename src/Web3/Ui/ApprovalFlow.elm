@@ -5,25 +5,25 @@ module Web3.Ui.ApprovalFlow exposing
     , view, Config
     )
 
-{-| The approve-then-act state machine — the most repeated flow in all of
-web3. Every ERC-20 interaction (deposit, stake, swap, lock…) is really two
+{-| The approve-then-act state machine -- the most repeated flow in all of
+web3. Every ERC-20 interaction (deposit, stake, swap, lock...) is really two
 transactions gated by an allowance read, and every dapp hand-rolls the same
 fragile ladder. This is that ladder, once, with the guards proven by fuzz
 tests (`ApprovalFlowTest`) and modeled in `proofs/tla/ApprovalSpec.tla`.
 
-    ┌──────────────────┐  insufficient   ┌────────────────┐
-    │ CheckingAllowance├────────────────▶│ ApprovalNeeded │
-    └───────┬──────────┘                 └───────┬────────┘
-            │ sufficient                 startApprove
-            ▼                                    ▼
-    ┌──────────────┐   approve confirmed ┌────────────┐
-    │  ReadyToAct  │◀───(via re-check)───│  Approving │
-    └───────┬──────┘                     └────────────┘
+    +------------------+  insufficient   +----------------+
+    | CheckingAllowance+---------------->| ApprovalNeeded |
+    +-------+----------+                 +-------+--------+
+            | sufficient                 startApprove
+            v                                    v
+    +--------------+   approve confirmed +------------+
+    |  ReadyToAct  |<---(via re-check)---|  Approving |
+    +-------+------+                     +------------+
        startAction
-            ▼
-    ┌──────────────┐    tx confirmed     ┌────────────┐
-    │    Acting    ├────────────────────▶│  Completed │
-    └──────────────┘                     └────────────┘
+            v
+    +--------------+    tx confirmed     +------------+
+    |    Acting    +-------------------->|  Completed |
+    +--------------+                     +------------+
 
 Design choices, deliberately:
 
@@ -31,10 +31,10 @@ Design choices, deliberately:
     assuming it. Non-standard tokens (USDT's approve-to-zero-first rule,
     fee-on-transfer tokens) make optimism a lie; the chain is the truth.
   - **Wallet rejection is not failure.** Rejecting the approve returns to
-    `ApprovalNeeded`; rejecting the action returns to `ReadyToAct` — the user
+    `ApprovalNeeded`; rejecting the action returns to `ReadyToAct` -- the user
     changed their mind, nothing is broken.
   - **The two transactions cannot cross.** `ApproveTx` messages are ignored
-    while `Acting`, `ActionTx` messages while `Approving` — a late
+    while `Acting`, `ActionTx` messages while `Approving` -- a late
     confirmation from one leg can never corrupt the other (the same
     no-cross-confusion rule elm-web3's SignSpec proves).
 
@@ -79,7 +79,7 @@ type Step
 
 
 {-| Inputs to the machine. `ApproveTx`/`ActionTx` wrap the port's
-`Tx.Msg` for whichever leg it belongs to — route by your correlation id.
+`Tx.Msg` for whichever leg it belongs to -- route by your correlation id.
 -}
 type Msg
     = AllowanceLoaded BigInt
@@ -95,7 +95,7 @@ start =
     CheckingAllowance
 
 
-{-| True in `Completed` — the flow finished; only [`reset`](#reset) leaves. -}
+{-| True in `Completed` -- the flow finished; only [`reset`](#reset) leaves. -}
 isTerminal : Step -> Bool
 isTerminal step =
     case step of
@@ -121,7 +121,7 @@ needsApproval step =
 
 
 {-| User clicked Approve: `ApprovalNeeded -> Approving AwaitingSignature`.
-No-op from every other step — this is the only door into `Approving`.
+No-op from every other step -- this is the only door into `Approving`.
 -}
 startApprove : Step -> Step
 startApprove step =
@@ -134,7 +134,7 @@ startApprove step =
 
 
 {-| User clicked the action: `ReadyToAct -> Acting AwaitingSignature`.
-No-op from every other step — the only door into `Acting`, which is what
+No-op from every other step -- the only door into `Acting`, which is what
 makes "never act on an unverified allowance" a structural guarantee rather
 than a convention.
 -}

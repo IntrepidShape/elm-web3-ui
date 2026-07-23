@@ -24,12 +24,12 @@ import Web3.Units as Units
 
 {-| Display an estimated transaction cost in the native token.
 
-`gasUnits` — gas limit returned by `estimateGas` (decoded from port)
-`gasPrice` — current gas price in wei, from `Web3.Fee.getGasPrice`
+`gasUnits` -- gas limit returned by `estimateGas` (decoded from port)
+`gasPrice` -- current gas price in wei, from `Web3.Fee.getGasPrice`
 
-Shows `"Estimating…"` while either value is `Nothing`.
+Shows `"Estimating..."` while either value is `Nothing`.
 
-Cost = gasUnits × gasPrice (in wei), displayed via `formatUnits`.
+Cost = gasUnits x gasPrice (in wei), displayed via `formatUnits`.
 
 CSS class: `web3-gas-estimate`
 

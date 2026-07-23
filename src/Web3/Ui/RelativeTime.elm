@@ -1,7 +1,7 @@
 module Web3.Ui.RelativeTime exposing (view, format)
 
 {-| Compact relative-time string for transaction ages, position open dates,
-graduation timestamps — anywhere a dapp shows "how long ago".
+graduation timestamps -- anywhere a dapp shows "how long ago".
 
     Web3.Ui.RelativeTime.view { nowSec = model.nowSec, atSec = tx.timestamp }
     --> "2m ago" / "3h ago" / "1d ago" / "Apr 12"
@@ -37,11 +37,11 @@ view opts =
 
 Buckets:
 
-  - < 60s  → "Ns ago"
-  - < 60m  → "Nm ago"
-  - < 24h  → "Nh ago"
-  - < 30d  → "Nd ago"
-  - else   → "Nw ago" (weeks; coarse beyond a month)
+  - < 60s  -> "Ns ago"
+  - < 60m  -> "Nm ago"
+  - < 24h  -> "Nh ago"
+  - < 30d  -> "Nd ago"
+  - else   -> "Nw ago" (weeks; coarse beyond a month)
 
 Negative deltas (future) render as "in Ns" / "in Nm" / etc.
 -}

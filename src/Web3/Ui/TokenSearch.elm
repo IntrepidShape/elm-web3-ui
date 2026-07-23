@@ -10,7 +10,7 @@ collection picker).
         , placeholder = "Search tokens..."
         }
 
-The component does not perform filtering — it just renders the input and
+The component does not perform filtering -- it just renders the input and
 emits change events. Filter logic is the consumer's responsibility (an
 `on*Match` predicate that compares against `name`, `symbol`, `address`).
 

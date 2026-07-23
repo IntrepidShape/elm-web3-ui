@@ -16,7 +16,7 @@ for the current spot price and floor price.
 
 The component is generic for any curve of shape `price = A * supply^N`,
 which covers `x^1.1`, classic `x^2`, and any sub-/super-linear
-issuance model. Math runs on `Float` because the chart is purely visual —
+issuance model. Math runs on `Float` because the chart is purely visual --
 do not consume the rendered points for on-chain calculation.
 
 CSS classes: `web3-bondingcurve`, `web3-bondingcurve__path`,

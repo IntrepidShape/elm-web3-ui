@@ -4,12 +4,12 @@ module Web3.Ui.AccountPill exposing (view, Config)
 
 Renders per `Wallet.State`:
 
-  - `Disconnected` / `Error` — a connect button
-  - `Connecting` — the connect button, busy
-  - `ReadOnly` — a "read-only" chip (no wallet, reads work)
-  - `Connected` — identicon · truncated address · chain chip · optional
-    balance · disconnect
-  - `WrongChain` — the same pill flagged, chain chip shows the mismatch
+  - `Disconnected` / `Error` -- a connect button
+  - `Connecting` -- the connect button, busy
+  - `ReadOnly` -- a "read-only" chip (no wallet, reads work)
+  - `Connected` -- identicon + truncated address + chain chip + optional
+    balance + disconnect
+  - `WrongChain` -- the same pill flagged, chain chip shows the mismatch
 
 <!---->
 
@@ -39,7 +39,7 @@ import Web3.Wallet as Wallet
 
 
 {-| Handlers plus how to name a chain and what balance to show (already
-formatted — pair with `Web3.Ui.Amount`).
+formatted -- pair with `Web3.Ui.Amount`).
 -}
 type alias Config msg =
     { onConnect : msg

@@ -33,8 +33,8 @@ import Web3.Units as Units
 
 Notation rules:
 
-- ≥ 1 000: SI suffix (`1.23M`, `45.6K`)
-- 0.001 – 999.99: fixed decimal (`1.23`, `0.456`, `0.00123`)
+- >= 1 000: SI suffix (`1.23M`, `45.6K`)
+- 0.001 - 999.99: fixed decimal (`1.23`, `0.456`, `0.00123`)
 - < 0.001: scientific (`4.56e-10`)
 
 CSS class: `web3-price`
@@ -112,7 +112,7 @@ siFormat sign intPart =
 
 
 {-| Fixed-decimal notation with magnitude-adaptive precision (more decimals for
-smaller magnitudes), trailing zeros trimmed. Pure string math — no `Float`. -}
+smaller magnitudes), trailing zeros trimmed. Pure string math -- no `Float`. -}
 fixedFormat : String -> String -> String -> String
 fixedFormat sign intPart fracPart =
     let

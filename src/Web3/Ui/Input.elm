@@ -9,7 +9,7 @@ module Web3.Ui.Input exposing
 {-| Typed input primitives for EVM data entry.
 
 Thin wrappers around `Html.input` with semantic class names and appropriate
-`type` / `inputmode` attributes. No validation — the host app calls
+`type` / `inputmode` attributes. No validation -- the host app calls
 `T.address`, `BigInt.fromString`, etc. on the string value.
 
 The `address`, `bigInt`, and `bytes` inputs accept a `valid : Bool` field.
@@ -34,7 +34,7 @@ import Html.Events as Events
 import Web3.Ui.Address as Address
 
 
-{-| Text input for Ethereum address entry (`0x…`).
+{-| Text input for Ethereum address entry (`0x...`).
 
 Adds `web3-input-address--invalid` when `valid` is `False`.
 
@@ -125,7 +125,7 @@ text attrs opts =
         []
 
 
-{-| Text input for hex bytes (`0x…`).
+{-| Text input for hex bytes (`0x...`).
 
 Adds `web3-input-bytes--invalid` when `valid` is `False`.
 

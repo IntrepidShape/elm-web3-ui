@@ -14,11 +14,11 @@ module Web3.Ui.Address exposing
         addr
 
     -- Truncated address string (pure, no Html):
-    Web3.Ui.Address.short addr  --> "0x1234…abcd"
+    Web3.Ui.Address.short addr  --> "0x1234...abcd"
 
     -- Truncated with custom lengths (e.g. token detail page):
     Web3.Ui.Address.shortWith { prefixChars = 8, suffixChars = 6 } addr
-    --> "0x123456…789abc"
+    --> "0x123456...789abc"
 
     -- Address text input:
     Web3.Ui.Address.input []
@@ -38,7 +38,7 @@ import Html.Events as Events
 import Web3.Types as T
 
 
-{-| Display an address as "0x1234…abcd". Optionally wraps in an `<a>` tag
+{-| Display an address as "0x1234...abcd". Optionally wraps in an `<a>` tag
 when `explorerUrl` is `Just url`.
 
 CSS class: `web3-address`
@@ -71,9 +71,9 @@ view attrs opts addr =
                 [ Html.text label ]
 
 
-{-| Truncate an address to "0x" + first 4 hex chars + "…" + last 4 hex chars.
+{-| Truncate an address to "0x" + first 4 hex chars + "..." + last 4 hex chars.
 
-    short addr  --> "0x1234…abcd"
+    short addr  --> "0x1234...abcd"
 
 -}
 short : T.Address -> String
@@ -87,10 +87,10 @@ short =
 `suffixChars` is the number of trailing hex characters.
 
     shortWith { prefixChars = 6, suffixChars = 4 } addr
-    --> "0x1234…abcd"   (same as short)
+    --> "0x1234...abcd"   (same as short)
 
     shortWith { prefixChars = 8, suffixChars = 6 } addr
-    --> "0x123456…789abc"
+    --> "0x123456...789abc"
 
 -}
 shortWith : { prefixChars : Int, suffixChars : Int } -> T.Address -> String
@@ -139,7 +139,7 @@ input attrs opts =
 
 {-| The short address display plus a copy affordance.
 
-The button emits `onCopy <full 0x address>` — the component states intent,
+The button emits `onCopy <full 0x address>` -- the component states intent,
 the APP performs the copy. This package ships zero JavaScript, so wire the
 message to a one-line port:
 

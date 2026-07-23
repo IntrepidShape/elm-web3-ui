@@ -6,7 +6,7 @@ argument, an optional `msg.value` input for `payable` functions, a "Send"
 button wired through the [`Tx.Status`](https://package.elm-lang.org/packages/intrepidshape/elm-web3/latest/Web3-Transaction#Status)
 state machine, and a status badge plus tx-hash link below.
 
-Like every primitive in this lib, the component is **stateless** — the
+Like every primitive in this lib, the component is **stateless** -- the
 caller owns the `args`, the `msgValue` input buffer, and the `txStatus`
 and passes them in on every render.
 
@@ -39,7 +39,7 @@ A complete write flow looks like this:
         , txStatus = model.tx
         , onSend = Send "approve"
         , sendLabel = "Approve"
-        , pendingLabel = "Approving…"
+        , pendingLabel = "Approving..."
         , explorerUrl = Just "https://scan.pulsechain.com/tx/"
         }
 
@@ -67,15 +67,15 @@ import Web3.Ui.Transaction as TxUi
 
 {-| Configuration for `view`.
 
-  - `name` — the function name to display (e.g. `"approve"`).
-  - `args` — one [`AbiInput`](Web3-Ui-AbiInput) config per ABI argument.
-  - `payable` — for `payable` functions, the `msg.value` input state and
+  - `name` -- the function name to display (e.g. `"approve"`).
+  - `args` -- one [`AbiInput`](Web3-Ui-AbiInput) config per ABI argument.
+  - `payable` -- for `payable` functions, the `msg.value` input state and
     callback; `Nothing` for non-payable.
-  - `txStatus` — current transaction lifecycle state.
-  - `onSend` — message dispatched when the user clicks the send button.
-  - `sendLabel` — button label when the tx is idle (e.g. `"Approve"`).
-  - `pendingLabel` — button label while the tx is in-flight (e.g. `"Approving…"`).
-  - `explorerUrl` — optional explorer URL prefix for the tx-hash link;
+  - `txStatus` -- current transaction lifecycle state.
+  - `onSend` -- message dispatched when the user clicks the send button.
+  - `sendLabel` -- button label when the tx is idle (e.g. `"Approve"`).
+  - `pendingLabel` -- button label while the tx is in-flight (e.g. `"Approving..."`).
+  - `explorerUrl` -- optional explorer URL prefix for the tx-hash link;
     `Nothing` renders the hash as plain text (useful in local dev).
 
 -}

@@ -29,7 +29,7 @@ id with `update`, render the whole thing as a toast stack:
 
 Every entry is a full `Web3.Transaction` state machine, so all its
 guarantees hold per-transaction (terminal absorbing, monotonic
-confirmations) — and because messages are routed by id, one transaction's
+confirmations) -- and because messages are routed by id, one transaction's
 late confirmation can never touch another's state.
 
 CSS classes: `web3-txq`, `web3-txq__toast`, `web3-txq__toast--pending`,
@@ -66,7 +66,7 @@ empty =
 
 {-| Start tracking a transaction under a correlation id, with a
 human-readable label ("Approve FOO", "Stake 50k"). Starts in
-`AwaitingSignature` — call it when you fire the write.
+`AwaitingSignature` -- call it when you fire the write.
 -}
 begin : String -> String -> TxQueue -> TxQueue
 begin id label (TxQueue d) =
@@ -74,7 +74,7 @@ begin id label (TxQueue d) =
 
 
 {-| Route a port `Tx.Msg` to the transaction it belongs to. Unknown ids are
-ignored — a message for a transaction you never began (or already dismissed)
+ignored -- a message for a transaction you never began (or already dismissed)
 cannot create ghost entries.
 -}
 update : String -> Tx.Msg -> TxQueue -> TxQueue
@@ -86,7 +86,7 @@ update id msg (TxQueue d) =
         )
 
 
-{-| Remove an entry (the toast's × button). -}
+{-| Remove an entry (the toast's x button). -}
 dismiss : String -> TxQueue -> TxQueue
 dismiss id (TxQueue d) =
     TxQueue (Dict.remove id d)
@@ -107,7 +107,7 @@ pendingCount (TxQueue d) =
         d
 
 
-{-| Every entry, id-ordered — for custom renderings. -}
+{-| Every entry, id-ordered -- for custom renderings. -}
 entries : TxQueue -> List ( String, { label : String, status : Tx.Status } )
 entries (TxQueue d) =
     Dict.toList d
@@ -120,7 +120,7 @@ type alias Config msg =
     }
 
 
-{-| Render the queue as a stack of toasts (`aria-live="polite"` — status
+{-| Render the queue as a stack of toasts (`aria-live="polite"` -- status
 changes are announced without stealing focus). Empty queue renders an empty
 container, so the stack can be styled `position: fixed` unconditionally.
 -}

@@ -4,11 +4,11 @@ module Web3.Ui.EventFeed exposing
     , view, Config
     )
 
-{-| A live on-chain event feed — the binder between `Web3.Subscription` log
+{-| A live on-chain event feed -- the binder between `Web3.Subscription` log
 streams and rendered rows.
 
 The port layer answers a subscription request with
-`{ tag = "subscribed", status = "open" | "failed" }` — `failed` meaning the
+`{ tag = "subscribed", status = "open" | "failed" }` -- `failed` meaning the
 WebSocket was unavailable and the bridge fell back to polling, so events
 still flow, just with more latency. The `Feed` tracks that honestly (a
 `Fallback` chip, not a lie of liveness), keeps items newest-first, and
@@ -29,7 +29,7 @@ enforces a cap so a hot contract can't grow your model without bound.
         viewTokenCreated
         model.feed
 
-Generic over the item type — the app decodes its own events; this module
+Generic over the item type -- the app decodes its own events; this module
 never guesses at your ABI.
 
 CSS classes: `web3-eventfeed`, `web3-eventfeed__status`,
@@ -55,7 +55,7 @@ type Status
     | Closed
 
 
-{-| The feed. Opaque — the cap and ordering are invariants, not suggestions. -}
+{-| The feed. Opaque -- the cap and ordering are invariants, not suggestions. -}
 type Feed item
     = Feed
         { status : Status
@@ -65,15 +65,15 @@ type Feed item
 
 
 {-| A feed awaiting its subscription confirmation. Caps below 1 are lifted
-to 1 — a feed that can hold nothing is not a feed.
+to 1 -- a feed that can hold nothing is not a feed.
 -}
 init : { cap : Int } -> Feed item
 init opts =
     Feed { status = Connecting, entries = [], cap = max 1 opts.cap }
 
 
-{-| Apply the port's `subscribed` answer: `open = True` → `Live`,
-`open = False` → `Fallback` (the bridge is polling; events still flow).
+{-| Apply the port's `subscribed` answer: `open = True` -> `Live`,
+`open = False` -> `Fallback` (the bridge is polling; events still flow).
 -}
 onSubscribed : { open : Bool } -> Feed item -> Feed item
 onSubscribed { open } (Feed f) =

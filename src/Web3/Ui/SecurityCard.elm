@@ -7,7 +7,7 @@ module Web3.Ui.SecurityCard exposing
 
 {-| Render a Trustpilot-style **security pre-flight card** for a smart
 contract, summarising static-analysis findings (Slither, Aderyn, Mythril,
-…).
+...).
 
 Design intent (informed by the dapp-gen UX research brief):
 
@@ -16,11 +16,11 @@ Design intent (informed by the dapp-gen UX research brief):
     rates; presenting a single pass/fail invites misinterpretation.
   - Top-3 most-severe findings surface inline so a user has *actionable*
     information without clicking into a long report.
-  - The "request human audit" CTA is always available — the card is a
+  - The "request human audit" CTA is always available -- the card is a
     funnel, not a substitute, and that framing protects everyone (the
     auditor, the user, and the contract author).
 
-The component is **stateless** like every primitive in this lib — the
+The component is **stateless** like every primitive in this lib -- the
 caller owns the [`Findings`](#Findings) record and the `Stubbed` flag
 (set to `Yes` when no analysis has run, e.g. an Etherscan-only fetch
 where no NatSpec or sources are available).
@@ -36,7 +36,7 @@ where no NatSpec or sources are available).
                 }
         , topFindings =
             [ { severity = High
-              , title = "Centralization risk — onlyOwner can mint"
+              , title = "Centralization risk -- onlyOwner can mint"
               , tool = "slither"
               }
             , { severity = High

@@ -1,7 +1,7 @@
 module Web3.Ui.VeBalanceChart exposing (view)
 
 {-| SVG line chart of vote-escrow balance decaying linearly from `nowSec` to
-`unlockTime`. Educational primitive — shows the user how their vote weight
+`unlockTime`. Educational primitive -- shows the user how their vote weight
 will fade as the lock matures.
 
 Linear-decay model (Curve / Aerodrome standard):
@@ -11,7 +11,7 @@ Linear-decay model (Curve / Aerodrome standard):
 At `t = nowSec` the line starts at the current ve-balance; at
 `t = unlockTime` it hits zero and stays there. The chart samples
 `sampleCount` points across that span and connects them with a polyline.
-Math runs on `Float` because the chart is purely visual — do not consume
+Math runs on `Float` because the chart is purely visual -- do not consume
 rendered points for on-chain calculation.
 
     Web3.Ui.VeBalanceChart.view

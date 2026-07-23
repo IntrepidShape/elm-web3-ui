@@ -4,7 +4,7 @@ module Web3.Ui.SupplyBar exposing
     , Config
     )
 
-{-| Progress bar for any "how full is X" metric — token supply against a cap,
+{-| Progress bar for any "how full is X" metric -- token supply against a cap,
 graduation reserves toward a threshold, vault deposits toward an issuance limit.
 
     -- Bare usage:

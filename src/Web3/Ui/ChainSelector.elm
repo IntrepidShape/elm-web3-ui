@@ -9,16 +9,16 @@ switch-chain flow.
             , { chainId = 1, label = "Ethereum" }
             ]
         , current = Wallet.getChainId model.wallet |> Maybe.map T.chainIdToInt
-        , onSelect = SwitchChainTo   -- then: web3Cmd (Wallet.encode (Wallet.switchChain …))
+        , onSelect = SwitchChainTo   -- then: web3Cmd (Wallet.encode (Wallet.switchChain ...))
         }
 
-Selecting an entry is a *request* — render the truth from `Wallet.State`,
+Selecting an entry is a *request* -- render the truth from `Wallet.State`,
 never optimistically: the pill only moves when `SwitchChainOk` /
 `ChainChanged` actually arrives. Chains the wallet doesn't know yet are the
 `Wallet.addChain` (EIP-3085) flow; fire it from your `onSelect` handler when
 the switch errors.
 
-Rendered as a `role="radiogroup"` of buttons — keyboard and screen-reader
+Rendered as a `role="radiogroup"` of buttons -- keyboard and screen-reader
 native.
 
 CSS classes: `web3-chains`, `web3-chains__option`,

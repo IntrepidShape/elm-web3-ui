@@ -3,7 +3,7 @@ module Web3.Ui.FeeBreakdown exposing
     , Slice
     )
 
-{-| Render a fee-split table. Each row is one slice of the fee — the caller
+{-| Render a fee-split table. Each row is one slice of the fee -- the caller
 provides labels, basis points, and (optionally) the Wei amount that slice will
 receive at the current trade size.
 

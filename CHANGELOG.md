@@ -1,11 +1,39 @@
 # Changelog
 
-## 2.3.2 — 2026-07-16
+## 2.4.0 — 2026-07-23
 
 Requires `intrepidshape/elm-web3` ≥ 2.0.0 (the RequestId-tracked wallet connect
-release). This is a PATCH: the public API is byte-identical — only formatting
-behaviour and the elm-web3 lower bound changed — so `elm bump` classifies it as
-a patch, not a minor.
+release). Supersedes the unpublished local "2.3.1"/"2.3.2" labels — registry
+history goes 2.3.0 → 2.4.0. `elm bump` classifies this as MINOR because
+`Wallet.disconnectPopover` is new exposed API (the earlier "byte-identical
+API" patch claim had missed it).
+
+### Added
+
+- **`Wallet.disconnectPopover`** — a ready-made disconnect affordance for the
+  connected-account pill.
+
+### Fixed — wallet connect UX
+
+- The connect button stays clickable while `Connecting` (a stuck provider no
+  longer wedges the UI), and `Connecting` pattern matches carry elm-web3
+  2.0.0's `RequestId` payload.
+
+### Docs — ASCII-only doc comments (registry-critical, CI-enforced)
+
+All doc comments are now pure ASCII. Reason: elm 0.19.1's client-side
+docs.json parser has a byte-position-sensitive bug with raw multi-byte UTF-8 —
+depending on where a character lands in the generated docs.json, `elm diff` /
+`elm bump` / `elm publish` fail with PROBLEM LOADING DOCS for *every consumer,
+forever* (published bytes are immutable). This package's published 2.3.0 docs
+are permanently affected (a `≥` at byte offset 65709); publishing 2.4.0 moves
+the ecosystem's diff baseline past it. Local workaround for machines that must
+still diff against 2.3.0: place an ASCII-escaped (`\uXXXX`) but
+content-identical copy of the docs at
+`~/.elm/0.19.1/packages/intrepidshape/elm-web3-ui/2.3.0/docs.json`.
+
+- README refresh (module count, gallery/theme/proofs links) so the registry
+  page carries the current front door.
 
 ### Fixed — small balances no longer vanish to "0"
 
@@ -26,12 +54,6 @@ a patch, not a minor.
 - Public API and every type signature are unchanged — a drop-in upgrade. The
   string math lives in a new internal (unexposed) `Web3.Ui.Internal.Decimal`
   module shared by both formatters.
-
-
-## 2.3.1 — 2026-07-02
-
-- Docs-only: README refresh (module count, gallery/theme/proofs links) so
-  the registry page carries the current front door. No code changes.
 
 
 ## 2.3.0 — 2026-07-02

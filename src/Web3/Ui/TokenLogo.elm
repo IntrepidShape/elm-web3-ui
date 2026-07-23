@@ -1,13 +1,13 @@
 module Web3.Ui.TokenLogo exposing (view, Config)
 
-{-| Token logo atom — an `img` when a logo URL is known, a deterministic
+{-| Token logo atom -- an `img` when a logo URL is known, a deterministic
 letter tile when it is not.
 
 Every token list, swap panel, and portfolio row needs the same thing: show
 the logo if we have one, and degrade to something recognisable (not a broken
-image icon) when we don't. The fallback tile shows the first 1–2 characters
+image icon) when we don't. The fallback tile shows the first 1-2 characters
 of the symbol and picks one of eight hue classes from a character-code hash
-of the symbol — so `"USDC"` is always the same colour everywhere it appears,
+of the symbol -- so `"USDC"` is always the same colour everywhere it appears,
 with zero inline styles. Your stylesheet owns the actual palette.
 
     Web3.Ui.TokenLogo.view
@@ -16,18 +16,18 @@ with zero inline styles. Your stylesheet owns the actual palette.
         , size = 24
         }
 
-    -- No logo known — renders the "FO" letter tile:
+    -- No logo known -- renders the "FO" letter tile:
     Web3.Ui.TokenLogo.view
         { logoUrl = Nothing, symbol = "FOO", size = 24 }
 
 The image is `loading="lazy"` (token lists are long) with `alt` set to the
 symbol. The tile carries `role="img"` and `aria-label` with the symbol so
 screen readers announce the same thing either way. Sizing uses width/height
-attributes (img) and SVG width/height (tile) — the same convention as
-`Web3.Ui.Identicon` — never inline styles.
+attributes (img) and SVG width/height (tile) -- the same convention as
+`Web3.Ui.Identicon` -- never inline styles.
 
 CSS classes: `web3-tokenlogo`, `web3-tokenlogo--img`, `web3-tokenlogo--tile`,
-`web3-tokenlogo--hue-0` … `web3-tokenlogo--hue-7`.
+`web3-tokenlogo--hue-0` ... `web3-tokenlogo--hue-7`.
 
 @docs view, Config
 
@@ -102,13 +102,13 @@ tile cfg =
         ]
 
 
-{-| First 1–2 characters of the symbol, uppercased. -}
+{-| First 1-2 characters of the symbol, uppercased. -}
 letters : String -> String
 letters symbol =
     String.toUpper (String.left 2 symbol)
 
 
-{-| Deterministic hue bucket 0–7 from the symbol's character codes. -}
+{-| Deterministic hue bucket 0-7 from the symbol's character codes. -}
 hue : String -> Int
 hue symbol =
     symbol

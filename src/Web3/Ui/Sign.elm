@@ -32,7 +32,7 @@ import Web3.Sign as Sign
 
 {-| Displays the sign lifecycle state as a labelled span.
 
-Labels: "Idle" / "Waiting for signature…" / "Signed" / "Failed: <err>" / "Rejected"
+Labels: "Idle" / "Waiting for signature..." / "Signed" / "Failed: <err>" / "Rejected"
 
 CSS class: `web3-sign-state`
 
@@ -98,7 +98,7 @@ signButton attrs opts state =
 
 {-| Displays the signature value when in the `Signed` state.
 
-Returns an empty text node for all other states — safe to always render.
+Returns an empty text node for all other states -- safe to always render.
 
 CSS classes: `web3-signature` (wrapper div), `web3-signature-value` (code element)
 

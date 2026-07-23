@@ -3,7 +3,7 @@ module Web3.Ui.FeeFlowDiagram exposing
     , Slice
     )
 
-{-| Educational visualization of a fee split — a horizontal stacked bar with
+{-| Educational visualization of a fee split -- a horizontal stacked bar with
 proportional segments, plus a label and Wei amount under each. Pairs with
 `Web3.Ui.FeeBreakdown` (which is the equivalent table view); use this one
 when you want a hero-tier "where does my fee go?" graphic on a marketing
@@ -12,7 +12,7 @@ page or trade modal.
 The bar segments are sized by basis points; total `bps` does not need to
 sum to 10000 (the bar is normalized to its own total).
 
-Each `Slice` accepts an optional `kind` string — emitted as a CSS class
+Each `Slice` accepts an optional `kind` string -- emitted as a CSS class
 suffix (`web3-feeflow__seg--<kind>`) so the consumer can color the
 segments by recipient type without inline styles.
 

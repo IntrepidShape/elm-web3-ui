@@ -8,7 +8,7 @@ module Web3.Ui.ContractRead exposing
 name header, one [`AbiInput`](Web3-Ui-AbiInput) per argument, a "Read"
 button, and a result panel that pattern-matches on the current `Status`.
 
-Like every primitive in this lib, the component is **stateless** — the
+Like every primitive in this lib, the component is **stateless** -- the
 caller owns the `args` (one `AbiInput.Config` per argument) and the
 `status` and passes them in on every render. The lib renders, the caller
 wires the result back through `update`.
@@ -66,7 +66,7 @@ import Web3.Ui.AbiInput as AbiInput
 
 {-| Lifecycle of a single read.
 
-`Success String` carries the rendered result — the caller stringifies the
+`Success String` carries the rendered result -- the caller stringifies the
 typed value (using whatever `Web3.Abi.Decode`-produced value they decoded).
 This keeps `ContractRead` agnostic to the result type.
 -}
@@ -119,12 +119,12 @@ isTerminal s =
 
 {-| Configuration for `view`.
 
-  - `name` — the function name to display (e.g. `"balanceOf"`).
-  - `solType` — the return type string for display (e.g. `"uint256"`).
-  - `args` — one [`AbiInput`](Web3-Ui-AbiInput) config per ABI argument.
-  - `status` — current lifecycle state.
-  - `onRead` — message dispatched when the user clicks the read button.
-  - `readLabel` — button label when idle / terminal (e.g. `"Read"` or `"Refresh"`).
+  - `name` -- the function name to display (e.g. `"balanceOf"`).
+  - `solType` -- the return type string for display (e.g. `"uint256"`).
+  - `args` -- one [`AbiInput`](Web3-Ui-AbiInput) config per ABI argument.
+  - `status` -- current lifecycle state.
+  - `onRead` -- message dispatched when the user clicks the read button.
+  - `readLabel` -- button label when idle / terminal (e.g. `"Read"` or `"Refresh"`).
 
 -}
 type alias Config msg =

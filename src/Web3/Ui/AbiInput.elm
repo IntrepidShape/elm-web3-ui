@@ -6,7 +6,7 @@ module Web3.Ui.AbiInput exposing
     , initFor, parse, parseSlot
     )
 
-{-| Render a typed input for any Solidity argument shape — `address`,
+{-| Render a typed input for any Solidity argument shape -- `address`,
 `uint*`, `int*`, `bool`, `string`, `bytes`, `bytesN`, `T[]`, `T[N]`, and
 `tuple` (recursively).
 
@@ -20,12 +20,12 @@ A complete write flow looks like this:
     type alias Model =
         { fooArg : Web3.Ui.AbiInput.Value
         , fooError : Maybe String
-        , …
+        , ...
         }
 
     -- in init
     init =
-        { fooArg = Web3.Ui.AbiInput.initFor fooField, … }
+        { fooArg = Web3.Ui.AbiInput.initFor fooField, ... }
 
     -- in your view
     Web3.Ui.AbiInput.view []
@@ -372,10 +372,10 @@ parseTuple fields values =
 
 {-| Parse a `Value` against its `Field` into a [`Calldata.Slot`](Web3-Abi-Calldata#Slot).
 
-This is the canonical parser for the pure-Elm calldata path — codegen tools
+This is the canonical parser for the pure-Elm calldata path -- codegen tools
 emit `parseSlot` calls and feed the resulting slots to
 [`Web3.Abi.Calldata.calldata`](Web3-Abi-Calldata#calldata) plus a baked
-selector, producing complete `"0x…"` calldata with zero JavaScript
+selector, producing complete `"0x..."` calldata with zero JavaScript
 involvement.
 
 Use `parseSlot` when building `readCallRaw` / `writeCallRaw`; use the

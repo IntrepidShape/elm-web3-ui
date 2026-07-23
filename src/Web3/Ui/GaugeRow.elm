@@ -14,7 +14,7 @@ The available actions depend on epoch state:
   - `epoch < currentEpoch`: epoch is closed; voters can claim, bribers can
     forfeit, no new votes/bribes possible.
 
-The component does not enforce these — caller passes `Nothing` for actions
+The component does not enforce these -- caller passes `Nothing` for actions
 that should be hidden in the current state.
 
 ```elm

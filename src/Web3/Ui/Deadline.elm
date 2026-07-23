@@ -1,6 +1,6 @@
 module Web3.Ui.Deadline exposing (view, Config, toUnixDeadline)
 
-{-| Transaction deadline picker — preset chips plus a custom minutes input,
+{-| Transaction deadline picker -- preset chips plus a custom minutes input,
 the sibling of `Web3.Ui.SlippageInput`.
 
     Web3.Ui.Deadline.view

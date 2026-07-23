@@ -8,10 +8,10 @@ module Web3.Ui.Wallet exposing
 
 {-| Wallet connection UI components.
 
-All functions accept `List (Html.Attribute msg)` as the first argument — merged
+All functions accept `List (Html.Attribute msg)` as the first argument -- merged
 onto the root element. Pass `[]` for no extra attributes.
 
-No default styles — every element has a semantic class name. Supply your own CSS.
+No default styles -- every element has a semantic class name. Supply your own CSS.
 
     -- Basic connect/disconnect button:
     Web3.Ui.Wallet.connectButton []
@@ -132,7 +132,7 @@ viewWalletOption opts provider =
         ]
 
 
-{-| Full wallet UI — handles all `Wallet.State` variants with appropriate labels
+{-| Full wallet UI -- handles all `Wallet.State` variants with appropriate labels
 and actions.
 
 Pass `knownChains` so the `WrongChain` branch can display the target network name.
@@ -194,7 +194,7 @@ Falls back to "Unknown Chain" if not found.
 
 Shows "Wrong Chain" when in `WrongChain` state.
 Shows "Read-only" when in `ReadOnly` state.
-Shows "—" when connecting, disconnected, or in error state.
+Shows "--" when connecting, disconnected, or in error state.
 
 CSS class: `web3-chain-badge`
 
@@ -242,7 +242,7 @@ lookupChainName chains cid =
 
 {-| The connected-state address control: short address (with copy button and
 optional explorer link, via `Web3.Ui.Address.copyable`) plus a disconnect
-button. Intended to render inside a caller-controlled dropdown/popover —
+button. Intended to render inside a caller-controlled dropdown/popover --
 this component doesn't manage its own open/closed state, since that's
 inherently the consumer's UI decision (a click-triggered popover, an
 always-visible panel, etc.).

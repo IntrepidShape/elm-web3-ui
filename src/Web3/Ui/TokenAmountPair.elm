@@ -1,7 +1,7 @@
 module Web3.Ui.TokenAmountPair exposing (view, Config)
 
 {-| The swap/deposit workhorse: token identity, decimals-aware amount input,
-live balance line, and percent presets — one compound, one Config.
+live balance line, and percent presets -- one compound, one Config.
 
     TokenAmountPair.view []
         { symbol = "FOO"

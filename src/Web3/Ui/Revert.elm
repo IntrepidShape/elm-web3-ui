@@ -1,9 +1,9 @@
 module Web3.Ui.Revert exposing (banner, toast, reason, bannerWith, toastWith)
 
 {-| Human-readable revert reasons. elm-web3 can decode `Error(string)`
-revert data (`Web3.Abi.Decode.decodeRevertReason`) — this module is the
+revert data (`Web3.Abi.Decode.decodeRevertReason`) -- this module is the
 missing last mile that actually shows it to the user instead of a raw
-`0x08c379a0…` blob.
+`0x08c379a0...` blob.
 
     case model.txError of
         Just raw ->
@@ -46,7 +46,7 @@ reason raw =
             Err (shorten raw)
 
 
-{-| An inline error banner (`role="alert"` — screen readers announce it).
+{-| An inline error banner (`role="alert"` -- screen readers announce it).
 Pass `onDismiss = Just msg` to get a dismiss button.
 -}
 banner : List (Html.Attribute msg) -> { onDismiss : Maybe msg } -> String -> Html msg
@@ -112,7 +112,7 @@ shorten raw =
         String.left 40 raw
 
 
-{-| Like [`banner`](#banner), but tries a typed custom-error decoder first —
+{-| Like [`banner`](#banner), but tries a typed custom-error decoder first --
 pass elm-web3's `Abi.Decode.decodeCustomError yourFragments` (>= 1.4.0). A
 decoded custom error renders its name and args
 (`web3-revert--custom`, name in `web3-revert__name`); anything else falls

@@ -4,7 +4,7 @@ module Web3.Ui.NFTStakeCard exposing
     )
 
 {-| Card for an ERC-721 stake position. Like `Web3.Ui.StakeCard`, but the
-position is a transferable NFT — so the card surfaces the `tokenId`, an
+position is a transferable NFT -- so the card surfaces the `tokenId`, an
 optional transfer action, and a separate "redeem at floor" action for
 designs where floor-redemption is a distinct primitive
 from full unstake.

@@ -21,7 +21,7 @@ project does not hand-roll the same spinner and copy.
         { message = "Check your wallet" }
         model.tx
 
-    -- Multi-step approve → call sequence:
+    -- Multi-step approve -> call sequence:
     Web3.Ui.PendingOverlay.viewMultiStep []
         { steps =
             [ { label = "Approve $TOKEN", state = StepDone }
@@ -71,7 +71,7 @@ view attrs opts =
 
 {-| Render the overlay only when `status` is `Tx.AwaitingSignature`.
 
-Returns `Html.text ""` for all other states — safe to always include in your
+Returns `Html.text ""` for all other states -- safe to always include in your
 view tree.
 
 -}
@@ -95,8 +95,8 @@ conditionalView attrs opts status =
 
 {-| One row in a multi-step pending overlay.
 
-  - `label` — human title for the step (e.g. "Approve $TOKEN").
-  - `state` — `StepPending` (not started), `StepActive` (in flight),
+  - `label` -- human title for the step (e.g. "Approve $TOKEN").
+  - `state` -- `StepPending` (not started), `StepActive` (in flight),
     `StepDone` (confirmed), `StepFailed reason` (last revert reason).
 
 -}
@@ -109,7 +109,7 @@ type alias Step =
 {-| Lifecycle of a single step in a multi-step sequence.
 
 `StepFailed` carries the revert / wallet reason so the user sees a
-specific message — useful for the post-approve, mid-call failure mode
+specific message -- useful for the post-approve, mid-call failure mode
 (approve confirms, then the call reverts and the approve toast already
 faded). The multi-step overlay keeps the full sequence visible until
 the user dismisses it or starts a new tx.
@@ -124,7 +124,7 @@ type StepState
 
 {-| Render a vertical stack of steps with the active one spinning.
 Renders an empty node if every step is `StepPending` AND the overall
-`currentStatus` is `Tx.Idle` (nothing is happening yet — caller can
+`currentStatus` is `Tx.Idle` (nothing is happening yet -- caller can
 keep the overlay inert without a per-page conditional).
 
 CSS classes: `web3-pending-overlay`, `web3-pending-overlay-multi`,
