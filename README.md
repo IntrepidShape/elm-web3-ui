@@ -1,6 +1,6 @@
 # elm-web3-ui
 
-Type-safe DeFi UI primitives for [elm-web3](https://package.elm-lang.org/packages/intrepidshape/elm-web3/latest/). 57 modules: wallet, transaction, address, balance, signing, token, approval-flow, event-feed, simulate-first, staking, voting, bonding-curve, fee, gauge and price primitives — all returning plain `Html msg`, all closing the frontend security gap that owns DeFi.
+Type-safe DeFi UI primitives for [elm-web3](https://package.elm-lang.org/packages/intrepidshape/elm-web3/latest/). 52 modules: wallet, transaction, address, balance, signing, token, approval-flow, event-feed, simulate-first, staking, voting, bonding-curve, fee, gauge and price primitives — all returning plain `Html msg`, all closing the frontend security gap that owns DeFi.
 
 No internal `Msg`, no subscriptions, no state of their own. You pass the state in, the component renders it, your `msg` comes back. The compiler enforces the rest.
 
@@ -14,7 +14,7 @@ For the underlying correctness / supply-chain / frontend-security pitch — why 
 elm install intrepidshape/elm-web3-ui
 ```
 
-Requires `intrepidshape/elm-web3` 1.0.0 or later.
+Requires `intrepidshape/elm-web3` `2.0.0 <= v < 3.0.0` — the range this package's `elm.json` declares. Pairing 2.4.0 with an elm-web3 1.x fails at `elm install`, by design. Upgrading from an earlier pair: see [`UPGRADING.md`](https://github.com/IntrepidShape/elm-web3/blob/master/docs/UPGRADING.md) in elm-web3, which carries the compatibility matrix.
 
 ## Design
 
@@ -33,6 +33,8 @@ Requires `intrepidshape/elm-web3` 1.0.0 or later.
 | `Web3.Ui.Balance` | Balance display with `formatUnits` / `formatEther`, loading-state variants |
 | `Web3.Ui.Input` | Typed inputs: `address`, `bigInt`, `bool`, `text`, `bytes` |
 | `Web3.Ui.Sign` | Sign state display, sign button, signature display |
+
+Those six are the core, documented in detail below. They are 6 of the 52 modules `elm.json` exposes — the full set (staking, voting, bonding curves, gauges, event feeds, approval flows, the flow generics) is mapped in [`PRIMITIVES.md`](https://github.com/IntrepidShape/elm-web3-ui/blob/master/PRIMITIVES.md) and demonstrated in the [live gallery](https://intrepidshape.github.io/elm-web3-ui/).
 
 ## Quick start
 
@@ -266,6 +268,12 @@ Renders the signature in a `<code>` element when in `Signed` state. Returns an e
 | `web3-sign-btn` | Sign button |
 | `web3-signature` | Signature display wrapper div |
 | `web3-signature-value` | Signature value code element |
+
+## Security
+
+No external audit has been performed. [`SECURITY.md`](SECURITY.md) states what is machine-checked and what is not, names the bug class that matters most in a rendering layer (display/reality mismatch — wrong `decimals`, a `Float` round-trip, a revert shown as success), and gives the deprecate-and-supersede procedure for a security patch, since the Elm registry can never unpublish.
+
+Disclosure: [Jake@intrepiddev.com.au](mailto:Jake@intrepiddev.com.au), subject `elm-web3-ui security`.
 
 ## Included stylesheets
 

@@ -4,7 +4,9 @@ An exhaustive taxonomy of every primitive and generic a web3 UI package needs,
 graded against what `intrepidshape/elm-web3-ui` ships today. This is the
 package's map and roadmap — the UI-layer companion to elm-web3's
 `proofs/EVM_API_COVERAGE.md`. Audited 2026-07-02 against the exposed
-modules; regraded same day after the 2.1.0 primitive build (46 modules).
+modules; regraded same day after the 2.1.0 primitive build. The count is
+whatever `elm.json`'s `exposed-modules` says — **52** as of 2.4.0, which is
+the one number the README and this file must both agree with.
 Every generic primitive is demonstrated live in `examples/gallery/`.
 
 Grading: ✅ shipped · 🟡 partial (exists but missing listed capability) ·

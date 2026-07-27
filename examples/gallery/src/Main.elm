@@ -8,7 +8,7 @@ machines (`Tx.Status`, `SignState`, `ApprovalFlow.Step`, `RemoteCall`,
 clicked through — without a wallet, a node, or JavaScript. That purity is
 the point of the library; this page is the proof you can see.
 
-Build:  cd examples/gallery && elm make Main.elm --output=elm.js
+Build:  cd examples/gallery && elm make src/Main.elm --output=elm.js
 Open:   index.html
 
 -}
@@ -448,7 +448,7 @@ view model =
                 "Progress toward caps and thresholds; block-time phrasing."
                 (Html.div [ Attr.class "row" ]
                     [ ProgressRing.view { current = wei "68", target = wei "100", size = 56, label = Just "68%" }
-                    , SupplyBar.view { current = wei "6800000000000000000000", max = wei "10000000000000000000000", label = Just "graduation" }
+                    , SupplyBar.view { current = wei "6800000000000000000000", max = wei "10000000000000000000000", decimals = 18, label = Just "graduation" }
                     , RelativeTime.view { nowSec = 1000000, atSec = 999160 }
                     ]
                 )
@@ -710,6 +710,7 @@ view model =
                     , nowSec = 999000 + 40 * 86400
                     , yieldAccrued = wei "1234000000000000000000"
                     , yieldSymbol = "PLS"
+                    , yieldDecimals = 18
                     , badges = [ { active = True, label = "floor-protected" }, { active = False, label = "boosted" } ]
                     , onClaimYield = Just Noop
                     , onUnstake = Just Noop
@@ -817,19 +818,33 @@ walletScene index =
             Wallet.Disconnected
 
         1 ->
-            Wallet.Connecting
+            -- Since 2.0.0 `Connecting` carries the `RequestId` of the attempt
+            -- in flight, so a response from a superseded attempt can never
+            -- clobber a newer one. `startConnect` is how you mint that state.
+            Wallet.startConnect 1 Wallet.Disconnected
 
         2 ->
             Wallet.ReadOnly
 
         3 ->
-            Wallet.update (T.chainId 369) (Wallet.WalletConnected (T.addressToString demoAddress) 369) Wallet.Disconnected
+            connectedOn 369
 
         4 ->
-            Wallet.update (T.chainId 369) (Wallet.WalletConnected (T.addressToString demoAddress) 1) Wallet.Disconnected
+            connectedOn 1
 
         _ ->
             Wallet.Error "user closed the wallet"
+
+
+{-| Drive the real state machine to a connected state, exactly as the port
+would: `WalletConnected` carries `Just requestId` for a user-initiated
+connect (`Nothing` only for a silent reconnect on page load).
+-}
+connectedOn : Int -> Wallet.State
+connectedOn chain =
+    Wallet.update (T.chainId 369)
+        (Wallet.WalletConnected (Just 1) (T.addressToString demoAddress) chain)
+        (Wallet.startConnect 1 Wallet.Disconnected)
 
 
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # Headless interaction verification for the gallery (playwright).
-# Build first: elm make Main.elm --output=elm.js
+# Build first: elm make src/Main.elm --output=elm.js
 import os
 from playwright.sync_api import sync_playwright
 with sync_playwright() as p:
