@@ -10,14 +10,23 @@ for the current spot price and floor price.
         , supply = curve.supply
         , maxSupply = maxSupply
         , floorPrice = Just curve.floorPrice
+        , decimals = 18
         , width = 320
         , height = 80
         }
 
 The component is generic for any curve of shape `price = A * supply^N`,
 which covers `x^1.1`, classic `x^2`, and any sub-/super-linear
-issuance model. Math runs on `Float` because the chart is purely visual --
-do not consume the rendered points for on-chain calculation.
+issuance model. `coeffA`, `floorPrice` and `supply` are all scaled by
+`10 ^ decimals`, which used to be hardcoded to 18 -- on a 6-decimal token the
+floor line was drawn 1e12 out of place.
+
+`supply / maxSupply` is divided in `BigInt` space and the curve is plotted from
+that bounded ratio, so no uint256 is converted to a `Float`; the floor line is
+placed from `Decimal.log10` magnitudes, which stay exact in the exponent
+however large the inputs are. The remaining `Float` work is the caller's
+fractional `exponent`, which has no integer equivalent. The chart is purely
+visual -- do not consume the rendered points for on-chain calculation.
 
 CSS classes: `web3-bondingcurve`, `web3-bondingcurve__path`,
 `web3-bondingcurve__spot`, `web3-bondingcurve__floor`. Stroke colors come
@@ -31,7 +40,8 @@ import Html exposing (Html)
 import Html.Attributes as Attr
 import Svg
 import Svg.Attributes as SAttr
-import Web3.BigInt as BigInt exposing (BigInt)
+import Web3.BigInt exposing (BigInt)
+import Web3.Ui.Internal.Decimal as Decimal
 
 
 {-| Render the sparkline. -}
@@ -41,6 +51,7 @@ sparkline :
     , supply : BigInt
     , maxSupply : BigInt
     , floorPrice : Maybe BigInt
+    , decimals : Int
     , width : Int
     , height : Int
     }
@@ -50,42 +61,27 @@ sparkline opts =
         sampleCount =
             64
 
-        maxSupplyF =
-            bigToFloat opts.maxSupply
+        -- Every plotted height is `price(x) / price(maxSupply)`, and both
+        -- `coeffA` and the unit scale cancel out of that ratio, leaving
+        -- `(x / maxSupply) ^ exponent`. So the curve needs only the bounded
+        -- supply ratio, never the raw uint256 amounts.
+        priceRatio supplyRatio =
+            Decimal.powScaled scale opts.exponent supplyRatio
 
-        coeffAF =
-            bigToFloat opts.coeffA / 1.0e18
+        toX100 supplyRatio =
+            supplyRatio * opts.width * 100 // scale
 
-        priceAt s =
-            coeffAF * (s / 1.0e18) ^ opts.exponent
+        toY100 pRatio =
+            opts.height * 100 - (clamp 0 scale pRatio * opts.height * 100 // scale)
 
         samples =
             List.range 0 (sampleCount - 1)
-                |> List.map
-                    (\i ->
-                        let
-                            x =
-                                toFloat i / toFloat (sampleCount - 1) * maxSupplyF
-                        in
-                        ( x, priceAt x )
-                    )
-
-        maxPrice =
-            samples
-                |> List.map Tuple.second
-                |> List.maximum
-                |> Maybe.withDefault 1
-
-        toX x =
-            x / maxSupplyF * toFloat opts.width
-
-        toY p =
-            toFloat opts.height - (p / maxPrice * toFloat opts.height)
+                |> List.map (\i -> i * scale // (sampleCount - 1))
 
         pathD =
             samples
                 |> List.indexedMap
-                    (\i ( x, p ) ->
+                    (\i supplyRatio ->
                         let
                             cmd =
                                 if i == 0 then
@@ -94,15 +90,18 @@ sparkline opts =
                                 else
                                     "L"
                         in
-                        cmd ++ String.fromFloat (toX x) ++ " " ++ String.fromFloat (toY p)
+                        cmd ++ px (toX100 supplyRatio) ++ " " ++ px (toY100 (priceRatio supplyRatio))
                     )
                 |> String.join " "
 
+        spotRatio =
+            Decimal.scaledRatio scale opts.supply opts.maxSupply
+
         spotX =
-            toX (bigToFloat opts.supply)
+            px (toX100 (min scale spotRatio))
 
         spotY =
-            toY (priceAt (bigToFloat opts.supply))
+            px (toY100 (priceRatio spotRatio))
 
         floorMarker =
             case opts.floorPrice of
@@ -112,14 +111,14 @@ sparkline opts =
                 Just fp ->
                     let
                         fy =
-                            toY (bigToFloat fp / 1.0e18)
+                            px (toY100 (floorRatio opts.decimals opts.exponent opts.coeffA opts.maxSupply fp))
                     in
                     Svg.line
                         [ SAttr.class "web3-bondingcurve__floor"
                         , SAttr.x1 "0"
-                        , SAttr.y1 (String.fromFloat fy)
+                        , SAttr.y1 fy
                         , SAttr.x2 (String.fromInt opts.width)
-                        , SAttr.y2 (String.fromFloat fy)
+                        , SAttr.y2 fy
                         , SAttr.strokeDasharray "3,3"
                         ]
                         []
@@ -144,8 +143,8 @@ sparkline opts =
             , floorMarker
             , Svg.circle
                 [ SAttr.class "web3-bondingcurve__spot"
-                , SAttr.cx (String.fromFloat spotX)
-                , SAttr.cy (String.fromFloat spotY)
+                , SAttr.cx spotX
+                , SAttr.cy spotY
                 , SAttr.r "3"
                 ]
                 []
@@ -153,6 +152,33 @@ sparkline opts =
         ]
 
 
-bigToFloat : BigInt -> Float
-bigToFloat bi =
-    String.toFloat (BigInt.toString bi) |> Maybe.withDefault 0
+{-| Fixed-point resolution for every normalised ratio here. -}
+scale : Int
+scale =
+    1000000
+
+
+{-| Hundredths of a pixel as an SVG coordinate. -}
+px : Int -> String
+px hundredths =
+    Decimal.fixedPoint 2 hundredths
+
+
+{-| Where the floor price sits on the normalised price axis, in millionths of
+the curve's price at `maxSupply`.
+
+`floor / price(maxSupply)` is `(floorPrice / coeffA) / (maxSupply / 10 ^ d) ^ N`.
+That mixes a fractional power with values far above 2^53, so it is evaluated in
+log space: `Decimal.log10` reads each magnitude off the decimal digit count plus
+a bounded mantissa, which never hands an arbitrary-size integer to `Float`.
+
+-}
+floorRatio : Int -> Float -> BigInt -> BigInt -> BigInt -> Int
+floorRatio decimals exponent coeffA maxSupply floorPrice =
+    case ( Decimal.log10 floorPrice, Decimal.log10 coeffA, Decimal.log10Units decimals maxSupply ) of
+        ( Just logFloor, Just logCoeff, Just logMaxUnits ) ->
+            Decimal.powerOfTenScaled scale
+                (logFloor - logCoeff - exponent * logMaxUnits)
+
+        _ ->
+            0

@@ -11,6 +11,7 @@ graduation reserves toward a threshold, vault deposits toward an issuance limit.
     Web3.Ui.SupplyBar.view
         { current = curve.supply
         , max = maxSupply
+        , decimals = 18
         , label = Just "supply"
         }
 
@@ -19,13 +20,21 @@ graduation reserves toward a threshold, vault deposits toward an issuance limit.
     Web3.Ui.SupplyBar.withMilestone
         { current = curve.curvePls
         , max = totalCapacity
+        , decimals = 18
         , milestone = Just { at = graduationThreshold, label = "graduation" }
         , label = Just "reserves"
         }
 
+`decimals` scales the amounts printed in the label. It used to be hardcoded to
+18, which rendered a 6-decimal token's supply 1e12 times too small.
+
 The bar is rendered as a styled `div` with CSS classes `web3-supplybar`,
 `web3-supplybar__fill`, `web3-supplybar__milestone`, `web3-supplybar__label`.
 Width is controlled by `width: <pct>%` inline; everything else is style-via-CSS.
+
+The fill percentage is computed by dividing in `BigInt` space and is emitted
+with two decimal places, so a bar at 1 part in 10000 of a 2^255 cap is still
+positioned correctly. No amount is routed through `Float`.
 
 @docs view, withMilestone, Config
 
@@ -33,14 +42,16 @@ Width is controlled by `width: <pct>%` inline; everything else is style-via-CSS.
 
 import Html exposing (Html)
 import Html.Attributes as Attr
-import Web3.BigInt as BigInt exposing (BigInt)
+import Web3.BigInt exposing (BigInt)
 import Web3.Ui.Amount as Amount
+import Web3.Ui.Internal.Decimal as Decimal
 
 
 {-| Minimal config for a plain progress bar. -}
 type alias Config =
     { current : BigInt
     , max : BigInt
+    , decimals : Int
     , label : Maybe String
     }
 
@@ -51,6 +62,7 @@ view cfg =
     withMilestone
         { current = cfg.current
         , max = cfg.max
+        , decimals = cfg.decimals
         , milestone = Nothing
         , label = cfg.label
         }
@@ -61,6 +73,7 @@ positioned at `milestone.at` along the `[0, max]` range. -}
 withMilestone :
     { current : BigInt
     , max : BigInt
+    , decimals : Int
     , milestone : Maybe { at : BigInt, label : String }
     , label : Maybe String
     }
@@ -68,7 +81,7 @@ withMilestone :
 withMilestone opts =
     let
         pct =
-            percent opts.current opts.max
+            percentHundredths opts.current opts.max
 
         milestoneEl =
             case opts.milestone of
@@ -78,7 +91,7 @@ withMilestone opts =
                 Just m ->
                     Html.div
                         [ Attr.class "web3-supplybar__milestone"
-                        , Attr.style "left" (String.fromFloat (percent m.at opts.max) ++ "%")
+                        , Attr.style "left" (pctStyle (percentHundredths m.at opts.max))
                         , Attr.title m.label
                         ]
                         []
@@ -93,15 +106,15 @@ withMilestone opts =
                         [ Attr.class "web3-supplybar__label" ]
                         [ Html.text l
                         , Html.text " · "
-                        , Html.text (Amount.formatWei 18 opts.current)
+                        , Html.text (Amount.formatWei opts.decimals opts.current)
                         , Html.text " / "
-                        , Html.text (Amount.formatWei 18 opts.max)
+                        , Html.text (Amount.formatWei opts.decimals opts.max)
                         ]
     in
     Html.div [ Attr.class "web3-supplybar" ]
         [ Html.div
             [ Attr.class "web3-supplybar__fill"
-            , Attr.style "width" (String.fromFloat (clamp 0 100 pct) ++ "%")
+            , Attr.style "width" (pctStyle pct)
             ]
             []
         , milestoneEl
@@ -109,20 +122,16 @@ withMilestone opts =
         ]
 
 
-{-| Compute `(current / max) * 100` as a Float, returning `0` when `max == 0`. -}
-percent : BigInt -> BigInt -> Float
-percent current max =
-    if BigInt.isZero max then
-        0
+{-| `(current / max) * 100` in hundredths of a percent, divided in `BigInt`
+space so no uint256 is ever narrowed to a machine number. `0` when `max` is
+zero.
+-}
+percentHundredths : BigInt -> BigInt -> Int
+percentHundredths current max =
+    Decimal.ratioBps current max
 
-    else
-        case ( String.toFloat (BigInt.toString current), String.toFloat (BigInt.toString max) ) of
-            ( Just c, Just m ) ->
-                if m == 0 then
-                    0
 
-                else
-                    100 * c / m
-
-            _ ->
-                0
+{-| Hundredths of a percent as a CSS length, clamped to `[0%, 100%]`. -}
+pctStyle : Int -> String
+pctStyle hundredths =
+    Decimal.fixedPoint 2 (clamp 0 10000 hundredths) ++ "%"

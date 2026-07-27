@@ -48,8 +48,9 @@ Epoch gets a `--closed` modifier when `epoch < currentEpoch`.
 import Html exposing (Html)
 import Html.Attributes as Attr
 import Html.Events as Events
-import Web3.BigInt as BigInt exposing (BigInt)
+import Web3.BigInt exposing (BigInt)
 import Web3.Ui.Amount as Amount
+import Web3.Ui.Internal.Decimal as Decimal
 
 
 {-| -}
@@ -86,18 +87,7 @@ view cfg =
                 "web3-gaugerow__epoch"
 
         sharePct =
-            if BigInt.isZero cfg.totalVotes then
-                "0%"
-
-            else
-                case BigInt.fromInt 10000 of
-                    bps ->
-                        case BigInt.div (BigInt.mul cfg.yourVote bps) cfg.totalVotes of
-                            Just shareBps ->
-                                bpsToPct (bigToInt shareBps)
-
-                            Nothing ->
-                                "0%"
+            bpsToPct (Decimal.ratioBps cfg.yourVote cfg.totalVotes)
 
         aprText =
             case cfg.aprBps of
@@ -147,11 +137,6 @@ view cfg =
             , actionButton "Claim" cfg.onClaim
             ]
         ]
-
-
-bigToInt : BigInt -> Int
-bigToInt b =
-    String.toInt (BigInt.toString b) |> Maybe.withDefault 0
 
 
 bpsToPct : Int -> String

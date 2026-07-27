@@ -7,6 +7,10 @@ module Web3.Ui.StakeCard exposing
 yield, eligibility badge (e.g., floor-protection eligibility), plus claim and
 unstake action buttons. Intended for any lock-and-yield staking contract.
 
+The reward is frequently a different token from the stake, so it carries its own
+`yieldDecimals`: formatting a 6-decimal reward with an 18-decimal stake token's
+scale understates it by a factor of 1e12.
+
     Web3.Ui.StakeCard.view
         { amount = position.amount
         , symbol = "TKN"
@@ -16,6 +20,7 @@ unstake action buttons. Intended for any lock-and-yield staking contract.
         , nowSec = nowSec
         , yieldAccrued = position.yieldAccrued
         , yieldSymbol = "PLS"
+        , yieldDecimals = 18
         , badges = [ { active = position.floorEligible, label = "floor protected" } ]
         , onClaimYield = Just (ClaimYield idx)
         , onUnstake = Just (Unstake idx)
@@ -47,6 +52,7 @@ type alias Config msg =
     , nowSec : Int
     , yieldAccrued : BigInt
     , yieldSymbol : String
+    , yieldDecimals : Int
     , badges : List { active : Bool, label : String }
     , onClaimYield : Maybe msg
     , onUnstake : Maybe msg
@@ -109,7 +115,7 @@ view cfg =
         , Html.div [ Attr.class "web3-stakecard__lock" ] [ Html.text lockText ]
         , Html.div [ Attr.class "web3-stakecard__yield" ]
             [ Html.text "Accrued: "
-            , Html.text (Amount.formatWei cfg.decimals cfg.yieldAccrued)
+            , Html.text (Amount.formatWei cfg.yieldDecimals cfg.yieldAccrued)
             , Html.text " "
             , Html.text cfg.yieldSymbol
             ]

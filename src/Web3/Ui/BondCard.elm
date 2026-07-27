@@ -18,11 +18,16 @@ Web3.Ui.BondCard.view
     , nowSec = model.nowSec
     , pendingYield = receipt.pendingYield
     , yieldSymbol = "PLS"
+    , yieldDecimals = 18
     , onClaimYield = Just (ClaimYield receipt.id)
     , onRedeem = Just (Redeem receipt.id)
     , onRoll = Just (Roll receipt.id)
     }
 ```
+
+`decimals` scales `principal`; `yieldDecimals` scales `pendingYield`, which is
+often paid in a different token (a 6-decimal coupon on an 18-decimal principal
+renders 1e12 too small if the two share one field).
 
 CSS classes: `web3-bondcard`, `web3-bondcard__id`, `web3-bondcard__principal`,
 `web3-bondcard__maturity`, `web3-bondcard__yield`, `web3-bondcard__actions`,
@@ -50,6 +55,7 @@ type alias Config msg =
     , nowSec : Int
     , pendingYield : BigInt
     , yieldSymbol : String
+    , yieldDecimals : Int
     , onClaimYield : Maybe msg
     , onRedeem : Maybe msg
     , onRoll : Maybe msg
@@ -104,7 +110,7 @@ view cfg =
         , Html.div [ Attr.class maturityClass ] [ Html.text maturityText ]
         , Html.div [ Attr.class "web3-bondcard__yield" ]
             [ Html.text "Accrued: "
-            , Html.text (Amount.formatWei cfg.decimals cfg.pendingYield)
+            , Html.text (Amount.formatWei cfg.yieldDecimals cfg.pendingYield)
             , Html.text " "
             , Html.text cfg.yieldSymbol
             ]

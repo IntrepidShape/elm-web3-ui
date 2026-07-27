@@ -78,6 +78,8 @@ CSS classes follow BEM: `web3-funding-pool`,
 import Html exposing (Html)
 import Html.Attributes as Attr
 import Html.Events as Events
+import Web3.BigInt as BigInt
+import Web3.Ui.Internal.Decimal as Decimal
 
 
 
@@ -116,8 +118,10 @@ type Pool
         }
 
 
-{-| Construct a `Pool`. Progress is derived from target+balance via
-best-effort string parsing; the result clamps to [0, 100].
+{-| Construct a `Pool`. Progress is derived from target+balance by parsing both
+decimal strings into scaled integers and dividing in `BigInt` space, so a pool
+denominated in wei-sized numbers is placed as accurately as one denominated in
+whole units. Unparseable input reads as 0. The result clamps to [0, 100].
 -}
 pool :
     { target : String
@@ -146,16 +150,26 @@ pool r =
 
 computeProgress : String -> String -> Int
 computeProgress balance target =
-    case ( String.toFloat balance, String.toFloat target ) of
+    let
+        parse =
+            Decimal.bigFromDecimalString progressPlaces
+    in
+    case ( parse balance, parse target ) of
         ( Just b, Just t ) ->
-            if t <= 0 then
+            if BigInt.isZero t then
                 0
 
             else
-                clamp 0 100 (floor ((b / t) * 100))
+                clamp 0 100 (Decimal.scaledRatio 100 b t)
 
         _ ->
             0
+
+
+{-| Fractional digits kept when parsing the caller's decimal strings. -}
+progressPlaces : Int
+progressPlaces =
+    18
 
 
 

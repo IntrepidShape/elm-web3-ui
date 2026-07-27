@@ -11,8 +11,12 @@ Linear-decay model (Curve / Aerodrome standard):
 At `t = nowSec` the line starts at the current ve-balance; at
 `t = unlockTime` it hits zero and stays there. The chart samples
 `sampleCount` points across that span and connects them with a polyline.
-Math runs on `Float` because the chart is purely visual -- do not consume
-rendered points for on-chain calculation.
+
+The `amount` cancels out of the normalised curve -- every plotted height is
+`remaining(t) / remaining(nowSec)`, a ratio of two second counts -- so the
+geometry is computed entirely in integer space and the uint256 `amount` is
+never converted to a `Float`. It is only tested for zero (a zero balance draws
+a flat line on the axis). Coordinates are emitted in hundredths of a pixel.
 
     Web3.Ui.VeBalanceChart.view
         { amount = lock.amount
@@ -35,7 +39,8 @@ import Html exposing (Html)
 import Html.Attributes as Attr
 import Svg
 import Svg.Attributes as SAttr
-import Web3.BigInt as BigInt exposing (BigInt)
+import Web3.BigInt exposing (BigInt)
+import Web3.Ui.Internal.Decimal as Decimal
 
 
 {-| Render the decay chart. -}
@@ -53,33 +58,31 @@ view opts =
         sampleCount =
             48
 
-        amountF =
-            bigToFloat opts.amount
-
-        maxLockF =
-            toFloat (max 1 opts.maxLockSec)
-
-        veAt t =
-            let
-                remaining =
-                    toFloat (max 0 (opts.unlockTime - t))
-            in
-            amountF * remaining / maxLockF
-
         spanSec =
             max 1 (opts.unlockTime - opts.nowSec)
 
-        currentVe =
-            veAt opts.nowSec
+        remainingAt t =
+            max 0 (opts.unlockTime - t)
 
-        peakVe =
-            max currentVe 1
+        peakRemaining =
+            remainingAt opts.nowSec
 
-        toX t =
-            toFloat (t - opts.nowSec) / toFloat spanSec * toFloat opts.width
+        -- Height of the curve at `t` as a fraction of the current balance, in
+        -- millionths. `amount` and `maxLockSec` are common factors of both
+        -- sides of the ratio and cancel exactly, so this is the whole curve.
+        heightMillionths t =
+            if peakRemaining <= 0 || Web3.BigInt.isZero opts.amount then
+                0
 
-        toY v =
-            toFloat opts.height - (v / peakVe * toFloat opts.height)
+            else
+                remainingAt t * scale // peakRemaining
+
+        -- Hundredths of a pixel: SVG takes decimals, integers keep them exact.
+        toX100 t =
+            (t - opts.nowSec) * opts.width * 100 // spanSec
+
+        toY100 h =
+            opts.height * 100 - (h * opts.height * 100 // scale)
 
         samples =
             List.range 0 (sampleCount - 1)
@@ -90,13 +93,13 @@ view opts =
                                 opts.nowSec
                                     + (spanSec * i // (sampleCount - 1))
                         in
-                        ( t, veAt t )
+                        ( t, heightMillionths t )
                     )
 
         pathD =
             samples
                 |> List.indexedMap
-                    (\i ( t, v ) ->
+                    (\i ( t, h ) ->
                         let
                             cmd =
                                 if i == 0 then
@@ -106,17 +109,17 @@ view opts =
                                     "L"
                         in
                         cmd
-                            ++ String.fromFloat (toX t)
+                            ++ px (toX100 t)
                             ++ " "
-                            ++ String.fromFloat (toY v)
+                            ++ px (toY100 h)
                     )
                 |> String.join " "
 
         currentX =
-            toX opts.nowSec
+            px (toX100 opts.nowSec)
 
         currentY =
-            toY currentVe
+            px (toY100 (heightMillionths opts.nowSec))
     in
     Html.div [ Attr.class "web3-vebalancechart" ]
         [ Svg.svg
@@ -145,8 +148,8 @@ view opts =
                 []
             , Svg.circle
                 [ SAttr.class "web3-vebalancechart__current"
-                , SAttr.cx (String.fromFloat currentX)
-                , SAttr.cy (String.fromFloat currentY)
+                , SAttr.cx currentX
+                , SAttr.cy currentY
                 , SAttr.r "3"
                 ]
                 []
@@ -154,6 +157,13 @@ view opts =
         ]
 
 
-bigToFloat : BigInt -> Float
-bigToFloat bi =
-    String.toFloat (BigInt.toString bi) |> Maybe.withDefault 0
+{-| Fixed-point resolution for the normalised curve height. -}
+scale : Int
+scale =
+    1000000
+
+
+{-| Hundredths of a pixel as an SVG coordinate. -}
+px : Int -> String
+px hundredths =
+    Decimal.fixedPoint 2 hundredths

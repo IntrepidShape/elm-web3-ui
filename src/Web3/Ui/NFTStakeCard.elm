@@ -9,6 +9,10 @@ optional transfer action, and a separate "redeem at floor" action for
 designs where floor-redemption is a distinct primitive
 from full unstake.
 
+`decimals` scales the staked `amount`; `yieldDecimals` scales `pendingYield`,
+which is routinely a different token (formatting a 6-decimal reward with an
+18-decimal stake scale understates it by 1e12).
+
 Two countdowns are tracked independently:
 
   - `unlockTimeSec`: when principal can be withdrawn without penalty.
@@ -27,6 +31,7 @@ Web3.Ui.NFTStakeCard.view
     , floorEligibleAt = position.floorEligibleAt
     , pendingYield = position.pendingYield
     , yieldSymbol = "PLS"
+    , yieldDecimals = 18
     , nowSec = model.nowSec
     , onClaimYield = Just (ClaimYield position.id)
     , onUnstake = Just (Unstake position.id)
@@ -63,6 +68,7 @@ type alias Config msg =
     , floorEligibleAt : Int
     , pendingYield : BigInt
     , yieldSymbol : String
+    , yieldDecimals : Int
     , nowSec : Int
     , onClaimYield : Maybe msg
     , onUnstake : Maybe msg
@@ -130,7 +136,7 @@ view cfg =
         , Html.div [ Attr.class floorClass ] [ Html.text floorText ]
         , Html.div [ Attr.class "web3-nftstakecard__yield" ]
             [ Html.text "Accrued: "
-            , Html.text (Amount.formatWei cfg.decimals cfg.pendingYield)
+            , Html.text (Amount.formatWei cfg.yieldDecimals cfg.pendingYield)
             , Html.text " "
             , Html.text cfg.yieldSymbol
             ]
