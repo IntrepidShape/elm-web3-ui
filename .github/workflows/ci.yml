@@ -30,6 +30,20 @@ jobs:
         with:
           node-version: 22
 
+      # Every example is an Elm *application* with its own elm.json, so each
+      # one has to be compiled from its own directory. Without this the gallery
+      # can (and did) stay pinned to an elm-web3 version that src/ no longer
+      # compiles against -- the Pages deploy was the only thing failing, and
+      # nobody watches a deploy log.
+      - name: Build every example
+        run: |
+          set -e
+          for manifest in examples/*/elm.json; do
+            dir=$(dirname "$manifest")
+            echo "--- building $dir"
+            (cd "$dir" && elm make src/Main.elm --output=/dev/null)
+          done
+
       - name: Verify docs build
         run: elm make --docs=/tmp/docs.json
 
