@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 # Headless interaction verification for the gallery (playwright).
 # Build first: elm make Main.elm --output=elm.js
+import os
 from playwright.sync_api import sync_playwright
 with sync_playwright() as p:
     b = p.chromium.launch(headless=True)
     page = b.new_page(viewport={'width':1200,'height':900})
-    page.goto('file:///mnt/pulsechain-sata/Projects/abraxas/elm-web3-ui/examples/gallery/index.html')
+    page.goto('file://' + os.path.abspath(os.path.join(os.path.dirname(__file__), 'index.html')))
     page.wait_for_timeout(400)
     # RemoteCall: fire then STALE answer -> must still be loading (skeleton)
     page.click("text=fire"); page.click("text=stale answer"); page.wait_for_timeout(100)
@@ -25,5 +26,5 @@ with sync_playwright() as p:
     page.wait_for_timeout(150)
     print("receipt shown:", page.query_selector(".web3-receipt--success") is not None)
     # AccountPill cycle: 6 clicks returns to connected
-    page.screenshot(path='/home/jimothy/.cache/gallery-final.png', full_page=True)
+    page.screenshot(path=os.environ.get('GALLERY_SHOT', 'gallery-final.png'), full_page=True)
     b.close()
