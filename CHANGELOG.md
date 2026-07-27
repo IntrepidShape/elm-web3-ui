@@ -1,5 +1,79 @@
 # Changelog
 
+## 3.0.0 — 2026-07-23
+
+MAJOR because seven exposed `Config` records gained a field. The migration is
+mechanical -- add the field, no logic changes -- and is listed in full below.
+
+Requires `intrepidshape/elm-web3` >= 2.0.0 (2.1.0 recommended, which fixes
+signed-integer decoding and calldata head offsets).
+
+### Fixed -- a second token's amount was formatted with the first token's decimals
+
+The same bug class the 2.4.0 entry describes as having bitten a live app, in
+five more places. `StakeCard`, `NFTStakeCard` and `BondCard` rendered the
+accrued yield -- a *different* token, labelled with its own `yieldSymbol` --
+using the primary token's `decimals`. A 6-decimal yield beside an 18-decimal
+stake rendered `0.0000000000025` where the correct output is `2.5`.
+`SupplyBar`, `TrendIndicator` and `BondingCurve` hardcoded 18 outright.
+
+### Fixed -- uint256 values routed through Float
+
+Six modules converted token amounts to `Float`, which
+`Web3.Ui.Internal.Decimal` exists specifically to forbid. Proven against the
+unfixed code, 12 of 17 behavioural checks failed:
+
+- `GaugeRow` displayed **0.60%** for a holder owning 1e30 times the gauge --
+  an int32 wrap, since Elm's `//` truncates to 32 bits.
+- `VeBalanceChart` emitted `cy="NaN"` for a balance past Float's exact range.
+- `TrendIndicator` answered **`Up` where the correct answer was `Down`**,
+  because Float collapsed both sides to the same basis points. A directionally
+  inverted signal, not merely an imprecise one.
+- `FundingPool` reported `aria-valuenow="100"` for a pool one unit short of
+  target, and again for a balance string it could not parse.
+- `SupplyBar` showed `width:100%` one wei below the cap.
+
+Ratios now divide in `BigInt` space and narrow to an `Int` only at the end,
+clamped to int32. `Float` survives only where no uint256 reaches it: a
+caller-supplied fractional exponent, a bounded mantissa, identicon HSL maths,
+and parsing human-typed input.
+
+Percentages and SVG coordinates now carry two decimal places
+(`width:100%` becomes `width:100.00%`). If you assert on rendered markup, that
+is the one output change that is not a bug fix.
+
+### Migration
+
+Add one field per call site. Every value is the decimal count of the token
+already named by the neighbouring `*Symbol` field:
+
+| Module | Add to `Config` |
+|---|---|
+| `StakeCard` | `yieldDecimals : Int` |
+| `NFTStakeCard` | `yieldDecimals : Int` |
+| `BondCard` | `yieldDecimals : Int` |
+| `SupplyBar` (`view`, `withMilestone`) | `decimals : Int` |
+| `TrendIndicator` (`view`) | `decimals : Int` |
+| `BondingCurve` (`sparkline`) | `decimals : Int` |
+
+`GaugeRow`, `VeBalanceChart`, `ProgressRing` and `FundingPool` keep their
+public types; only their output changed.
+
+### Docs
+
+- `SECURITY.md` added. It names display/reality mismatch as the top severity
+  class for a rendering layer -- wrong decimals, a Float round-trip, a revert
+  rendered as success -- and states plainly that no external audit exists and
+  that "renders correctly" here is tested, not proved.
+- Module count corrected to 52 across README and PRIMITIVES (they claimed 57
+  and 46 simultaneously), and PRIMITIVES now defers to `elm.json` so it cannot
+  drift again. README's elm-web3 requirement corrected from "1.0.0 or later"
+  to the `2.0.0 <= v < 3.0.0` that `elm.json` actually enforces.
+- The gallery pinned elm-web3 1.2.2 while `src/` needed 2.0.0, so its Pages
+  deploy had failed on every push since 2026-07-16 and the published site
+  still served a 2026-07-02 build. Fixed; CI now builds every example.
+
+
 ## 2.4.0 — 2026-07-23
 
 Requires `intrepidshape/elm-web3` ≥ 2.0.0 (the RequestId-tracked wallet connect
