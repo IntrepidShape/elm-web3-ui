@@ -1,4 +1,4 @@
-module Web3.Ui.VeBalanceChart exposing (view)
+module Web3.Ui.VeBalanceChart exposing (view, Config)
 
 {-| SVG line chart of vote-escrow balance decaying linearly from `nowSec` to
 `unlockTime`. Educational primitive -- shows the user how their vote weight
@@ -18,7 +18,7 @@ geometry is computed entirely in integer space and the uint256 `amount` is
 never converted to a `Float`. It is only tested for zero (a zero balance draws
 a flat line on the axis). Coordinates are emitted in hundredths of a pixel.
 
-    Web3.Ui.VeBalanceChart.view
+    Web3.Ui.VeBalanceChart.view []
         { amount = lock.amount
         , unlockTime = lock.unlockTime
         , maxLockSec = fourYears
@@ -31,7 +31,7 @@ CSS classes: `web3-vebalancechart`, `web3-vebalancechart__path`,
 `web3-vebalancechart__current`, `web3-vebalancechart__axis`. Stroke and
 fill colors come from the consumer stylesheet.
 
-@docs view
+@docs view, Config
 
 -}
 
@@ -43,8 +43,10 @@ import Web3.BigInt exposing (BigInt)
 import Web3.Ui.Internal.Decimal as Decimal
 
 
-{-| Render the decay chart. -}
-view :
+{-| The lock being charted, the instant to chart it from, and the pixel
+geometry of the plot.
+-}
+type alias Config =
     { amount : BigInt
     , unlockTime : Int
     , maxLockSec : Int
@@ -52,8 +54,11 @@ view :
     , width : Int
     , height : Int
     }
-    -> Html msg
-view opts =
+
+
+{-| Render the decay chart. -}
+view : List (Html.Attribute msg) -> Config -> Html msg
+view attrs opts =
     let
         sampleCount =
             48
@@ -121,7 +126,7 @@ view opts =
         currentY =
             px (toY100 (heightMillionths opts.nowSec))
     in
-    Html.div [ Attr.class "web3-vebalancechart" ]
+    Html.div (Attr.class "web3-vebalancechart" :: attrs)
         [ Svg.svg
             [ SAttr.width (String.fromInt opts.width)
             , SAttr.height (String.fromInt opts.height)

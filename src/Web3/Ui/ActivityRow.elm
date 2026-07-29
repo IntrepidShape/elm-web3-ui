@@ -1,5 +1,6 @@
 module Web3.Ui.ActivityRow exposing
     ( view
+    , Config
     , Kind(..)
     , defaultLabel
     )
@@ -9,7 +10,7 @@ module Web3.Ui.ActivityRow exposing
 This component renders one such row with a `Kind` enum that drives the
 icon and color modifier classes.
 
-    Web3.Ui.ActivityRow.view
+    Web3.Ui.ActivityRow.view []
         { kind = Web3.Ui.ActivityRow.Buy
         , primary = "1.2M FOO"
         , secondary = Just "by 0xABC...DEF"
@@ -22,7 +23,7 @@ CSS classes: `web3-activityrow`, `web3-activityrow--buy/--sell/--stake/...`,
 `web3-activityrow__icon`, `web3-activityrow__primary`, `web3-activityrow__secondary`,
 `web3-activityrow__time`.
 
-@docs view, Kind, defaultLabel
+@docs view, Config, Kind, defaultLabel
 
 -}
 
@@ -77,8 +78,8 @@ defaultLabel k =
             s
 
 
-{-| Render an activity row. -}
-view :
+{-| What the row says and whether it is clickable. -}
+type alias Config msg =
     { kind : Kind
     , primary : String
     , secondary : Maybe String
@@ -86,8 +87,11 @@ view :
     , nowSec : Int
     , onClick : Maybe msg
     }
-    -> Html msg
-view opts =
+
+
+{-| Render an activity row. -}
+view : List (Html.Attribute msg) -> Config msg -> Html msg
+view attrs opts =
     let
         modifier =
             case opts.kind of
@@ -139,7 +143,10 @@ view opts =
                         [ Html.text s ]
     in
     Html.div
-        ([ Attr.class ("web3-activityrow web3-activityrow--" ++ modifier) ] ++ clickAttrs)
+        ([ Attr.class ("web3-activityrow web3-activityrow--" ++ modifier) ]
+            ++ clickAttrs
+            ++ attrs
+        )
         [ Html.span
             [ Attr.class "web3-activityrow__icon"
             , Attr.attribute "aria-label" (defaultLabel opts.kind)
@@ -148,7 +155,7 @@ view opts =
         , Html.span [ Attr.class "web3-activityrow__primary" ] [ Html.text opts.primary ]
         , secondaryEl
         , Html.span [ Attr.class "web3-activityrow__time" ]
-            [ RelativeTime.view { nowSec = opts.nowSec, atSec = opts.atSec } ]
+            [ RelativeTime.view [] { nowSec = opts.nowSec, atSec = opts.atSec } ]
         ]
 
 

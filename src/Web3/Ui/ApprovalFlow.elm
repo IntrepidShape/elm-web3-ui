@@ -243,8 +243,8 @@ CSS classes: `web3-approval`, `web3-approval--checking`, `--approve`,
 `web3-approval__step--done`, `web3-approval__button`, `web3-approval__error`.
 
 -}
-view : Config msg -> Step -> Html msg
-view cfg step =
+view : List (Html.Attribute msg) -> Config msg -> Step -> Html msg
+view attrs cfg step =
     let
         ( modifier, stepIndex, control ) =
             case step of
@@ -276,9 +276,10 @@ view cfg step =
                     )
     in
     Html.div
-        [ Attr.class "web3-approval"
-        , Attr.class ("web3-approval--" ++ modifier)
-        ]
+        (Attr.class "web3-approval"
+            :: Attr.class ("web3-approval--" ++ modifier)
+            :: attrs
+        )
         [ Html.ol [ Attr.class "web3-approval__steps" ]
             [ stepDot stepIndex 1 cfg.approveLabel
             , stepDot stepIndex 2 cfg.actionLabel

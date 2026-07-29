@@ -7,7 +7,7 @@ module Web3.Ui.HoldClock exposing
 that decays linearly from a base rate to a floor over N days. Shows current
 fee % and a progress ring/line until the floor is reached.
 
-    Web3.Ui.HoldClock.view
+    Web3.Ui.HoldClock.view []
         { holdSeconds = nowSec - weightedBuyTime
         , decayDays = 40
         , baseFeeBps = 500   -- 5%
@@ -35,8 +35,8 @@ type alias Config =
 
 
 {-| Render the hold-clock widget. -}
-view : Config -> Html msg
-view cfg =
+view : List (Html.Attribute msg) -> Config -> Html msg
+view attrs cfg =
     let
         dayFloat : Float
         dayFloat =
@@ -66,7 +66,7 @@ view cfg =
             in
             String.fromFloat pct ++ "%"
     in
-    Html.div [ Attr.class "web3-holdclock" ]
+    Html.div (Attr.class "web3-holdclock" :: attrs)
         [ Html.div
             [ Attr.class "web3-holdclock__current"
             , Attr.title "Current sell-fee tier given current hold time"

@@ -13,7 +13,7 @@ Renders per `Wallet.State`:
 
 <!---->
 
-    AccountPill.view
+    AccountPill.view []
         { onConnect = ConnectClicked
         , onDisconnect = DisconnectClicked
         , chainLabel = Chain.nameOf     -- T.ChainId -> String
@@ -49,15 +49,21 @@ type alias Config msg =
     }
 
 
-{-| Render the pill for any wallet state. -}
-view : Config msg -> Wallet.State -> Html msg
-view cfg state =
+{-| Render the pill for any wallet state.
+
+`attrs` land on whichever element is the root of the current state -- the
+connect button, the read-only chip, or the connected pill -- so an `id` or a
+`data-testid` survives every wallet transition.
+
+-}
+view : List (Html.Attribute msg) -> Config msg -> Wallet.State -> Html msg
+view attrs cfg state =
     case state of
         Wallet.Disconnected ->
-            connectButton cfg "connect" False "Connect wallet"
+            connectButton attrs cfg "connect" False "Connect wallet"
 
         Wallet.Error _ ->
-            connectButton cfg "connect" False "Reconnect"
+            connectButton attrs cfg "connect" False "Reconnect"
 
         Wallet.Connecting _ ->
             -- busy=False (not disabled): Wallet.startConnect allows a fresh
@@ -65,18 +71,19 @@ view cfg state =
             -- clickable — see Web3.Ui.Wallet.connectButton's Connecting
             -- branch for the full reasoning. aria-busy still communicates
             -- "in progress" without removing the control from the tab order.
-            connectButton cfg "connecting" False "Connecting…"
+            connectButton attrs cfg "connecting" False "Connecting…"
 
         Wallet.ReadOnly ->
             Html.div
-                [ Attr.class "web3-pill web3-pill--readonly" ]
+                (Attr.class "web3-pill web3-pill--readonly" :: attrs)
                 [ Html.span [ Attr.class "web3-pill__chain" ] [ Html.text "read-only" ] ]
 
         Wallet.Connected info ->
-            accountPill cfg "connected" info.address (cfg.chainLabel info.chainId)
+            accountPill attrs cfg "connected" info.address (cfg.chainLabel info.chainId)
 
         Wallet.WrongChain info expected ->
-            accountPill cfg
+            accountPill attrs
+                cfg
                 "wrong-chain"
                 info.address
                 (cfg.chainLabel info.chainId ++ " → " ++ cfg.chainLabel expected)
@@ -86,26 +93,28 @@ view cfg state =
 -- INTERNAL
 
 
-connectButton : Config msg -> String -> Bool -> String -> Html msg
-connectButton cfg modifier busy label =
+connectButton : List (Html.Attribute msg) -> Config msg -> String -> Bool -> String -> Html msg
+connectButton attrs cfg modifier busy label =
     Html.button
-        [ Attr.class "web3-pill"
-        , Attr.class ("web3-pill--" ++ modifier)
-        , Attr.disabled busy
-        , Attr.attribute "aria-busy"
+        ([ Attr.class "web3-pill"
+         , Attr.class ("web3-pill--" ++ modifier)
+         , Attr.disabled busy
+         , Attr.attribute "aria-busy"
             (if busy then
                 "true"
 
              else
                 "false"
             )
-        , Events.onClick cfg.onConnect
-        ]
+         , Events.onClick cfg.onConnect
+         ]
+            ++ attrs
+        )
         [ Html.text label ]
 
 
-accountPill : Config msg -> String -> T.Address -> String -> Html msg
-accountPill cfg modifier addr chainText =
+accountPill : List (Html.Attribute msg) -> Config msg -> String -> T.Address -> String -> Html msg
+accountPill attrs cfg modifier addr chainText =
     let
         full =
             T.addressToString addr
@@ -122,9 +131,11 @@ accountPill cfg modifier addr chainText =
                     []
     in
     Html.div
-        [ Attr.class "web3-pill"
-        , Attr.class ("web3-pill--" ++ modifier)
-        ]
+        ([ Attr.class "web3-pill"
+         , Attr.class ("web3-pill--" ++ modifier)
+         ]
+            ++ attrs
+        )
         (Identicon.view [ Attr.class "web3-pill__identicon" ] { size = 20 } addr
             :: Html.span [ Attr.class "web3-pill__address", Attr.title full ]
                 [ Html.text short ]

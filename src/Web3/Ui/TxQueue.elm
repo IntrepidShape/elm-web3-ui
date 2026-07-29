@@ -21,7 +21,7 @@ id with `update`, render the whole thing as a toast stack:
     { model | txs = TxQueue.update incomingId txMsg model.txs }
 
     -- in view:
-    TxQueue.toastStack
+    TxQueue.toastStack []
         { onDismiss = DismissTx
         , explorerUrl = Just "https://scan.pulsechain.com/tx/"
         }
@@ -124,12 +124,13 @@ type alias Config msg =
 changes are announced without stealing focus). Empty queue renders an empty
 container, so the stack can be styled `position: fixed` unconditionally.
 -}
-toastStack : Config msg -> TxQueue -> Html msg
-toastStack cfg queue =
+toastStack : List (Html.Attribute msg) -> Config msg -> TxQueue -> Html msg
+toastStack attrs cfg queue =
     Html.div
-        [ Attr.class "web3-txq"
-        , Attr.attribute "aria-live" "polite"
-        ]
+        (Attr.class "web3-txq"
+            :: Attr.attribute "aria-live" "polite"
+            :: attrs
+        )
         (List.map (toast cfg) (entries queue))
 
 

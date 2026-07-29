@@ -8,7 +8,7 @@ module Web3.Ui.SlippageInput exposing
 (0.1% / 0.5% / 1%) plus a custom input. Returns the chosen value as basis
 points so the caller can compute `minTokensOut` / `minPlsOut`.
 
-    Web3.Ui.SlippageInput.view
+    Web3.Ui.SlippageInput.view []
         { valueBps = model.slippageBps
         , onChange = SlippageChanged
         , presetsBps = [ 10, 50, 100 ]   -- 0.1%, 0.5%, 1%
@@ -67,10 +67,21 @@ minOutFromBps slippageBps expected =
                 BigInt.zero
 
 
-{-| Render the picker. -}
-view : Config msg -> Html msg
-view cfg =
-    Html.div [ Attr.class "web3-slippage" ]
+{-| Render the picker.
+
+The root is the chip-plus-input group (`role="group"`), because the component
+is a set of controls rather than a single one -- there is no one control an
+`id` would belong on.
+
+-}
+view : List (Html.Attribute msg) -> Config msg -> Html msg
+view attrs cfg =
+    Html.div
+        (Attr.class "web3-slippage"
+            :: Attr.attribute "role" "group"
+            :: Attr.attribute "aria-label" "Slippage tolerance"
+            :: attrs
+        )
         (List.map (chip cfg) cfg.presetsBps
             ++ [ customInput cfg ]
         )

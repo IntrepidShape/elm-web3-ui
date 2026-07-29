@@ -440,16 +440,16 @@ view model =
                 "The analytics row every dapp reaches for."
                 (Html.div [ Attr.class "row" ]
                     [ PriceDisplay.view [] { decimals = 18, symbol = "PLS" } (wei "1204776000000000000000000")
-                    , StatCell.view { label = "TVL", value = "$1.2M", delta = Just "+4.2%", sentiment = StatCell.Positive }
-                    , StatCell.view { label = "24h", value = "$88k", delta = Just "-1.9%", sentiment = StatCell.Negative }
+                    , StatCell.view [] { label = "TVL", value = "$1.2M", delta = Just "+4.2%", sentiment = StatCell.Positive }
+                    , StatCell.view [] { label = "24h", value = "$88k", delta = Just "-1.9%", sentiment = StatCell.Negative }
                     ]
                 )
             , demo "ProgressRing / SupplyBar / RelativeTime"
                 "Progress toward caps and thresholds; block-time phrasing."
                 (Html.div [ Attr.class "row" ]
-                    [ ProgressRing.view { current = wei "68", target = wei "100", size = 56, label = Just "68%" }
-                    , SupplyBar.view { current = wei "6800000000000000000000", max = wei "10000000000000000000000", decimals = 18, label = Just "graduation" }
-                    , RelativeTime.view { nowSec = 1000000, atSec = 999160 }
+                    [ ProgressRing.view [] { current = wei "68", target = wei "100", size = 56, label = Just "68%" }
+                    , SupplyBar.view [] { current = wei "6800000000000000000000", max = wei "10000000000000000000000", decimals = 18, label = Just "graduation" }
+                    , RelativeTime.view [] { nowSec = 1000000, atSec = 999160 }
                     ]
                 )
             , demo "Skeleton"
@@ -478,15 +478,15 @@ view model =
                 "Decimals-aware input; percentage chips emit intent, app computes from live balance."
                 (Html.div [ Attr.class "col" ]
                     [ Amount.amountInput []
-                        { value = model.amount, onInput = SetAmount, decimals = 18, symbol = "PLS", valid = True }
+                        { value = model.amount, onInput = SetAmount, decimals = 18, symbol = "PLS", valid = True, inputAttrs = [] }
                     , Amount.presetRow [] { onPick = PickPercent }
                     ]
                 )
             , demo "SlippageInput / Deadline"
                 "The trade-settings pair, in basis points and minutes."
                 (Html.div [ Attr.class "col" ]
-                    [ SlippageInput.view { valueBps = model.slippageBps, onChange = SetSlippage, presetsBps = [ 10, 50, 100 ] }
-                    , Deadline.view { valueMinutes = model.deadlineMinutes, onChange = SetDeadline, presetsMinutes = [ 10, 20, 30 ] }
+                    [ SlippageInput.view [] { valueBps = model.slippageBps, onChange = SetSlippage, presetsBps = [ 10, 50, 100 ] }
+                    , Deadline.view [] { valueMinutes = model.deadlineMinutes, onChange = SetDeadline, presetsMinutes = [ 10, 20, 30 ] }
                     ]
                 )
             , demo "ChainSelector"
@@ -504,8 +504,8 @@ view model =
             , demo "TokenSearch / TradeTabs"
                 "List-filtering and side-switching."
                 (Html.div [ Attr.class "col" ]
-                    [ TokenSearch.view { value = model.search, onInput = SetSearch, placeholder = "Search tokens…" }
-                    , TradeTabs.view
+                    [ TokenSearch.view [] { value = model.search, onInput = SetSearch, placeholder = "Search tokens…", inputAttrs = [] }
+                    , TradeTabs.view []
                         { current = model.tab
                         , onSelect = SetTab
                         , tabs = [ { id = BuySide, label = "Buy" }, { id = SellSide, label = "Sell" } ]
@@ -526,7 +526,7 @@ view model =
             [ demoWith "AccountPill"
                 "The whole wallet story in one pill. Cycle through all six states."
                 [ button CycleWallet "cycle state" ]
-                (AccountPill.view
+                (AccountPill.view []
                     { onConnect = Noop
                     , onDisconnect = Noop
                     , chainLabel = \c -> chainId (T.chainIdToInt c)
@@ -567,7 +567,7 @@ view model =
                 , button RemoteFail "fail"
                 , button RemoteStale "stale answer"
                 ]
-                (RemoteCall.view
+                (RemoteCall.view []
                     { skeleton = Skeleton.amount []
                     , failed = \err -> Revert.banner [] { onDismiss = Nothing } err
                     }
@@ -579,7 +579,7 @@ view model =
                 [ button (QueueAdvance "q1") "advance q1"
                 , button (QueueAdvance "q2") "advance q2"
                 ]
-                (TxQueue.toastStack
+                (TxQueue.toastStack []
                     { onDismiss = QueueDismiss, explorerUrl = explorer.explorerUrl }
                     model.queue
                 )
@@ -593,7 +593,7 @@ view model =
                 )
             , demo "FeeBreakdown"
                 "Where every basis point goes."
-                (FeeBreakdown.view
+                (FeeBreakdown.view []
                     { totalBps = 300
                     , symbol = "PLS"
                     , decimals = 18
@@ -619,7 +619,7 @@ view model =
                 , button (FlowMsg (Flow.ActionTx (Tx.TxConfirmed demoReceiptJson))) "act confirmed"
                 , button FlowReset "reset"
                 ]
-                (Flow.view
+                (Flow.view []
                     { approveLabel = "Approve FOO"
                     , actionLabel = "Stake 50k"
                     , onApprove = FlowStartApprove
@@ -634,9 +634,9 @@ view model =
                 "Logo atom with deterministic letter-tile fallback; the swap/deposit compound."
                 (Html.div [ Attr.class "col" ]
                     [ Html.div [ Attr.class "row" ]
-                        [ TokenLogo.view { logoUrl = Nothing, symbol = "FOO", size = 28 }
-                        , TokenLogo.view { logoUrl = Nothing, symbol = "PLS", size = 28 }
-                        , TokenLogo.view { logoUrl = Nothing, symbol = "USDC", size = 28 }
+                        [ TokenLogo.view [] { logoUrl = Nothing, symbol = "FOO", size = 28 }
+                        , TokenLogo.view [] { logoUrl = Nothing, symbol = "PLS", size = 28 }
+                        , TokenLogo.view [] { logoUrl = Nothing, symbol = "USDC", size = 28 }
                         ]
                     , Pair.view []
                         { symbol = "FOO"
@@ -661,7 +661,7 @@ view model =
             , demoWith "EventFeed"
                 "Live-vs-fallback honesty chip; capped, newest first, aria-live."
                 [ button FeedPush "push event" ]
-                (EventFeed.view { onLoadMore = Nothing } Html.text model.feed)
+                (EventFeed.view [] { onLoadMore = Nothing } Html.text model.feed)
             , demoWith "SimulateFirst"
                 "A transaction cannot be sent without a completed simulation — confirm is the only door."
                 [ button SimStart "simulate"
@@ -672,7 +672,7 @@ view model =
                 , button (SimTx Tx.TxRejected) "reject"
                 , button SimReset "reset"
                 ]
-                (SimulateFirst.view
+                (SimulateFirst.view []
                     { simulateLabel = "Preview buy"
                     , confirmLabel = "Buy 1.2M FOO"
                     , onStart = SimStart
@@ -686,7 +686,7 @@ view model =
                 [ button PagerMore "load older" ]
                 (Html.div [ Attr.class "row" ]
                     [ Html.text (String.fromInt (PaginatedLogs.loadedCount model.pager) ++ " logs loaded")
-                    , PaginatedLogs.loadMoreButton { onLoadMore = PagerMore, label = "Load older" } model.pager
+                    , PaginatedLogs.loadMoreButton [] { onLoadMore = PagerMore, label = "Load older" } model.pager
                     ]
                 )
             , demo "Revert.bannerWith (typed custom error)"
@@ -701,7 +701,7 @@ view model =
         , layer "Layer 4 — domain compounds (a sample)"
             [ demo "StakeCard"
                 "A live staking position: amount, lock progress, accrued yield, eligibility badges."
-                (StakeCard.view
+                (StakeCard.view []
                     { amount = wei "50000000000000000000000"
                     , symbol = "FOO"
                     , decimals = 18
@@ -719,7 +719,7 @@ view model =
                 )
             , demo "VeLock"
                 "Vote-escrow lock builder — amount plus a period slider snapped to contract steps."
-                (VeLock.view
+                (VeLock.view []
                     { amount = Maybe.withDefault B.zero (B.fromString (model.veAmount ++ "000000000000000000"))
                     , amountInput = model.veAmount
                     , decimals = 18
@@ -735,7 +735,7 @@ view model =
                 )
             , demo "GaugeRow"
                 "One gauge in a vote market: votes, bribes, your share, APR, and the three actions."
-                (GaugeRow.view
+                (GaugeRow.view []
                     { gaugeLabel = "FOO / PLS"
                     , epoch = 42
                     , currentEpoch = 42

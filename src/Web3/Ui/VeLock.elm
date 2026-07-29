@@ -16,7 +16,7 @@ Linear-decay vote-escrow standard:
 So a maximum-length lock yields ve-balance equal to the principal; a quarter
 of max-length yields a quarter of the principal.
 
-    Web3.Ui.VeLock.view
+    Web3.Ui.VeLock.view []
         { amount = model.lockAmount
         , amountInput = model.lockAmountInput
         , decimals = 18
@@ -90,8 +90,8 @@ veBalance opts =
 
 
 {-| Render the picker. -}
-view : Config msg -> Html msg
-view cfg =
+view : List (Html.Attribute msg) -> Config msg -> Html msg
+view attrs cfg =
     let
         previewWei =
             veBalance
@@ -103,7 +103,7 @@ view cfg =
         previewText =
             Amount.formatWei cfg.decimals previewWei
     in
-    Html.div [ Attr.class "web3-velock" ]
+    Html.div (Attr.class "web3-velock" :: attrs)
         [ Html.div [ Attr.class "web3-velock__amount" ]
             [ Amount.amountInput []
                 { value = cfg.amountInput
@@ -111,6 +111,7 @@ view cfg =
                 , decimals = cfg.decimals
                 , symbol = cfg.symbol
                 , valid = True
+                , inputAttrs = []
                 }
             ]
         , Html.input

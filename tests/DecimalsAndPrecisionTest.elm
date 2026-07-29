@@ -79,7 +79,7 @@ secondTokenDecimals =
     describe "E6 -- the second token carries its own decimals"
         [ test "StakeCard renders a 6-decimal yield beside an 18-decimal stake" <|
             \_ ->
-                StakeCard.view
+                StakeCard.view []
                     { amount = big (pow10 18)
                     , symbol = "TKN"
                     , decimals = 18
@@ -106,7 +106,7 @@ secondTokenDecimals =
                         ]
         , test "NFTStakeCard renders a 6-decimal pending yield" <|
             \_ ->
-                NFTStakeCard.view
+                NFTStakeCard.view []
                     { tokenId = 7
                     , amount = big (pow10 18)
                     , symbol = "TKN"
@@ -133,7 +133,7 @@ secondTokenDecimals =
                         ]
         , test "BondCard renders a 6-decimal coupon on an 18-decimal principal" <|
             \_ ->
-                BondCard.view
+                BondCard.view []
                     { bondId = 3
                     , principal = big (pow10 18)
                     , principalSymbol = "TKN"
@@ -157,7 +157,7 @@ secondTokenDecimals =
                         ]
         , test "SupplyBar labels a 6-decimal token at its own scale" <|
             \_ ->
-                SupplyBar.view
+                SupplyBar.view []
                     { current = big "1500000"
                     , max = big "3000000"
                     , decimals = 6
@@ -171,7 +171,7 @@ secondTokenDecimals =
                         ]
         , test "TrendIndicator pills a 6-decimal volume at its own scale" <|
             \_ ->
-                TrendIndicator.view
+                TrendIndicator.view []
                     { trend = TrendIndicator.Up
                     , buyVolume = big "1500000"
                     , sellVolume = big "3000000"
@@ -324,7 +324,7 @@ floatRoundTripRegressions =
                     |> Query.has [ Selector.exactText "21474836.47%" ]
         , test "SupplyBar: one wei short of the cap is 99.99%, not full" <|
             \_ ->
-                SupplyBar.view
+                SupplyBar.view []
                     { current = big (nines 30)
                     , max = big (pow10 30)
                     , decimals = 18
@@ -343,7 +343,7 @@ floatRoundTripRegressions =
                     |> Query.has [ Selector.style "width" "100.00%" ]
         , test "SupplyBar: a milestone sits where BigInt division puts it" <|
             \_ ->
-                SupplyBar.withMilestone
+                SupplyBar.withMilestone []
                     { current = big (pow10 27)
                     , max = big (pow10 30)
                     , decimals = 18
@@ -385,7 +385,7 @@ floatRoundTripRegressions =
             \_ ->
                 -- `String.toFloat` of a 401-digit amount is Infinity, and
                 -- Infinity / Infinity painted every coordinate "NaN".
-                VeBalanceChart.view
+                VeBalanceChart.view []
                     { amount = big (pow10 400)
                     , unlockTime = 200000
                     , maxLockSec = 126144000
@@ -401,7 +401,7 @@ floatRoundTripRegressions =
                         ]
         , test "VeBalanceChart: an expired lock sits flat on the axis" <|
             \_ ->
-                VeBalanceChart.view
+                VeBalanceChart.view []
                     { amount = big (pow10 27)
                     , unlockTime = 100
                     , maxLockSec = 126144000
@@ -414,7 +414,7 @@ floatRoundTripRegressions =
                     |> Query.has [ Selector.attribute (Attr.attribute "cy" "80.00") ]
         , test "ProgressRing: geometry is integer-derived and finite" <|
             \_ ->
-                ProgressRing.view
+                ProgressRing.view []
                     { current = big (pow10 30)
                     , target = big (pow10 30)
                     , size = 64
@@ -428,7 +428,7 @@ floatRoundTripRegressions =
                         ]
         , test "ProgressRing: an empty ring is fully offset" <|
             \_ ->
-                ProgressRing.view
+                ProgressRing.view []
                     { current = BigInt.zero
                     , target = big (pow10 30)
                     , size = 64
@@ -485,7 +485,7 @@ floatRoundTripRegressions =
 
 gaugeRow : BigInt -> BigInt -> Html.Html Msg
 gaugeRow yourVote totalVotes =
-    GaugeRow.view
+    GaugeRow.view []
         { gaugeLabel = "PAIR"
         , epoch = 12
         , currentEpoch = 12
@@ -505,7 +505,7 @@ gaugeRow yourVote totalVotes =
 
 bondingCurve : Int -> BigInt -> BigInt -> BigInt -> Maybe BigInt -> Html.Html Msg
 bondingCurve decimals coeffA supply maxSupply floorPrice =
-    BondingCurve.sparkline
+    BondingCurve.view []
         { coeffA = coeffA
         , exponent = 2
         , supply = supply
@@ -519,7 +519,7 @@ bondingCurve decimals coeffA supply maxSupply floorPrice =
 
 supplyBarFill : BigInt -> BigInt -> Query.Single Msg
 supplyBarFill current max =
-    SupplyBar.view { current = current, max = max, decimals = 18, label = Nothing }
+    SupplyBar.view [] { current = current, max = max, decimals = 18, label = Nothing }
         |> Query.fromHtml
         |> Query.find [ Selector.class "web3-supplybar__fill" ]
 

@@ -7,12 +7,13 @@ module Web3.Ui.LockPeriod exposing
 hint underneath. Designed for stake-and-lock contracts where users choose
 how long to commit (any min/max range; pass what your contract enforces).
 
-    Web3.Ui.LockPeriod.view
+    Web3.Ui.LockPeriod.view []
         { value = model.lockDays
         , onChange = LockDaysChanged
         , min = 1
         , max = 365
         , penaltyAtMax = Just 35  -- 35% penalty at full early-exit
+        , inputAttrs = []
         }
 
 The slider renders a native `<input type="range">` for accessibility, with the
@@ -31,6 +32,11 @@ import Json.Decode as Decode
 
 {-| Slider configuration. `penaltyAtMax` is the maximum early-exit penalty in
 percent (e.g., `Just 35` for 35%). When `Nothing`, no penalty hint is shown.
+
+`inputAttrs` reach the `<input type="range">` itself. The root is the wrapper
+that also holds the readout and the penalty hint, so `id`, `disabled` and
+`aria-describedby` -- which belong on the control -- go here instead.
+
 -}
 type alias Config msg =
     { value : Int
@@ -38,12 +44,13 @@ type alias Config msg =
     , min : Int
     , max : Int
     , penaltyAtMax : Maybe Int
+    , inputAttrs : List (Html.Attribute msg)
     }
 
 
 {-| Render the slider. -}
-view : Config msg -> Html msg
-view cfg =
+view : List (Html.Attribute msg) -> Config msg -> Html msg
+view attrs cfg =
     let
         penaltyHint =
             case cfg.penaltyAtMax of
@@ -64,15 +71,17 @@ view cfg =
                         ]
                         [ Html.text ("≤ " ++ String.fromInt (round rough) ++ "% early-exit") ]
     in
-    Html.div [ Attr.class "web3-lockperiod" ]
+    Html.div (Attr.class "web3-lockperiod" :: attrs)
         [ Html.input
-            [ Attr.class "web3-lockperiod__slider"
-            , Attr.type_ "range"
-            , Attr.min (String.fromInt cfg.min)
-            , Attr.max (String.fromInt cfg.max)
-            , Attr.value (String.fromInt cfg.value)
-            , Events.on "input" (Decode.map cfg.onChange targetValueAsInt)
-            ]
+            ([ Attr.class "web3-lockperiod__slider"
+             , Attr.type_ "range"
+             , Attr.min (String.fromInt cfg.min)
+             , Attr.max (String.fromInt cfg.max)
+             , Attr.value (String.fromInt cfg.value)
+             , Events.on "input" (Decode.map cfg.onChange targetValueAsInt)
+             ]
+                ++ cfg.inputAttrs
+            )
             []
         , Html.output
             [ Attr.class "web3-lockperiod__readout" ]

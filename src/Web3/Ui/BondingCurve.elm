@@ -1,10 +1,10 @@
-module Web3.Ui.BondingCurve exposing (sparkline)
+module Web3.Ui.BondingCurve exposing (view, Config)
 
 {-| SVG sparkline of an `A * x^N` bonding-curve price function. Renders the
 price-vs-supply curve from supply 0 to a chosen max, with optional markers
 for the current spot price and floor price.
 
-    Web3.Ui.BondingCurve.sparkline
+    Web3.Ui.BondingCurve.view []
         { coeffA = curve.coeffA
         , exponent = 1.1
         , supply = curve.supply
@@ -32,7 +32,7 @@ CSS classes: `web3-bondingcurve`, `web3-bondingcurve__path`,
 `web3-bondingcurve__spot`, `web3-bondingcurve__floor`. Stroke colors come
 from CSS.
 
-@docs sparkline
+@docs view, Config
 
 -}
 
@@ -44,8 +44,10 @@ import Web3.BigInt exposing (BigInt)
 import Web3.Ui.Internal.Decimal as Decimal
 
 
-{-| Render the sparkline. -}
-sparkline :
+{-| The curve to draw. `coeffA`, `supply`, `maxSupply` and `floorPrice` are
+all scaled by `10 ^ decimals`; `width` and `height` are pixels.
+-}
+type alias Config =
     { coeffA : BigInt
     , exponent : Float
     , supply : BigInt
@@ -55,8 +57,11 @@ sparkline :
     , width : Int
     , height : Int
     }
-    -> Html msg
-sparkline opts =
+
+
+{-| Render the sparkline. -}
+view : List (Html.Attribute msg) -> Config -> Html msg
+view attrs opts =
     let
         sampleCount =
             64
@@ -123,7 +128,7 @@ sparkline opts =
                         ]
                         []
     in
-    Html.div [ Attr.class "web3-bondingcurve" ]
+    Html.div (Attr.class "web3-bondingcurve" :: attrs)
         [ Svg.svg
             [ SAttr.width (String.fromInt opts.width)
             , SAttr.height (String.fromInt opts.height)

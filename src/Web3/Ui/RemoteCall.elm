@@ -27,7 +27,7 @@ bookkeeping built in:
     { model | reserves = RemoteCall.resolve incomingId result model.reserves }
 
     -- render
-    RemoteCall.view
+    RemoteCall.view []
         { skeleton = Skeleton.line []
         , failed = \\err -> Html.text err
         }
@@ -184,20 +184,21 @@ CSS classes: `web3-remote`, `web3-remote--loading`, `web3-remote--ready`,
 `web3-remote--failed`.
 
 -}
-view : Slots msg -> (a -> Html msg) -> RemoteCall a -> Html msg
-view slots ready call =
+view : List (Html.Attribute msg) -> Slots msg -> (a -> Html msg) -> RemoteCall a -> Html msg
+view attrs slots ready call =
     case call of
         Ready a ->
-            Html.div [ Attr.class "web3-remote web3-remote--ready" ]
+            Html.div (Attr.class "web3-remote web3-remote--ready" :: attrs)
                 [ ready a ]
 
         Failed err ->
-            Html.div [ Attr.class "web3-remote web3-remote--failed" ]
+            Html.div (Attr.class "web3-remote web3-remote--failed" :: attrs)
                 [ slots.failed err ]
 
         _ ->
             Html.div
-                [ Attr.class "web3-remote web3-remote--loading"
-                , Attr.attribute "aria-busy" "true"
-                ]
+                (Attr.class "web3-remote web3-remote--loading"
+                    :: Attr.attribute "aria-busy" "true"
+                    :: attrs
+                )
                 [ slots.skeleton ]

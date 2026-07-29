@@ -1,5 +1,6 @@
 module Web3.Ui.Amount exposing
     ( amountInput
+    , Config
     , formatWei
     , presetRow
     , formatWeiDust
@@ -14,13 +15,14 @@ module Web3.Ui.Amount exposing
         , decimals = 18
         , symbol = "PLS"
         , valid = True
+        , inputAttrs = []
         }
 
     -- Format a Wei value as human-readable (caller appends symbol):
     Web3.Ui.Amount.formatWei 18 weiAmount ++ " PLS"
     --> "1.23M PLS"
 
-@docs amountInput, formatWei, presetRow, formatWeiDust
+@docs amountInput, Config, formatWei, presetRow, formatWeiDust
 
 -}
 
@@ -33,20 +35,38 @@ import Web3.Ui.Internal.Decimal as Decimal
 import Web3.Units as Units
 
 
+{-| What the input shows and where its edits go.
+
+`inputAttrs` reach the inner `<input>`. The component's root is the wrapper
+`div` (it also holds the symbol label), so the first positional argument
+cannot address the control itself -- and `id`, `aria-describedby`,
+`autofocus`, `disabled` and a `<label for=...>` target all belong on the
+control, not on a box around it. That is what this field is for.
+
+-}
+type alias Config msg =
+    { value : String
+    , onInput : String -> msg
+    , decimals : Int
+    , symbol : String
+    , valid : Bool
+    , inputAttrs : List (Html.Attribute msg)
+    }
+
+
 {-| Numeric text input for a token amount. `value` is a plain decimal string
 (e.g. `"1000.5"`). No parsing is done here -- call `Web3.Units.parseUnits` in
 your `update` to convert to Wei.
 
 Adds `web3-amount-input--invalid` when `valid` is `False`.
 
+The first argument lands on the wrapper; `inputAttrs` lands on the `<input>`.
+
 CSS classes: `web3-amount-wrapper` (outer div), `web3-amount-input` (input),
 `web3-amount-symbol` (symbol label)
 
 -}
-amountInput :
-    List (Html.Attribute msg)
-    -> { value : String, onInput : String -> msg, decimals : Int, symbol : String, valid : Bool }
-    -> Html msg
+amountInput : List (Html.Attribute msg) -> Config msg -> Html msg
 amountInput attrs opts =
     let
         invalidClass =
@@ -66,6 +86,7 @@ amountInput attrs opts =
              , Events.onInput opts.onInput
              ]
                 ++ invalidClass
+                ++ opts.inputAttrs
             )
             []
         , Html.span

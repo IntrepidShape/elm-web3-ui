@@ -1,10 +1,10 @@
-module Web3.Ui.ProgressRing exposing (view)
+module Web3.Ui.ProgressRing exposing (view, Config)
 
 {-| Circular progress ring (SVG) for "X% toward Y" displays -- graduation
 progress, vesting unlock, vault deposit cap. The circular variant of
 `Web3.Ui.SupplyBar`.
 
-    Web3.Ui.ProgressRing.view
+    Web3.Ui.ProgressRing.view []
         { current = curve.curvePls
         , target = graduationThreshold
         , size = 64
@@ -19,7 +19,7 @@ CSS classes: `web3-progressring`, `web3-progressring__track`,
 come from CSS -- set `stroke` and `stroke-width` on the `__track` and `__fill`
 elements; geometry is inline for SVG.
 
-@docs view
+@docs view, Config
 
 -}
 
@@ -31,15 +31,20 @@ import Web3.BigInt exposing (BigInt)
 import Web3.Ui.Internal.Decimal as Decimal
 
 
-{-| Render the ring. -}
-view :
+{-| Progress toward a target, the ring's pixel size, and an optional label
+rendered inside it (also used as the accessible name).
+-}
+type alias Config =
     { current : BigInt
     , target : BigInt
     , size : Int
     , label : Maybe String
     }
-    -> Html msg
-view opts =
+
+
+{-| Render the ring. -}
+view : List (Html.Attribute msg) -> Config -> Html msg
+view attrs opts =
     let
         sizeStr =
             String.fromInt opts.size
@@ -74,15 +79,17 @@ view opts =
                         [ Html.text l ]
     in
     Html.div
-        [ Attr.class "web3-progressring"
-        , Attr.attribute "role" "img"
-        , Attr.attribute "aria-label"
+        ([ Attr.class "web3-progressring"
+         , Attr.attribute "role" "img"
+         , Attr.attribute "aria-label"
             ((opts.label |> Maybe.withDefault "progress")
                 ++ ": "
                 ++ String.fromInt ((Decimal.ratioBps opts.current opts.target + 50) // 100)
                 ++ "%"
             )
-        ]
+         ]
+            ++ attrs
+        )
         [ Svg.svg
             [ SAttr.width sizeStr
             , SAttr.height sizeStr

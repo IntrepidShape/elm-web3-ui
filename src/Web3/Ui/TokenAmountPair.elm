@@ -85,7 +85,7 @@ token : Config msg -> Html msg
 token cfg =
     let
         body =
-            [ TokenLogo.view { logoUrl = cfg.logoUrl, symbol = cfg.symbol, size = 20 }
+            [ TokenLogo.view [] { logoUrl = cfg.logoUrl, symbol = cfg.symbol, size = 20 }
             , Html.span [ Attr.class "web3-tokenamount__symbol" ] [ Html.text cfg.symbol ]
             ]
     in

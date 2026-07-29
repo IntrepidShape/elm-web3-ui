@@ -1,5 +1,6 @@
 module Web3.Ui.FeeFlowDiagram exposing
     ( view
+    , Config
     , Slice
     )
 
@@ -17,7 +18,7 @@ suffix (`web3-feeflow__seg--<kind>`) so the consumer can color the
 segments by recipient type without inline styles.
 
 ```elm
-Web3.Ui.FeeFlowDiagram.view
+Web3.Ui.FeeFlowDiagram.view []
     { gross = tradeFee
     , symbol = "PLS"
     , decimals = 18
@@ -38,7 +39,7 @@ CSS classes: `web3-feeflow`, `web3-feeflow__bar`, `web3-feeflow__seg`,
 `web3-feeflow__legend-item`, `web3-feeflow__legend-swatch`,
 `web3-feeflow__legend-label`, `web3-feeflow__legend-amount`.
 
-@docs view, Slice
+@docs view, Config, Slice
 
 -}
 
@@ -59,8 +60,8 @@ type alias Slice =
     }
 
 
-{-| Render the diagram (bar + legend). -}
-view :
+{-| The fee being split, the bar's pixel geometry, and the segments. -}
+type alias Config =
     { gross : BigInt
     , symbol : String
     , decimals : Int
@@ -68,8 +69,11 @@ view :
     , height : Int
     , slices : List Slice
     }
-    -> Html msg
-view opts =
+
+
+{-| Render the diagram (bar + legend). -}
+view : List (Html.Attribute msg) -> Config -> Html msg
+view attrs opts =
     let
         totalBps =
             List.sum (List.map .bps opts.slices)
@@ -105,7 +109,7 @@ view opts =
         legendItems =
             List.map (legendItem opts) opts.slices
     in
-    Html.div [ Attr.class "web3-feeflow" ]
+    Html.div (Attr.class "web3-feeflow" :: attrs)
         [ Svg.svg
             [ SAttr.class "web3-feeflow__bar"
             , SAttr.width (String.fromInt opts.width)

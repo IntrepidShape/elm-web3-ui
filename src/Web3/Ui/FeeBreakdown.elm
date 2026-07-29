@@ -1,5 +1,6 @@
 module Web3.Ui.FeeBreakdown exposing
     ( view
+    , Config
     , Slice
     )
 
@@ -7,7 +8,7 @@ module Web3.Ui.FeeBreakdown exposing
 provides labels, basis points, and (optionally) the Wei amount that slice will
 receive at the current trade size.
 
-    Web3.Ui.FeeBreakdown.view
+    Web3.Ui.FeeBreakdown.view []
         { totalBps = 150
         , symbol = "PLS"
         , decimals = 18
@@ -23,7 +24,7 @@ receive at the current trade size.
 Style classes: `web3-feebreakdown`, `web3-feebreakdown__row`, `web3-feebreakdown__label`,
 `web3-feebreakdown__bps`, `web3-feebreakdown__amount`, `web3-feebreakdown__total`.
 
-@docs view, Slice
+@docs view, Config, Slice
 
 -}
 
@@ -43,16 +44,21 @@ type alias Slice =
     }
 
 
-{-| Render the breakdown table. -}
-view :
+{-| The whole fee split. `gross` is the trade size the slices are taken from;
+`Nothing` renders the bps column without amounts.
+-}
+type alias Config =
     { totalBps : Int
     , symbol : String
     , decimals : Int
     , gross : Maybe BigInt
     , slices : List Slice
     }
-    -> Html msg
-view opts =
+
+
+{-| Render the breakdown table. -}
+view : List (Html.Attribute msg) -> Config -> Html msg
+view attrs opts =
     let
         rows =
             List.map (sliceRow opts) opts.slices
@@ -66,7 +72,7 @@ view opts =
                     [ Html.text (sliceAmount opts opts.totalBps) ]
                 ]
     in
-    Html.div [ Attr.class "web3-feebreakdown" ] (rows ++ [ totalRow ])
+    Html.div (Attr.class "web3-feebreakdown" :: attrs) (rows ++ [ totalRow ])
 
 
 sliceRow : { a | symbol : String, decimals : Int, gross : Maybe BigInt } -> Slice -> Html msg

@@ -3,7 +3,7 @@ module Web3.Ui.Deadline exposing (view, Config, toUnixDeadline)
 {-| Transaction deadline picker -- preset chips plus a custom minutes input,
 the sibling of `Web3.Ui.SlippageInput`.
 
-    Web3.Ui.Deadline.view
+    Web3.Ui.Deadline.view []
         { valueMinutes = model.deadlineMinutes
         , onChange = DeadlineChanged
         , presetsMinutes = [ 10, 20, 30 ]
@@ -39,10 +39,21 @@ toUnixDeadline minutes nowMillis =
     nowMillis // 1000 + minutes * 60
 
 
-{-| Render the picker. -}
-view : Config msg -> Html msg
-view cfg =
-    Html.div [ Attr.class "web3-deadline" ]
+{-| Render the picker.
+
+The root is the chip-plus-input group (`role="group"`), because the component
+is a set of controls rather than a single one -- there is no one control an
+`id` would belong on.
+
+-}
+view : List (Html.Attribute msg) -> Config msg -> Html msg
+view attrs cfg =
+    Html.div
+        (Attr.class "web3-deadline"
+            :: Attr.attribute "role" "group"
+            :: Attr.attribute "aria-label" "Transaction deadline"
+            :: attrs
+        )
         (List.map (chip cfg) cfg.presetsMinutes
             ++ [ customInput cfg ]
         )

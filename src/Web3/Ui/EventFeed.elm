@@ -24,7 +24,7 @@ enforces a cap so a hot contract can't grow your model without bound.
     { model | feed = EventFeed.push tokenCreated model.feed }
 
     -- VIEW
-    EventFeed.view
+    EventFeed.view []
         { onLoadMore = Just LoadOlder }   -- app fires a getLogs range query
         viewTokenCreated
         model.feed
@@ -120,8 +120,8 @@ type alias Config msg =
 
 {-| Render the feed: status chip, `aria-live` list, optional load-more.
 -}
-view : Config msg -> (item -> Html msg) -> Feed item -> Html msg
-view cfg viewItem (Feed f) =
+view : List (Html.Attribute msg) -> Config msg -> (item -> Html msg) -> Feed item -> Html msg
+view attrs cfg viewItem (Feed f) =
     let
         ( modifier, label ) =
             case f.status of
@@ -148,7 +148,7 @@ view cfg viewItem (Feed f) =
                 Nothing ->
                     []
     in
-    Html.div [ Attr.class "web3-eventfeed" ]
+    Html.div (Attr.class "web3-eventfeed" :: attrs)
         (Html.span
             [ Attr.class "web3-eventfeed__status"
             , Attr.class ("web3-eventfeed__status--" ++ modifier)

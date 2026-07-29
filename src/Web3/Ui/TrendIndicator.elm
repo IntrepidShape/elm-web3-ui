@@ -1,5 +1,6 @@
 module Web3.Ui.TrendIndicator exposing
     ( view
+    , Config
     , Trend(..)
     , fromVolumes
     )
@@ -9,7 +10,7 @@ trend-aware contract -- trend-detector outputs, lending-rate sentiment,
 DAO vote pressure indicators, etc.
 
     -- From explicit trend:
-    Web3.Ui.TrendIndicator.view
+    Web3.Ui.TrendIndicator.view []
         { trend = Web3.Ui.TrendIndicator.Down
         , buyVolume = buyVol
         , sellVolume = sellVol
@@ -26,7 +27,7 @@ DAO vote pressure indicators, etc.
                 , thresholdBps = 5800
                 }
     in
-    Web3.Ui.TrendIndicator.view
+    Web3.Ui.TrendIndicator.view []
         { trend = trend
         , buyVolume = buyVol
         , sellVolume = sellVol
@@ -39,7 +40,7 @@ USDC-denominated volume rendered 1e12 too small.
 Style classes: `web3-trend`, `web3-trend--up`, `web3-trend--neutral`,
 `web3-trend--down`, `web3-trend__arrow`, `web3-trend__pill`.
 
-@docs view, Trend, fromVolumes
+@docs view, Config, Trend, fromVolumes
 
 -}
 
@@ -84,9 +85,20 @@ fromVolumes opts =
         Neutral
 
 
+{-| The direction to show and the two volumes behind it. `decimals` scales
+both volume pills.
+-}
+type alias Config =
+    { trend : Trend
+    , buyVolume : BigInt
+    , sellVolume : BigInt
+    , decimals : Int
+    }
+
+
 {-| Render the indicator. `decimals` scales both volume pills. -}
-view : { trend : Trend, buyVolume : BigInt, sellVolume : BigInt, decimals : Int } -> Html msg
-view opts =
+view : List (Html.Attribute msg) -> Config -> Html msg
+view attrs opts =
     let
         ( arrow, modifier ) =
             case opts.trend of
@@ -100,7 +112,7 @@ view opts =
                     ( "↓", "down" )
     in
     Html.div
-        [ Attr.class ("web3-trend web3-trend--" ++ modifier) ]
+        (Attr.class ("web3-trend web3-trend--" ++ modifier) :: attrs)
         [ Html.span [ Attr.class "web3-trend__arrow", Attr.attribute "aria-hidden" "true" ]
             [ Html.text arrow ]
         , Html.span [ Attr.class "web3-trend__pill web3-trend__pill--buy", Attr.title "Buy volume" ]

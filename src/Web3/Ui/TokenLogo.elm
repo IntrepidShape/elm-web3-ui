@@ -10,14 +10,14 @@ of the symbol and picks one of eight hue classes from a character-code hash
 of the symbol -- so `"USDC"` is always the same colour everywhere it appears,
 with zero inline styles. Your stylesheet owns the actual palette.
 
-    Web3.Ui.TokenLogo.view
+    Web3.Ui.TokenLogo.view []
         { logoUrl = Just "https://tokens.example/usdc.png"
         , symbol = "USDC"
         , size = 24
         }
 
     -- No logo known -- renders the "FO" letter tile:
-    Web3.Ui.TokenLogo.view
+    Web3.Ui.TokenLogo.view []
         { logoUrl = Nothing, symbol = "FOO", size = 24 }
 
 The image is `loading="lazy"` (token lists are long) with `alt` set to the
@@ -51,41 +51,50 @@ type alias Config =
 
 {-| Render the logo image, or the letter-tile fallback when `logoUrl` is
 `Nothing`.
+
+`attrs` land on whichever of the two the config selects -- the `img` or the
+tile `span` -- so a layout class does not have to be applied per branch by
+the caller.
+
 -}
-view : Config -> Html msg
-view cfg =
+view : List (Html.Attribute msg) -> Config -> Html msg
+view attrs cfg =
     case cfg.logoUrl of
         Just url ->
             Html.img
-                [ Attr.class "web3-tokenlogo web3-tokenlogo--img"
-                , Attr.src url
-                , Attr.alt cfg.symbol
-                , Attr.attribute "loading" "lazy"
-                , Attr.width cfg.size
-                , Attr.height cfg.size
-                ]
+                ([ Attr.class "web3-tokenlogo web3-tokenlogo--img"
+                 , Attr.src url
+                 , Attr.alt cfg.symbol
+                 , Attr.attribute "loading" "lazy"
+                 , Attr.width cfg.size
+                 , Attr.height cfg.size
+                 ]
+                    ++ attrs
+                )
                 []
 
         Nothing ->
-            tile cfg
+            tile attrs cfg
 
 
 
 -- INTERNAL
 
 
-tile : Config -> Html msg
-tile cfg =
+tile : List (Html.Attribute msg) -> Config -> Html msg
+tile attrs cfg =
     let
         px =
             String.fromInt cfg.size
     in
     Html.span
-        [ Attr.class "web3-tokenlogo web3-tokenlogo--tile"
-        , Attr.class ("web3-tokenlogo--hue-" ++ String.fromInt (hue cfg.symbol))
-        , Attr.attribute "role" "img"
-        , Attr.attribute "aria-label" cfg.symbol
-        ]
+        ([ Attr.class "web3-tokenlogo web3-tokenlogo--tile"
+         , Attr.class ("web3-tokenlogo--hue-" ++ String.fromInt (hue cfg.symbol))
+         , Attr.attribute "role" "img"
+         , Attr.attribute "aria-label" cfg.symbol
+         ]
+            ++ attrs
+        )
         [ Svg.svg
             [ SA.viewBox "0 0 24 24"
             , SA.width px

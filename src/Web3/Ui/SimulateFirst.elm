@@ -153,8 +153,8 @@ type alias Config msg =
 
 
 {-| The one valid control per step, plus the preview/receipt/error surface. -}
-view : Config msg -> Step -> Html msg
-view cfg step =
+view : List (Html.Attribute msg) -> Config msg -> Step -> Html msg
+view attrs cfg step =
     let
         ( modifier, body ) =
             case step of
@@ -189,9 +189,10 @@ view cfg step =
                     )
     in
     Html.div
-        [ Attr.class "web3-simulate"
-        , Attr.class ("web3-simulate--" ++ modifier)
-        ]
+        (Attr.class "web3-simulate"
+            :: Attr.class ("web3-simulate--" ++ modifier)
+            :: attrs
+        )
         body
 
 

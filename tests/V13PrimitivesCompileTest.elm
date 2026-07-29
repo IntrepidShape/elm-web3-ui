@@ -28,7 +28,7 @@ suite =
     describe "v1.3.0 primitives compile + emit base class"
         [ test "VeLock" <|
             \_ ->
-                VeLock.view
+                VeLock.view []
                     { amount = BigInt.fromInt 1000
                     , amountInput = "1000"
                     , decimals = 18
@@ -45,7 +45,7 @@ suite =
                     |> Query.has [ Selector.class "web3-velock" ]
         , test "VeBalanceChart" <|
             \_ ->
-                VeBalanceChart.view
+                VeBalanceChart.view []
                     { amount = BigInt.fromInt 1000
                     , unlockTime = 200000
                     , maxLockSec = 126144000
@@ -57,7 +57,7 @@ suite =
                     |> Query.has [ Selector.class "web3-vebalancechart" ]
         , test "NFTStakeCard" <|
             \_ ->
-                NFTStakeCard.view
+                NFTStakeCard.view []
                     { tokenId = 7
                     , amount = BigInt.fromInt 1000
                     , symbol = "PULSE"
@@ -78,7 +78,7 @@ suite =
                     |> Query.has [ Selector.class "web3-nftstakecard" ]
         , test "BondCard" <|
             \_ ->
-                BondCard.view
+                BondCard.view []
                     { bondId = 3
                     , principal = BigInt.fromInt 100
                     , principalSymbol = "PLS"
@@ -96,7 +96,7 @@ suite =
                     |> Query.has [ Selector.class "web3-bondcard" ]
         , test "GaugeRow" <|
             \_ ->
-                GaugeRow.view
+                GaugeRow.view []
                     { gaugeLabel = "PULSE/PLS"
                     , epoch = 12
                     , currentEpoch = 12
@@ -116,7 +116,7 @@ suite =
                     |> Query.has [ Selector.class "web3-gaugerow" ]
         , test "FeeFlowDiagram" <|
             \_ ->
-                FeeFlowDiagram.view
+                FeeFlowDiagram.view []
                     { gross = BigInt.fromInt 1000
                     , symbol = "PLS"
                     , decimals = 18

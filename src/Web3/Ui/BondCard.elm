@@ -9,7 +9,7 @@ maturity (or rolled for another term). Generic for any term-deposit
 primitive (OHM-style bonds, fixed-term deposits, treasury bills, ...).
 
 ```elm
-Web3.Ui.BondCard.view
+Web3.Ui.BondCard.view []
     { bondId = receipt.id
     , principal = receipt.principal
     , principalSymbol = "PLS"
@@ -63,8 +63,8 @@ type alias Config msg =
 
 
 {-| Render the bond-receipt card. -}
-view : Config msg -> Html msg
-view cfg =
+view : List (Html.Attribute msg) -> Config msg -> Html msg
+view attrs cfg =
     let
         remaining =
             max 0 (cfg.maturitySec - cfg.nowSec)
@@ -99,7 +99,7 @@ view cfg =
                         ]
                         [ Html.text label ]
     in
-    Html.div [ Attr.class "web3-bondcard" ]
+    Html.div (Attr.class "web3-bondcard" :: attrs)
         [ Html.div [ Attr.class "web3-bondcard__id" ]
             [ Html.text ("#" ++ String.fromInt cfg.bondId) ]
         , Html.div [ Attr.class "web3-bondcard__principal" ]

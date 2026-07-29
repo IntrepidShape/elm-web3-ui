@@ -1,11 +1,11 @@
-module Web3.Ui.TradeTabs exposing (view, Tab)
+module Web3.Ui.TradeTabs exposing (view, Config, Tab)
 
 {-| Generic tab switcher for trade UIs (Buy / Sell / Stake, or any other
 named tab set). Single-select, button-based, accessible.
 
     type TradeTab = BuyTab | SellTab | StakeTab
 
-    Web3.Ui.TradeTabs.view
+    Web3.Ui.TradeTabs.view []
         { current = model.tradeTab
         , onSelect = ChangeTradeTab
         , tabs =
@@ -17,7 +17,7 @@ named tab set). Single-select, button-based, accessible.
 
 CSS classes: `web3-tradetabs`, `web3-tradetabs__tab`, `web3-tradetabs__tab--active`.
 
-@docs view, Tab
+@docs view, Config, Tab
 
 -}
 
@@ -33,18 +33,24 @@ type alias Tab id =
     }
 
 
-{-| Render the switcher. -}
-view :
+{-| Which tab is selected, where selections go, and the tab set. `id` is your
+app's tab type.
+-}
+type alias Config id msg =
     { current : id
     , onSelect : id -> msg
     , tabs : List (Tab id)
     }
-    -> Html msg
-view opts =
+
+
+{-| Render the switcher. -}
+view : List (Html.Attribute msg) -> Config id msg -> Html msg
+view attrs opts =
     Html.div
-        [ Attr.class "web3-tradetabs"
-        , Attr.attribute "role" "tablist"
-        ]
+        (Attr.class "web3-tradetabs"
+            :: Attr.attribute "role" "tablist"
+            :: attrs
+        )
         (List.map (tabButton opts) opts.tabs)
 
 

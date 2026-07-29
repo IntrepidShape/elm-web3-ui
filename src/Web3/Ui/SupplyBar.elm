@@ -2,13 +2,14 @@ module Web3.Ui.SupplyBar exposing
     ( view
     , withMilestone
     , Config
+    , MilestoneConfig
     )
 
 {-| Progress bar for any "how full is X" metric -- token supply against a cap,
 graduation reserves toward a threshold, vault deposits toward an issuance limit.
 
     -- Bare usage:
-    Web3.Ui.SupplyBar.view
+    Web3.Ui.SupplyBar.view []
         { current = curve.supply
         , max = maxSupply
         , decimals = 18
@@ -17,7 +18,7 @@ graduation reserves toward a threshold, vault deposits toward an issuance limit.
 
     -- With a milestone marker (e.g., the bonding-curve graduation threshold
     -- sitting partway along a max-reserve bar):
-    Web3.Ui.SupplyBar.withMilestone
+    Web3.Ui.SupplyBar.withMilestone []
         { current = curve.curvePls
         , max = totalCapacity
         , decimals = 18
@@ -36,7 +37,7 @@ The fill percentage is computed by dividing in `BigInt` space and is emitted
 with two decimal places, so a bar at 1 part in 10000 of a 2^255 cap is still
 positioned correctly. No amount is routed through `Float`.
 
-@docs view, withMilestone, Config
+@docs view, withMilestone, Config, MilestoneConfig
 
 -}
 
@@ -56,10 +57,22 @@ type alias Config =
     }
 
 
+{-| [`Config`](#Config) plus an optional marker positioned at `milestone.at`
+along the `[0, max]` range.
+-}
+type alias MilestoneConfig =
+    { current : BigInt
+    , max : BigInt
+    , decimals : Int
+    , milestone : Maybe { at : BigInt, label : String }
+    , label : Maybe String
+    }
+
+
 {-| Render a progress bar without a milestone marker. -}
-view : Config -> Html msg
-view cfg =
-    withMilestone
+view : List (Html.Attribute msg) -> Config -> Html msg
+view attrs cfg =
+    withMilestone attrs
         { current = cfg.current
         , max = cfg.max
         , decimals = cfg.decimals
@@ -70,15 +83,8 @@ view cfg =
 
 {-| Render a progress bar, optionally annotated with a milestone marker
 positioned at `milestone.at` along the `[0, max]` range. -}
-withMilestone :
-    { current : BigInt
-    , max : BigInt
-    , decimals : Int
-    , milestone : Maybe { at : BigInt, label : String }
-    , label : Maybe String
-    }
-    -> Html msg
-withMilestone opts =
+withMilestone : List (Html.Attribute msg) -> MilestoneConfig -> Html msg
+withMilestone attrs opts =
     let
         pct =
             percentHundredths opts.current opts.max
@@ -111,7 +117,7 @@ withMilestone opts =
                         , Html.text (Amount.formatWei opts.decimals opts.max)
                         ]
     in
-    Html.div [ Attr.class "web3-supplybar" ]
+    Html.div (Attr.class "web3-supplybar" :: attrs)
         [ Html.div
             [ Attr.class "web3-supplybar__fill"
             , Attr.style "width" (pctStyle pct)

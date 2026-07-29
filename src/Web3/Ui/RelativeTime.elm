@@ -1,9 +1,9 @@
-module Web3.Ui.RelativeTime exposing (view, format)
+module Web3.Ui.RelativeTime exposing (view, Config, format)
 
 {-| Compact relative-time string for transaction ages, position open dates,
 graduation timestamps -- anywhere a dapp shows "how long ago".
 
-    Web3.Ui.RelativeTime.view { nowSec = model.nowSec, atSec = tx.timestamp }
+    Web3.Ui.RelativeTime.view [] { nowSec = model.nowSec, atSec = tx.timestamp }
     --> "2m ago" / "3h ago" / "1d ago" / "Apr 12"
 
 For non-Html callers (e.g., row labels):
@@ -14,7 +14,7 @@ For non-Html callers (e.g., row labels):
 CSS class on the rendered span: `web3-relativetime`. The full RFC-style
 timestamp (ISO-like seconds) is set as a `title` attribute for hover.
 
-@docs view, format
+@docs view, Config, format
 
 -}
 
@@ -22,14 +22,24 @@ import Html exposing (Html)
 import Html.Attributes as Attr
 
 
+{-| The instant being described and the instant it is described from, both in
+Unix seconds.
+-}
+type alias Config =
+    { nowSec : Int
+    , atSec : Int
+    }
+
+
 {-| Render the relative time string inside a span with a `title` showing the
 absolute Unix seconds for accessibility / hover. -}
-view : { nowSec : Int, atSec : Int } -> Html msg
-view opts =
+view : List (Html.Attribute msg) -> Config -> Html msg
+view attrs opts =
     Html.span
-        [ Attr.class "web3-relativetime"
-        , Attr.title (String.fromInt opts.atSec ++ "s")
-        ]
+        (Attr.class "web3-relativetime"
+            :: Attr.title (String.fromInt opts.atSec ++ "s")
+            :: attrs
+        )
         [ Html.text (format opts) ]
 
 
@@ -45,7 +55,7 @@ Buckets:
 
 Negative deltas (future) render as "in Ns" / "in Nm" / etc.
 -}
-format : { nowSec : Int, atSec : Int } -> String
+format : Config -> String
 format { nowSec, atSec } =
     let
         delta =

@@ -18,7 +18,7 @@ The component does not enforce these -- caller passes `Nothing` for actions
 that should be hidden in the current state.
 
 ```elm
-Web3.Ui.GaugeRow.view
+Web3.Ui.GaugeRow.view []
     { gaugeLabel = gauge.label
     , epoch = gauge.epoch
     , currentEpoch = market.currentEpoch
@@ -73,8 +73,8 @@ type alias Config msg =
 
 
 {-| Render the row. -}
-view : Config msg -> Html msg
-view cfg =
+view : List (Html.Attribute msg) -> Config msg -> Html msg
+view attrs cfg =
     let
         closed =
             cfg.epoch < cfg.currentEpoch
@@ -110,7 +110,7 @@ view cfg =
                         ]
                         [ Html.text label ]
     in
-    Html.div [ Attr.class "web3-gaugerow" ]
+    Html.div (Attr.class "web3-gaugerow" :: attrs)
         [ Html.div [ Attr.class "web3-gaugerow__label" ]
             [ Html.text cfg.gaugeLabel ]
         , Html.div [ Attr.class epochClass ]

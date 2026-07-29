@@ -11,7 +11,7 @@ The reward is frequently a different token from the stake, so it carries its own
 `yieldDecimals`: formatting a 6-decimal reward with an 18-decimal stake token's
 scale understates it by a factor of 1e12.
 
-    Web3.Ui.StakeCard.view
+    Web3.Ui.StakeCard.view []
         { amount = position.amount
         , symbol = "TKN"
         , decimals = 18
@@ -61,8 +61,8 @@ type alias Config msg =
 
 
 {-| Render a stake-position card. -}
-view : Config msg -> Html msg
-view cfg =
+view : List (Html.Attribute msg) -> Config msg -> Html msg
+view attrs cfg =
     let
         elapsedSec =
             max 0 (cfg.nowSec - cfg.startTimeSec)
@@ -106,7 +106,7 @@ view cfg =
                         ]
                         [ Html.text label ]
     in
-    Html.div [ Attr.class "web3-stakecard" ]
+    Html.div (Attr.class "web3-stakecard" :: attrs)
         [ Html.div [ Attr.class "web3-stakecard__amount" ]
             [ Html.text (Amount.formatWei cfg.decimals cfg.amount)
             , Html.text " "

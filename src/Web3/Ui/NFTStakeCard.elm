@@ -21,7 +21,7 @@ Two countdowns are tracked independently:
     (the wash-trade-immunity property).
 
 ```elm
-Web3.Ui.NFTStakeCard.view
+Web3.Ui.NFTStakeCard.view []
     { tokenId = position.id
     , amount = position.amount
     , symbol = "PULSE"
@@ -78,8 +78,8 @@ type alias Config msg =
 
 
 {-| Render the NFT stake-position card. -}
-view : Config msg -> Html msg
-view cfg =
+view : List (Html.Attribute msg) -> Config msg -> Html msg
+view attrs cfg =
     let
         unlockRemaining =
             max 0 (cfg.unlockTimeSec - cfg.nowSec)
@@ -124,7 +124,7 @@ view cfg =
                         ]
                         [ Html.text label ]
     in
-    Html.div [ Attr.class "web3-nftstakecard" ]
+    Html.div (Attr.class "web3-nftstakecard" :: attrs)
         [ Html.div [ Attr.class "web3-nftstakecard__id" ]
             [ Html.text ("#" ++ String.fromInt cfg.tokenId) ]
         , Html.div [ Attr.class "web3-nftstakecard__amount" ]

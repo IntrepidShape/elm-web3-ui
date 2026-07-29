@@ -1,7 +1,7 @@
 module Web3.Ui.PaginatedLogs exposing
     ( Pager, Range
     , init, next, onLoaded, exhausted, loadedCount
-    , loadMoreButton
+    , loadMoreButton, Config
     )
 
 {-| Block-range windowed `eth_getLogs` paging -- newest window first, walking
@@ -25,7 +25,7 @@ CSS classes: `web3-pagedlogs__more`.
 
 @docs Pager, Range
 @docs init, next, onLoaded, exhausted, loadedCount
-@docs loadMoreButton
+@docs loadMoreButton, Config
 
 -}
 
@@ -114,13 +114,30 @@ loadedCount (Pager p) =
     p.loaded
 
 
-{-| A load-more button that disappears at genesis. -}
-loadMoreButton : { onLoadMore : msg, label : String } -> Pager -> Html msg
-loadMoreButton cfg pager =
+{-| What the load-more button says and what it fires. -}
+type alias Config msg =
+    { onLoadMore : msg
+    , label : String
+    }
+
+
+{-| A load-more button that disappears at genesis.
+
+At genesis the whole button is gone, so there is no element left to carry
+`attrs` -- the same convention as
+[`Web3.Ui.PendingOverlay.conditionalView`](Web3-Ui-PendingOverlay#conditionalView).
+Style the surrounding slot, not this node, if you need a stable box.
+
+-}
+loadMoreButton : List (Html.Attribute msg) -> Config msg -> Pager -> Html msg
+loadMoreButton attrs cfg pager =
     if exhausted pager then
         Html.text ""
 
     else
         Html.button
-            [ Attr.class "web3-pagedlogs__more", Events.onClick cfg.onLoadMore ]
+            (Attr.class "web3-pagedlogs__more"
+                :: Events.onClick cfg.onLoadMore
+                :: attrs
+            )
             [ Html.text cfg.label ]
