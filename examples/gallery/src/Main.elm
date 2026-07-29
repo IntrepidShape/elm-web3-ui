@@ -166,7 +166,7 @@ init =
     , queue =
         TxQueue.empty
             |> TxQueue.begin "q1" "Approve FOO"
-            |> TxQueue.update "q1" (Tx.TxSubmitted demoHashStr)
+            |> TxQueue.update "q1" (Tx.TxSubmitted Nothing demoHashStr)
             |> TxQueue.begin "q2" "Stake 50k FOO"
     , revertDismissed = False
     , pairValue = "50000"
@@ -358,22 +358,23 @@ advanceTx status =
             Tx.AwaitingSignature
 
         Tx.AwaitingSignature ->
-            Tx.update (Tx.TxSubmitted demoHashStr) status
+            Tx.update (Tx.TxSubmitted Nothing demoHashStr) status
 
         Tx.Submitted _ ->
-            Tx.update (Tx.TxConfirmation demoHashStr 1) status
+            Tx.update (Tx.TxConfirmation Nothing demoHashStr 1) status
 
         Tx.Confirming _ n ->
             if n < 3 then
-                Tx.update (Tx.TxConfirmation demoHashStr (n + 1)) status
+                Tx.update (Tx.TxConfirmation Nothing demoHashStr (n + 1)) status
 
             else
                 Tx.update
-                    (Tx.TxConfirmed
+                    (Tx.TxConfirmed Nothing
                         { txHash = demoHashStr
                         , blockNumber = 21688204
                         , gasUsed = "48213"
                         , status = True
+                        , contractAddress = Nothing
                         , logs = []
                         }
                     )
@@ -612,11 +613,11 @@ view model =
                 [ button (FlowMsg (Flow.AllowanceLoaded (wei "0"))) "allowance: 0"
                 , button (FlowMsg (Flow.AllowanceLoaded (wei "2000000000000000000"))) "allowance: plenty"
                 , button FlowStartApprove "approve"
-                , button (FlowMsg (Flow.ApproveTx (Tx.TxSubmitted demoHashStr))) "approve submitted"
-                , button (FlowMsg (Flow.ApproveTx (Tx.TxConfirmed demoReceiptJson))) "approve confirmed"
+                , button (FlowMsg (Flow.ApproveTx (Tx.TxSubmitted Nothing demoHashStr))) "approve submitted"
+                , button (FlowMsg (Flow.ApproveTx (Tx.TxConfirmed Nothing demoReceiptJson))) "approve confirmed"
                 , button FlowStartAction "act"
-                , button (FlowMsg (Flow.ActionTx (Tx.TxSubmitted demoHashStr))) "act submitted"
-                , button (FlowMsg (Flow.ActionTx (Tx.TxConfirmed demoReceiptJson))) "act confirmed"
+                , button (FlowMsg (Flow.ActionTx (Tx.TxSubmitted Nothing demoHashStr))) "act submitted"
+                , button (FlowMsg (Flow.ActionTx (Tx.TxConfirmed Nothing demoReceiptJson))) "act confirmed"
                 , button FlowReset "reset"
                 ]
                 (Flow.view []
@@ -667,9 +668,9 @@ view model =
                 [ button SimStart "simulate"
                 , button SimOk "sim ok"
                 , button SimConfirm "confirm"
-                , button (SimTx (Tx.TxSubmitted demoHashStr)) "submitted"
-                , button (SimTx (Tx.TxConfirmed demoReceiptJson)) "confirmed"
-                , button (SimTx Tx.TxRejected) "reject"
+                , button (SimTx (Tx.TxSubmitted Nothing demoHashStr)) "submitted"
+                , button (SimTx (Tx.TxConfirmed Nothing demoReceiptJson)) "confirmed"
+                , button (SimTx (Tx.TxRejected Nothing)) "reject"
                 , button SimReset "reset"
                 ]
                 (SimulateFirst.view []
@@ -771,9 +772,25 @@ errorStringRevert =
         ++ "7263686173650000000000000000000000000000000000000000000000000000"
 
 
-demoReceiptJson : { txHash : String, blockNumber : Int, gasUsed : String, status : Bool, logs : List { address : String, topics : List String, data : String, blockNumber : Int, logIndex : Int } }
+-- NOTE: Web3.Transaction.ReceiptJson is not exposed, so this annotation has to
+-- restate the shape structurally and will drift whenever the record changes --
+-- which it just did (contractAddress). Worth exposing upstream.
+demoReceiptJson :
+    { txHash : String
+    , blockNumber : Int
+    , gasUsed : String
+    , status : Bool
+    , contractAddress : Maybe String
+    , logs : List { address : String, topics : List String, data : String, blockNumber : Int, logIndex : Int }
+    }
 demoReceiptJson =
-    { txHash = demoHashStr, blockNumber = 21688204, gasUsed = "48213", status = True, logs = [] }
+    { txHash = demoHashStr
+    , blockNumber = 21688204
+    , gasUsed = "48213"
+    , status = True
+    , contractAddress = Nothing
+    , logs = []
+    }
 
 
 {-| Walk a queued tx one step along its lifecycle. -}
@@ -783,17 +800,17 @@ nextQueueMsg id queue =
         Just ( _, e ) ->
             case e.status of
                 Tx.AwaitingSignature ->
-                    Tx.TxSubmitted demoHashStr
+                    Tx.TxSubmitted Nothing demoHashStr
 
                 Tx.Submitted _ ->
-                    Tx.TxConfirmation demoHashStr 1
+                    Tx.TxConfirmation Nothing demoHashStr 1
 
                 Tx.Confirming _ n ->
                     if n < 2 then
-                        Tx.TxConfirmation demoHashStr (n + 1)
+                        Tx.TxConfirmation Nothing demoHashStr (n + 1)
 
                     else
-                        Tx.TxConfirmed demoReceiptJson
+                        Tx.TxConfirmed Nothing demoReceiptJson
 
                 _ ->
                     Tx.TxReset
@@ -833,7 +850,7 @@ walletScene index =
             connectedOn 1
 
         _ ->
-            Wallet.Error "user closed the wallet"
+            Wallet.Error (Wallet.ConnectFailed Wallet.NoAccounts "user closed the wallet")
 
 
 {-| Drive the real state machine to a connected state, exactly as the port

@@ -81,9 +81,9 @@ simMsgFuzzer =
             (Fuzz.oneOf [ Fuzz.map Ok Fuzz.string, Fuzz.map Err Fuzz.string ])
         , Fuzz.map SF.onTx
             (Fuzz.oneOf
-                [ Fuzz.constant (Tx.TxSubmitted "0xabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcd")
-                , Fuzz.constant Tx.TxRejected
-                , Fuzz.map Tx.TxFailed Fuzz.string
+                [ Fuzz.constant (Tx.TxSubmitted Nothing "0xabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcd")
+                , Fuzz.constant (Tx.TxRejected Nothing)
+                , Fuzz.map (Tx.TxFailed Nothing) Fuzz.string
                 ]
             )
         , Fuzz.constant SF.reset
@@ -115,7 +115,7 @@ simulateFirstTests =
             \preview ->
                 SF.Previewing preview
                     |> SF.confirm
-                    |> SF.onTx Tx.TxRejected
+                    |> SF.onTx (Tx.TxRejected Nothing)
                     |> Expect.equal (SF.Previewing preview)
         , test "confirm only opens from Previewing" <|
             \_ ->

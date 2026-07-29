@@ -79,6 +79,12 @@ statusBadge attrs status =
                 Tx.Confirmed _ ->
                     ( "Confirmed", "web3-tx-badge--confirmed" )
 
+                Tx.RevertedOnChain _ ->
+                    -- Mined, and it failed. Distinct from Failed (which never
+                    -- made it on chain) and emphatically not Confirmed, which
+                    -- is where this used to land.
+                    ( "Reverted", "web3-tx-badge--reverted" )
+
                 Tx.Failed _ ->
                     ( "Failed", "web3-tx-badge--failed" )
 
@@ -176,6 +182,11 @@ statusHashLink attrs opts status =
             Just (hashDisplay attrs opts hash)
 
         Tx.Confirmed receipt ->
+            Just (hashDisplay attrs opts receipt.txHash)
+
+        Tx.RevertedOnChain receipt ->
+            -- A reverted tx is on chain and is precisely the one a user wants
+            -- to open in the explorer. The catch-all below used to hide it.
             Just (hashDisplay attrs opts receipt.txHash)
 
         _ ->

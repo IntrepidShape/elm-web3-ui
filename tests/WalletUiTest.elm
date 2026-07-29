@@ -157,6 +157,9 @@ txStatusLabel status =
         Tx.Confirmed _ ->
             "Confirmed"
 
+        Tx.RevertedOnChain _ ->
+            "Reverted"
+
         Tx.Failed _ ->
             "Failed"
 

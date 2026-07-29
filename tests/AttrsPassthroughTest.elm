@@ -277,7 +277,7 @@ suite =
                 \_ ->
                     TxQueue.toastStack [ probe ]
                         { onDismiss = Dismissed, explorerUrl = Nothing }
-                        (TxQueue.update "q1" (Tx.TxSubmitted hashString) (TxQueue.begin "q1" "Approve" TxQueue.empty))
+                        (TxQueue.update "q1" (Tx.TxSubmitted Nothing hashString) (TxQueue.begin "q1" "Approve" TxQueue.empty))
                         |> Query.fromHtml
                         |> Query.has [ Selector.attribute probe, Selector.class "web3-txq" ]
             ]

@@ -183,7 +183,7 @@ viewState attrs callbacks state =
                 ]
 
             Wallet.Error err ->
-                [ Html.span [] [ Html.text ("Error: " ++ err) ]
+                [ Html.span [] [ Html.text ("Error: " ++ Wallet.failureMessage err) ]
                 , connectButton [] { onConnect = callbacks.onConnect, onDisconnect = callbacks.onDisconnect } state
                 ]
         )

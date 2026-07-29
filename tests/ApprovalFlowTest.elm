@@ -33,19 +33,20 @@ validHash =
     "0xabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcd"
 
 
-receipt : { txHash : String, blockNumber : Int, gasUsed : String, status : Bool, logs : List { address : String, topics : List String, data : String, blockNumber : Int, logIndex : Int } }
+receipt : { txHash : String, blockNumber : Int, gasUsed : String, status : Bool, contractAddress : Maybe String, logs : List { address : String, topics : List String, data : String, blockNumber : Int, logIndex : Int } }
 receipt =
-    { txHash = validHash, blockNumber = 1, gasUsed = "21000", status = True, logs = [] }
+    { txHash = validHash, blockNumber = 1, gasUsed = "21000", status = True, contractAddress = Nothing
+    , logs = [] }
 
 
 txMsgFuzzer : Fuzzer Tx.Msg
 txMsgFuzzer =
     Fuzz.oneOf
-        [ Fuzz.constant (Tx.TxSubmitted validHash)
-        , Fuzz.map (Tx.TxConfirmation validHash) (Fuzz.intRange 1 5)
-        , Fuzz.constant (Tx.TxConfirmed receipt)
-        , Fuzz.map Tx.TxFailed Fuzz.string
-        , Fuzz.constant Tx.TxRejected
+        [ Fuzz.constant (Tx.TxSubmitted Nothing validHash)
+        , Fuzz.map (Tx.TxConfirmation Nothing validHash) (Fuzz.intRange 1 5)
+        , Fuzz.constant (Tx.TxConfirmed Nothing receipt)
+        , Fuzz.map (Tx.TxFailed Nothing) Fuzz.string
+        , Fuzz.constant (Tx.TxRejected Nothing)
         , Fuzz.constant Tx.TxReset
         ]
 
@@ -108,21 +109,21 @@ suite =
                     |> Expect.equal ( ReadyToAct, ApprovalNeeded )
         , test "rejecting the approve returns to ApprovalNeeded (not Blocked)" <|
             \_ ->
-                Flow.update req (ApproveTx Tx.TxRejected) (Approving Tx.AwaitingSignature)
+                Flow.update req (ApproveTx (Tx.TxRejected Nothing)) (Approving Tx.AwaitingSignature)
                     |> Expect.equal ApprovalNeeded
         , test "rejecting the action returns to ReadyToAct (not Blocked)" <|
             \_ ->
-                Flow.update req (ActionTx Tx.TxRejected) (Acting Tx.AwaitingSignature)
+                Flow.update req (ActionTx (Tx.TxRejected Nothing)) (Acting Tx.AwaitingSignature)
                     |> Expect.equal ReadyToAct
         , test "confirmed approval re-checks the allowance (chain is the truth)" <|
             \_ ->
                 submittedApprove
-                    |> Flow.update req (ApproveTx (Tx.TxConfirmed receipt))
+                    |> Flow.update req (ApproveTx (Tx.TxConfirmed Nothing receipt))
                     |> Expect.equal CheckingAllowance
         , test "confirmed action completes the flow" <|
             \_ ->
                 submittedAction
-                    |> Flow.update req (ActionTx (Tx.TxConfirmed receipt))
+                    |> Flow.update req (ActionTx (Tx.TxConfirmed Nothing receipt))
                     |> expectCompleted
         ]
 
@@ -132,12 +133,12 @@ by the guarded Tx machine).
 -}
 submittedApprove : Step
 submittedApprove =
-    Flow.update req (ApproveTx (Tx.TxSubmitted validHash)) (Approving Tx.AwaitingSignature)
+    Flow.update req (ApproveTx (Tx.TxSubmitted Nothing validHash)) (Approving Tx.AwaitingSignature)
 
 
 submittedAction : Step
 submittedAction =
-    Flow.update req (ActionTx (Tx.TxSubmitted validHash)) (Acting Tx.AwaitingSignature)
+    Flow.update req (ActionTx (Tx.TxSubmitted Nothing validHash)) (Acting Tx.AwaitingSignature)
 
 
 anyReceipt : Tx.Receipt
@@ -146,6 +147,7 @@ anyReceipt =
     , blockNumber = 1
     , gasUsed = "21000"
     , status = True
+    , contractAddress = Nothing
     , logs = []
     }
 

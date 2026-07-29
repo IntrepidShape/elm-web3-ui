@@ -23,14 +23,14 @@ suite =
                     Q.empty
                         |> Q.begin "a" "Approve"
                         |> Q.begin "b" "Stake"
-                        |> Q.update "a" (Tx.TxSubmitted validHash)
+                        |> Q.update "a" (Tx.TxSubmitted Nothing validHash)
                         |> Q.entries
                         |> List.map (\( id, e ) -> ( id, Tx.isPending e.status ))
                         |> Expect.equal [ ( "a", True ), ( "b", True ) ]
             , test "unknown id is ignored — no ghost entries" <|
                 \_ ->
                     Q.empty
-                        |> Q.update "ghost" (Tx.TxSubmitted validHash)
+                        |> Q.update "ghost" (Tx.TxSubmitted Nothing validHash)
                         |> Q.entries
                         |> Expect.equal []
             , test "pendingCount counts only in-flight" <|
@@ -38,7 +38,7 @@ suite =
                     Q.empty
                         |> Q.begin "a" "Approve"
                         |> Q.begin "b" "Stake"
-                        |> Q.update "b" Tx.TxRejected
+                        |> Q.update "b" (Tx.TxRejected Nothing)
                         |> Q.pendingCount
                         |> Expect.equal 1
             , test "dismiss removes the entry" <|

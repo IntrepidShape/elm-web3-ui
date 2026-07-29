@@ -159,6 +159,14 @@ button.web3-pill:hover { border-color: var(--accent-dim); }
 .web3-tx-badge--pending { color: var(--warn); border-color: #4d3a1e; animation: pulse 1.6s ease-in-out infinite; }
 .web3-tx-badge--confirmed { color: var(--accent); border-color: var(--accent-dim); }
 .web3-tx-badge--failed, .web3-tx-badge--rejected { color: var(--danger); border-color: #55232b; }
+/* Mined, and it failed. Deliberately not the confirmed colour -- this state
+   used to render as "Confirmed" and that was the bug. */
+.web3-tx-badge--reverted { color: #e0913a; border-color: #5a3f1c; }
+
+/* ChainGate gained a real root element in 3.0.0 so caller attributes have
+   somewhere to land; before that it returned its child unchanged. */
+.web3-chaingate { display: contents; }
+.web3-chaingate--wrong-chain { display: block; opacity: .95; }
 @keyframes pulse { 50% { opacity: .55; } }
 
 .web3-action-btn {

@@ -1,5 +1,71 @@
 # Changelog
 
+## 4.0.0 — 2026-07-29
+
+MAJOR. Requires `intrepidshape/elm-web3` >= 3.0.0. Two changes: every view now
+accepts caller attributes, and a reverted transaction is finally rendered as
+reverted.
+
+### Changed — every view takes attributes (BREAKING, and mechanical)
+
+`README.md` has always promised that every function takes
+`List (Html.Attribute msg)` as its first argument. It was true of 8 of 39
+modules. Consumers could not attach an `id`, a `data-testid`, an
+`aria-describedby`, a layout class or an event handler to the root of most of
+this library, so anyone needing slightly different behaviour had to copy the
+module -- which is what both downstream apps did, one of them reimplementing
+this library's own Layer 0 in 687 lines.
+
+All **83** exposed view-producing functions across all 52 modules now take
+attributes first and merge them onto their root, applied after the library's
+own classes so a caller can override where the platform allows.
+
+**Migration:** insert `[]` as the first argument at every call site. That is
+the whole migration for most consumers -- 24 lines in this repo's own gallery.
+
+Two entry points were also renamed to `view` for consistency:
+`ChainGate.chainGate` and `BondingCurve.sparkline`.
+
+Fifteen anonymous config records became named exposed `Config` types
+(`ActivityRow`, `Amount`, `BondingCurve`, `ChainGate`, `FeeBreakdown`,
+`FeeFlowDiagram`, `PaginatedLogs`, `ProgressRing`, `RelativeTime`, `StatCell`,
+`SupplyBar.MilestoneConfig`, `TokenSearch`, `TradeTabs`, `TrendIndicator`,
+`VeBalanceChart`), because a consumer cannot write a function returning a type
+that has no name.
+
+**`ChainGate` had no root element at all** -- it returned its caller-supplied
+child unchanged, so there was nowhere for attributes to go. It now renders a
+real root, which also let its two adjacent `Html msg` arguments become the
+named fields `wrongChain` and `content`. Transposing those used to compile
+fine and show the app on the wrong network; it is now a type error.
+
+Three wrapper-around-one-control modules (`Amount.amountInput`,
+`TokenSearch.view`, `LockPeriod.view`) gained an `inputAttrs` field, because
+`id`, `disabled` and `aria-describedby` belong on the control rather than the
+wrapper.
+
+### Fixed — a reverted transaction rendered as confirmed
+
+elm-web3 3.0.0 splits `Status` into `Confirmed` and `RevertedOnChain`.
+`statusBadge` now shows a distinct "Reverted" state, and `statusHashLink`
+returns the hash for it -- a catch-all was previously swallowing the one
+transaction a user most wants to open in an explorer.
+
+Note the compiler could not have caught this: the catch-alls meant this
+package compiled clean against the new constructor while silently mishandling
+it. The bug was surfaced by a downstream application, not by the library.
+
+### Verification
+
+`scripts/check-attrs-passthrough.ts` makes the attribute-passthrough promise
+machine-enforced rather than aspirational, which is how it drifted to 8-of-39
+unnoticed. It catches the failure `elm make` cannot see -- the correct
+signature with the parameter bound to `_` and silently dropped -- and its
+parser is cross-validated against `elm make --docs` so it cannot pass by
+failing to see a module. `--self-test` proves it detects an injected violation
+of each class.
+
+
 ## 3.0.0 — 2026-07-23
 
 MAJOR because seven exposed `Config` records gained a field. The migration is

@@ -36,6 +36,7 @@ suite =
                                     , blockNumber = 1
                                     , gasUsed = "21000"
                                     , status = True
+                                    , contractAddress = Nothing
                                     , logs = []
                                     }
                                 )
@@ -97,6 +98,7 @@ suite =
                                     , blockNumber = 1
                                     , gasUsed = "21000"
                                     , status = True
+                                    , contractAddress = Nothing
                                     , logs = []
                                     }
                                 )
@@ -116,6 +118,7 @@ suite =
                                 , blockNumber = 100
                                 , gasUsed = "21000"
                                 , status = True
+                                , contractAddress = Nothing
                                 , logs = []
                                 }
                                 |> Query.fromHtml
@@ -133,6 +136,7 @@ suite =
                                 , blockNumber = 100
                                 , gasUsed = "21000"
                                 , status = True
+                                , contractAddress = Nothing
                                 , logs = []
                                 }
                                 |> Query.fromHtml
@@ -150,6 +154,7 @@ suite =
                                 , blockNumber = 100
                                 , gasUsed = "21000"
                                 , status = False
+                                , contractAddress = Nothing
                                 , logs = []
                                 }
                                 |> Query.fromHtml
